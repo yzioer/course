@@ -33,7 +33,7 @@ public class SimulationInfo extends Persistable {
 
 	public SimulationInfo(Checksum checksum, GitSimulationHandle handle) {
 		this(checksum);
-		this.name = handle.getName();
+		this.name = handle.getBranch();
 		this.sourceUrl = handle.getBrowsableURL("com.agentecon.Simulation").toString();
 	}
 

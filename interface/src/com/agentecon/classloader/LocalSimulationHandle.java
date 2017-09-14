@@ -32,6 +32,10 @@ public class LocalSimulationHandle extends SimulationHandle {
 	public String getDescription() {
 		return "Simulation loader from local file system";
 	}
+	
+	public String getBranch() {
+		return "local";
+	}
 
 	public String getAuthor() {
 		return getOwner();

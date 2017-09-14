@@ -28,16 +28,15 @@ public class SimulationServer extends VisServer {
 
 	public SimulationServer(int port) throws IOException, InterruptedException {
 		super(port);
-		String owner = "meisserecon";
-		String repo = "agentecon";
 
 		this.simulations = new ListMethod();
 		LocalSimulationHandle local = new LocalSimulationHandle();
 		if (local.isPresent()) {
 			this.simulations.add(new LocalSimulationHandle());
 		}
-		this.simulations.add(new GitSimulationHandle(owner, repo, "master"));
-		this.simulations.add(new GitSimulationHandle(owner, repo, "demo"));
+		this.simulations.add(new GitSimulationHandle("meisser", "course", "master"));
+		this.simulations.add(new GitSimulationHandle("meisser", "course", "ex1-hermit"));
+		this.simulations.add(new GitSimulationHandle("meisserecon", "agentecon", "demo"));
 		// this.simulations.add(new GitSimulationHandle(owner, repo, "multigoodtag"));
 
 		this.methods = new MethodsMethod();

@@ -17,13 +17,15 @@ public abstract class SimulationHandle {
 		this.name = name;
 	}
 
-	public String getName() {
+	public String getRepo() {
 		return name;
 	}
 
 	public String getOwner() {
 		return owner;
 	}
+	
+	public abstract String getBranch();
 	
 	public abstract boolean isPresent() throws IOException;
 	

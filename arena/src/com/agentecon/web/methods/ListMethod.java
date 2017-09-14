@@ -29,7 +29,7 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	public void add(SimulationHandle handle) {
-		this.handles.put(handle.getName(), handle);
+		this.handles.put(handle.getBranch(), handle);
 	}
 	
 	public synchronized SimulationStepper getSimulation(SimulationHandle handle) throws IOException {
@@ -74,7 +74,7 @@ public class ListMethod extends WebApiMethod {
 
 		public SimulationInfo(SimulationHandle handle) {
 			this.owner = handle.getOwner();
-			this.path = handle.getName();
+			this.path = handle.getBranch();
 			this.sourceUrl = handle.getBrowsableURL(SimulationLoader.SIM_CLASS).toExternalForm();
 		}
 		

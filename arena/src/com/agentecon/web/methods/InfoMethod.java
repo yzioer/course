@@ -45,7 +45,7 @@ public class InfoMethod extends SimSpecificMethod {
 		public int days;
 
 		public Info(SimulationHandle handle, SimulationConfig config) {
-			this.name = handle.getName();
+			this.name = handle.getBranch();
 			this.simulationSourceURL = handle.getBrowsableURL(SimulationLoader.SIM_CLASS).toExternalForm();
 
 			this.configurationName = config.getName();

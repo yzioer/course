@@ -23,30 +23,35 @@ import com.agentecon.metric.SimStats;
 public class ExcelWriter {
 
 	private File folder;
-	
-	public ExcelWriter(File folder){
+
+	public ExcelWriter(File folder) {
 		folder.mkdirs();
 		assert folder.exists();
 		this.folder = folder;
 	}
-	
-	public void export(SimStats stats) throws IOException, NoInterestingTimeSeriesFoundException{
+
+	public void export(SimStats stats) throws IOException, NoInterestingTimeSeriesFoundException {
 		File file = getNewFile(stats.getName());
-		try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))){
-			stats.print(writer, ", ");
+		try {
+			try (PrintStream writer = new PrintStream(new BufferedOutputStream(new FileOutputStream(file)))) {
+				stats.print(writer, ", ");
+			}
+			System.out.println("Opening " + file.getAbsolutePath());
+			Desktop.getDesktop().open(file);
+		} catch (NoInterestingTimeSeriesFoundException e) {
+			file.delete();
+			throw e;
 		}
-		System.out.println("Opening " + file.getAbsolutePath());
-		Desktop.getDesktop().open(file);
 	}
 
 	private File getNewFile(String name) {
 		String dateString = new SimpleDateFormat("yyyy-MM-dd").format(new Date());
 		File f = new File(folder, dateString + " " + name + ".csv");
 		int count = 1;
-		while (f.exists()){
+		while (f.exists()) {
 			f = new File(folder, dateString + " " + name + " (" + count++ + ").csv");
 		}
 		return f;
 	}
-	
+
 }

@@ -38,7 +38,7 @@ public abstract class RemoteLoader extends ClassLoader {
 	}
 	
 	public String getOwner() {
-		return source.getName();
+		return source.getRepo();
 	}
 
 	public SimulationHandle getSource() {

@@ -28,13 +28,18 @@ public class GitSimulationHandle extends SimulationHandle {
 	}
 
 	public String getPath() {
-		return super.getOwner() + "/" + getName() + "/" + branch;
+		return super.getOwner() + "/" + getRepo() + "/" + branch;
+	}
+	
+	@Override
+	public String getBranch() {
+		return branch;
 	}
 
 	@Override
 	public URL getBrowsableURL(String classname) {
 		try {
-			return new URL("https://github.com/" + getOwner() + "/" + getName() + "/blob/" + branch + "/simulation/src/"
+			return new URL("https://github.com/" + getOwner() + "/" + getRepo() + "/blob/" + branch + "/simulation/src/"
 					+ classname.replace(".", "/") + ".java");
 		} catch (MalformedURLException e) {
 			throw new java.lang.RuntimeException(e);
@@ -47,13 +52,13 @@ public class GitSimulationHandle extends SimulationHandle {
 		// Alternative would be to use blob api, but that api only works with file
 		// hashes, not with pathes.
 		URL url = new URL(
-				"https://raw.githubusercontent.com/" + getOwner() + "/" + getName() + "/" + branch + "/" + JAR_PATH);
+				"https://raw.githubusercontent.com/" + getOwner() + "/" + getRepo() + "/" + branch + "/" + JAR_PATH);
 		return url.openConnection();
 	}
 
 	private URLConnection openContentConnection(String path) throws IOException {
 		try {
-			URL url = new URL(WebUtil.addSecret("https://api.github.com/repos/" + getOwner() + "/" + getName()
+			URL url = new URL(WebUtil.addSecret("https://api.github.com/repos/" + getOwner() + "/" + getRepo()
 					+ "/contents/" + path + "?ref=" + branch));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("Accept", "application/vnd.github.VERSION.raw");
@@ -66,7 +71,7 @@ public class GitSimulationHandle extends SimulationHandle {
 	@Override
 	public boolean isPresent() throws IOException {
 		try {
-			WebUtil.readHttp("https://api.github.com/repos/" + getOwner() + "/" + getName());
+			WebUtil.readHttp("https://api.github.com/repos/" + getOwner() + "/" + getRepo());
 			return true;
 		} catch (FileNotFoundException e) {
 			return false;
@@ -102,7 +107,7 @@ public class GitSimulationHandle extends SimulationHandle {
 			ArrayList<String> names = new ArrayList<>();
 			HashSet<String> subfolders = new HashSet<>();
 			try {
-				String answer = WebUtil.readGitApi(getOwner(), getName(), "contents",
+				String answer = WebUtil.readGitApi(getOwner(), getRepo(), "contents",
 						"exercises/src/" + packageName.replace('.', '/'), branch);
 				int[] pos = new int[] { 0 };
 				while (true) {
@@ -144,7 +149,7 @@ public class GitSimulationHandle extends SimulationHandle {
 
 	@Override
 	public String getVersion() throws IOException {
-		String commitUrl = "https://api.github.com/repos/" + getOwner() + "/" + getName() + "/commits/" + branch;
+		String commitUrl = "https://api.github.com/repos/" + getOwner() + "/" + getRepo() + "/commits/" + branch;
 		String commitDesc = WebUtil.readHttp(commitUrl);
 		String hash = WebUtil.extract(commitDesc, "sha", new int[] { 0 });
 		// String name = WebUtil.extract(commitDesc, "name", new int[]{0});

@@ -26,7 +26,7 @@ public abstract class SimSpecificMethod extends WebApiMethod {
 	
 	@Override
 	protected String createExamplePath() {
-		return super.createExamplePath() + "?" + Parameters.SIM + "=" + new LocalSimulationHandle().getName() + "&" + Parameters.DAY + "=313";
+		return super.createExamplePath() + "?" + Parameters.SIM + "=" + new LocalSimulationHandle().getBranch() + "&" + Parameters.DAY + "=313";
 	}
 	
 	protected SimulationHandle getHandle(Parameters params){
