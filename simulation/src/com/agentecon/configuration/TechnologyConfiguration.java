@@ -15,7 +15,6 @@ import com.agentecon.finance.MarketMaker;
 import com.agentecon.goods.Good;
 import com.agentecon.goods.Stock;
 import com.agentecon.production.IProductionFunction;
-import com.agentecon.ranking.ConsumerRanking;
 import com.agentecon.sim.SimulationConfig;
 import com.agentecon.verification.PriceMetric;
 import com.agentecon.world.ICountry;
@@ -107,8 +106,6 @@ public class TechnologyConfiguration implements IConfiguration {
 
 	public static void main(String[] args) {
 		Simulation sim = new Simulation(new TechnologyConfiguration(13));
-		ConsumerRanking ranking = new ConsumerRanking();
-		sim.addListener(ranking);
 		PriceMetric metric1 = new PriceMetric(1000);
 		// PricePrinter pp = new PricePrinter(ReincarnatingConsumer.START,
 		// ROUNDS);
@@ -116,7 +113,6 @@ public class TechnologyConfiguration implements IConfiguration {
 		// sim.addListener(pp);
 		sim.run();
 		metric1.printResult(System.out);
-		ranking.print(System.out);
 	}
 
 }

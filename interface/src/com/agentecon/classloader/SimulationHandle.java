@@ -25,6 +25,8 @@ public abstract class SimulationHandle {
 		return owner;
 	}
 	
+	public abstract boolean isPresent() throws IOException;
+	
 	public abstract String getPath();
 	
 	public abstract long getJarDate() throws IOException;

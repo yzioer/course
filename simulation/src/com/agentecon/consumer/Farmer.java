@@ -8,11 +8,6 @@
  */
 package com.agentecon.consumer;
 
-import java.io.IOException;
-import java.net.SocketTimeoutException;
-
-import com.agentecon.IAgentFactory;
-import com.agentecon.Simulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.configuration.FarmingConfiguration;
@@ -30,7 +25,6 @@ import com.agentecon.market.IStatistics;
 import com.agentecon.production.IPriceProvider;
 import com.agentecon.production.IProductionFunction;
 import com.agentecon.production.PriceUnknownException;
-import com.agentecon.ranking.ConsumerRanking;
 import com.agentecon.research.IFounder;
 import com.agentecon.research.IInnovation;
 
@@ -103,26 +97,26 @@ public class Farmer extends Consumer implements IFounder {
 		return super.consume();
 	}
 
-	// The "static void main" method is executed when running a class
-	public static void main(String[] args) throws SocketTimeoutException, IOException {
-		FarmingConfiguration config = new FarmingConfiguration(new IAgentFactory() {
-
-			@Override
-			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-				return new Farmer(id, endowment, utilityFunction);
-			}
-		}, 10); // Create the configuration
-		Simulation sim = new Simulation(config); // Create the simulation
-		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
-		sim.addListener(ranking); // register the ranking as a listener
-									// interested in what is going on
-		while (!sim.isFinished()) {
-			sim.forwardTo(sim.getDay() + 1);
-			System.out.println("Market stats at end of day " + sim.getDay());
-			sim.getStatistics().getGoodsMarketStats().print(System.out);
-			System.out.println();
-		}
-		ranking.print(System.out); // print the resulting ranking
-	}
+//	// The "static void main" method is executed when running a class
+//	public static void main(String[] args) throws SocketTimeoutException, IOException {
+//		FarmingConfiguration config = new FarmingConfiguration(new IAgentFactory() {
+//
+//			@Override
+//			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+//				return new Farmer(id, endowment, utilityFunction);
+//			}
+//		}, 10); // Create the configuration
+//		Simulation sim = new Simulation(config); // Create the simulation
+//		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
+//		sim.addListener(ranking); // register the ranking as a listener
+//									// interested in what is going on
+//		while (!sim.isFinished()) {
+//			sim.forwardTo(sim.getDay() + 1);
+//			System.out.println("Market stats at end of day " + sim.getDay());
+//			sim.getStatistics().getGoodsMarketStats().print(System.out);
+//			System.out.println();
+//		}
+//		ranking.print(System.out); // print the resulting ranking
+//	}
 
 }

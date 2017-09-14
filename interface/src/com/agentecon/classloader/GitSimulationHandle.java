@@ -14,7 +14,7 @@ import java.util.HashSet;
 
 public class GitSimulationHandle extends SimulationHandle {
 
-	private String repo;
+	private String branch;
 	private HashMap<String, HashSet<String>> cachedTree;
 
 	public GitSimulationHandle(String owner, String repo) {
@@ -22,39 +22,54 @@ public class GitSimulationHandle extends SimulationHandle {
 	}
 
 	public GitSimulationHandle(String owner, String repo, String branch) {
-		super(owner, branch);
-		this.repo = repo;
+		super(owner, repo);
+		this.branch = branch;
 		this.cachedTree = new HashMap<>();
 	}
 
 	public String getPath() {
-		return super.getOwner() + "/" + repo + "/" + getName();
+		return super.getOwner() + "/" + getName() + "/" + branch;
 	}
 
 	@Override
 	public URL getBrowsableURL(String classname) {
 		try {
-			return new URL("https://github.com/" + getOwner() + "/" + repo + "/blob/" + getName() + "/simulation/src/" + classname.replace(".", "/") + ".java");
+			return new URL("https://github.com/" + getOwner() + "/" + getName() + "/blob/" + branch + "/simulation/src/"
+					+ classname.replace(".", "/") + ".java");
 		} catch (MalformedURLException e) {
 			throw new java.lang.RuntimeException(e);
 		}
 	}
 
 	public URLConnection getJarURLConnection() throws IOException {
-		// only works when the jar is publicly available. Cannot use openContentConnection because that only works up to 1 MB.
-		// Alternative would be to use blob api, but that api only works with file hashes, not with pathes.
-		URL url = new URL("https://raw.githubusercontent.com/" + getOwner() + "/" + repo + "/" + getName() + "/" + JAR_PATH);
+		// only works when the jar is publicly available. Cannot use
+		// openContentConnection because that only works up to 1 MB.
+		// Alternative would be to use blob api, but that api only works with file
+		// hashes, not with pathes.
+		URL url = new URL(
+				"https://raw.githubusercontent.com/" + getOwner() + "/" + getName() + "/" + branch + "/" + JAR_PATH);
 		return url.openConnection();
 	}
 
 	private URLConnection openContentConnection(String path) throws IOException {
 		try {
-			URL url = new URL(WebUtil.addSecret("https://api.github.com/repos/" + getOwner() + "/" + repo + "/contents/" + path + "?ref=" + getName()));
+			URL url = new URL(WebUtil.addSecret("https://api.github.com/repos/" + getOwner() + "/" + getName()
+					+ "/contents/" + path + "?ref=" + branch));
 			URLConnection conn = url.openConnection();
 			conn.setRequestProperty("Accept", "application/vnd.github.VERSION.raw");
 			return conn;
 		} catch (MalformedURLException e) {
 			throw new java.lang.RuntimeException(e);
+		}
+	}
+
+	@Override
+	public boolean isPresent() throws IOException {
+		try {
+			WebUtil.readHttp("https://api.github.com/repos/" + getOwner() + "/" + getName());
+			return true;
+		} catch (FileNotFoundException e) {
+			return false;
 		}
 	}
 
@@ -87,7 +102,8 @@ public class GitSimulationHandle extends SimulationHandle {
 			ArrayList<String> names = new ArrayList<>();
 			HashSet<String> subfolders = new HashSet<>();
 			try {
-				String answer = WebUtil.readGitApi(getOwner(), repo, "contents", "exercises/src/" + packageName.replace('.', '/'), getName());
+				String answer = WebUtil.readGitApi(getOwner(), getName(), "contents",
+						"exercises/src/" + packageName.replace('.', '/'), branch);
 				int[] pos = new int[] { 0 };
 				while (true) {
 					String name = WebUtil.extract(answer, "name", pos);
@@ -128,7 +144,7 @@ public class GitSimulationHandle extends SimulationHandle {
 
 	@Override
 	public String getVersion() throws IOException {
-		String commitUrl = "https://api.github.com/repos/" + getOwner() + "/" + repo + "/commits/" + getName();
+		String commitUrl = "https://api.github.com/repos/" + getOwner() + "/" + getName() + "/commits/" + branch;
 		String commitDesc = WebUtil.readHttp(commitUrl);
 		String hash = WebUtil.extract(commitDesc, "sha", new int[] { 0 });
 		// String name = WebUtil.extract(commitDesc, "name", new int[]{0});
@@ -139,7 +155,7 @@ public class GitSimulationHandle extends SimulationHandle {
 	@Override
 	public boolean equals(Object o) {
 		if (o instanceof GitSimulationHandle) {
-			return super.equals(o) && ((GitSimulationHandle) o).repo.equals(repo);
+			return super.equals(o) && ((GitSimulationHandle) o).branch.equals(branch);
 		} else {
 			return false;
 		}

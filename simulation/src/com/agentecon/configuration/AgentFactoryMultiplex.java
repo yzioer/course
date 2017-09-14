@@ -17,29 +17,29 @@ import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IUtility;
 
 public class AgentFactoryMultiplex implements IAgentFactory {
-	
+
 	private int current;
 	private IAgentFactory[] factories;
-	
-	public AgentFactoryMultiplex(IAgentFactory... factories) throws IOException{
+
+	public AgentFactoryMultiplex(IAgentFactory... factories) throws IOException {
 		this.factories = factories;
-		this.current = 0;
+		this.current = 1;
+		assert factories.length >= 1;
 	}
-	
-	private IAgentFactory getCurrent(){
+
+	private IAgentFactory getCurrent() {
 		return factories[current++ % factories.length];
 	}
 
-//	public static final AgentFactoryMultiplex createDefault() throws SocketTimeoutException, IOException{
-//		return new AgentFactoryMultiplex(
-//				new CompilingAgentFactory("meisserecon", "agentecon", "master")
-//				);
-//	}
-
 	@Override
 	public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-		IConsumer consumer =  getCurrent().createConsumer(id, endowment, utilityFunction);
-		return consumer == null ? createConsumer(id, endowment, utilityFunction) : consumer;
+		IAgentFactory current = getCurrent();
+		IConsumer consumer = current.createConsumer(id, endowment, utilityFunction);
+		return consumer == null ? createDefault(id, endowment, utilityFunction) : consumer;
+	}
+
+	protected IConsumer createDefault(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+		return factories[0].createConsumer(id, endowment, utilityFunction);
 	}
 
 }

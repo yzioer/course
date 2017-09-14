@@ -26,13 +26,11 @@ import com.agentecon.goods.Inventory;
 import com.agentecon.market.IPriceTakerMarket;
 import com.agentecon.market.IStatistics;
 import com.agentecon.production.IProductionFunction;
-import com.agentecon.ranking.ConsumerRanking;
 import com.agentecon.research.IFounder;
 import com.agentecon.research.IInnovation;
 
 /**
- * An autarkic consumer that produces its own food and does not interact with
- * others.
+ * An autarkic consumer that produces its own food and does not interact with others.
  */
 public class Hermit extends Consumer implements IFounder {
 
@@ -87,7 +85,8 @@ public class Hermit extends Consumer implements IFounder {
 	public double consume() {
 		// super class already knows how to consume, let it do the work
 		// System.out.println("Eating from " + getInventory());
-		return super.consume();
+		double utility = super.consume();
+		return utility;
 	}
 
 	// The "static void main" method is executed when running a class
@@ -96,14 +95,20 @@ public class Hermit extends Consumer implements IFounder {
 
 			@Override
 			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-				return new Hermit(id, endowment, utilityFunction);
+				return new Hermit(id, endowment, utilityFunction) {
+					
+					// We override the consume method of the hermit implementation to add some system output
+					@Override
+					public double consume() {
+						double utility = super.consume();
+						System.out.println("Day " + getAge() + ": achieved utility " + utility);
+						return utility;
+					}
+				};
 			}
-		}, 10); // Create the configuration
+		}, 1); // Create the configuration
 		Simulation sim = new Simulation(config); // Create the simulation
-		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
-		sim.addListener(ranking); // register the ranking as a listener interested in what is going on
 		sim.run(); // run the simulation
-		ranking.print(System.out); // print the resulting ranking
 	}
 
 }

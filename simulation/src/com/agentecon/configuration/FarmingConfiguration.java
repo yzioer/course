@@ -11,11 +11,9 @@ package com.agentecon.configuration;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.net.SocketTimeoutException;
 
 import com.agentecon.IAgentFactory;
 import com.agentecon.ISimulation;
-import com.agentecon.Simulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.consumer.Consumer;
@@ -36,7 +34,6 @@ import com.agentecon.market.GoodStats;
 import com.agentecon.market.IStatistics;
 import com.agentecon.production.IProductionFunction;
 import com.agentecon.production.PriceUnknownException;
-import com.agentecon.ranking.ConsumerRanking;
 import com.agentecon.research.IInnovation;
 import com.agentecon.research.IResearchProject;
 import com.agentecon.sim.SimulationConfig;
@@ -154,27 +151,27 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 		return prod.getAmount() * sim.getGoodsMarketStats().getPriceBelief(POTATOE) - costs;
 	}
 
-	public static void main(String[] args) throws SocketTimeoutException, IOException {
-		IAgentFactory defaultFactory = new CompilingAgentFactory(FARMER, new File("../exercises/src")); // this factory loads your Farmer
-		IAgentFactory normalConsumerFactory = new IAgentFactory() {
-
-			@Override
-			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-				return new Consumer(id, endowment, utilityFunction);
-			}
-		};
-		// IAgentFactory meisserFactory = new RemoteAgentFactory("meisserecon", "agentecon"); // loads the Hermit implementation from the meisserecon repository
-		// IAgentFactory other = new RemoteAgentFactory("user", "repo"); // maybe you want to load agents from someone else's repository for comparison?
-
-		// Create a multiplex factory that alternates between different factories when instantiating agents
-		IAgentFactory factory = new AgentFactoryMultiplex(defaultFactory, normalConsumerFactory);
-
-		FarmingConfiguration config = new FarmingConfiguration(factory, 10); // Create the configuration
-		Simulation sim = new Simulation(config); // Create the simulation
-		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
-		sim.addListener(ranking); // register the ranking as a listener interested in what is going on
-		sim.run(); // run the simulation
-		ranking.print(System.out); // print the resulting ranking
-	}
+//	public static void main(String[] args) throws SocketTimeoutException, IOException {
+//		IAgentFactory defaultFactory = new CompilingAgentFactory(FARMER, new File("../exercises/src")); // this factory loads your Farmer
+//		IAgentFactory normalConsumerFactory = new IAgentFactory() {
+//
+//			@Override
+//			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+//				return new Consumer(id, endowment, utilityFunction);
+//			}
+//		};
+//		// IAgentFactory meisserFactory = new RemoteAgentFactory("meisserecon", "agentecon"); // loads the Hermit implementation from the meisserecon repository
+//		// IAgentFactory other = new RemoteAgentFactory("user", "repo"); // maybe you want to load agents from someone else's repository for comparison?
+//
+//		// Create a multiplex factory that alternates between different factories when instantiating agents
+//		IAgentFactory factory = new AgentFactoryMultiplex(defaultFactory, normalConsumerFactory);
+//
+//		FarmingConfiguration config = new FarmingConfiguration(factory, 10); // Create the configuration
+//		Simulation sim = new Simulation(config); // Create the simulation
+//		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
+//		sim.addListener(ranking); // register the ranking as a listener interested in what is going on
+//		sim.run(); // run the simulation
+//		ranking.print(System.out); // print the resulting ranking
+//	}
 
 }
