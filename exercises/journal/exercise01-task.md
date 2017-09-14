@@ -10,6 +10,6 @@ You can start with the given [Hermit class](../src/com/agentecon/exercise1/Hermi
 
 It is possible to edit this class directly on github.com and then check the [resulting ranking online](http://meissereconomics.com/vis/simulation?sim=ex1-hermit). However, in practice, it is much more efficient to edit and test a local copy of your agents before uploading (pushing) them to github, a process which is described [here](http://meissereconomics.com/course/setup).
 
-Document your findings in the [lab journal](exercise01 - journal.md) as you try out different ideas to make your hermit behave optimally.
+Document your findings in the [lab journal](exercise01-journal.md) as you try out different ideas to make your hermit behave optimally.
 
 The deadline for submitting your hermit and the lab journal to github is 2017-09-21 at 24:00.
