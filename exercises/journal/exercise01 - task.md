@@ -1,5 +1,7 @@
 # Exercise 1 - The Hermit
 
+![hermit](images/hermit.jpg A hermit's house)
+
 A hermit is an autarkic consumer that does not interact with other agents. The hermit has a production function that turns man-hours into food.
 
 Your task is to program your own hermit with an optimal work-life balance, as the hermit enjoys both, food and man-hours spent as leisure time.
