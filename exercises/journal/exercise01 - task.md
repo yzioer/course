@@ -1,6 +1,6 @@
 # Exercise 1 - The Hermit
 
-![hermit](images/hermit.jpg A hermit's house)
+![hermit](images/hermit.jpg "A hermit's house")
 
 A hermit is an autarkic consumer that does not interact with other agents. The hermit has a production function that turns man-hours into food.
 
