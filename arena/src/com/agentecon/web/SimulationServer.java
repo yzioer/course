@@ -8,6 +8,7 @@ import com.agentecon.classloader.LocalSimulationHandle;
 import com.agentecon.web.methods.AgentsMethod;
 import com.agentecon.web.methods.ChildrenMethod;
 import com.agentecon.web.methods.DownloadCSVMethod;
+import com.agentecon.web.methods.GithubeventMethod;
 import com.agentecon.web.methods.InfoMethod;
 import com.agentecon.web.methods.ListMethod;
 import com.agentecon.web.methods.MethodsMethod;
@@ -43,6 +44,7 @@ public class SimulationServer extends VisServer {
 		this.methods.add(this.simulations);
 		this.methods.add(new SizeTypesMethod());
 		this.methods.add(new MetricsMethod());
+		this.methods.add(new GithubeventMethod(this.simulations));
 		this.methods.add(new InfoMethod(this.simulations));
 		this.methods.add(new AgentsMethod(this.simulations));
 		this.methods.add(new TradeGraphMethod(this.simulations));
@@ -54,8 +56,8 @@ public class SimulationServer extends VisServer {
 
 	@Override
 	public Response serve(IHTTPSession session) {
-		Method method = session.getMethod();
-		assert method == Method.GET : "Received a " + method;
+//		Method method = session.getMethod();
+//		assert method == Method.GET : "Received a " + method;
 		String uri = session.getUri();
 		Response res = createResponse(session, uri);
 		res.addHeader("Access-Control-Allow-Origin", "*");

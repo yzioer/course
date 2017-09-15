@@ -37,6 +37,9 @@ public class ListMethod extends WebApiMethod {
 		if (stepper == null){
 			stepper = new SimulationStepper(handle);
 			simulations.put(handle, stepper);
+		} else if (stepper.isObsolete()){
+			stepper = stepper.getSuccessor();
+			simulations.put(handle, stepper);
 		}
 		return stepper;
 	}

@@ -9,6 +9,9 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 import com.agentecon.util.IOUtils;
 
@@ -87,6 +90,18 @@ public class WebUtil {
 	public static String readGitApi(String owner, String repo, String command, String path, String branch) throws IOException {
 		String address = API_ADDRESS + "/repos/" + owner + "/" + repo + "/" + command + "/" + path + "?ref=" + branch;
 		return readHttp(address);
+	}
+
+	public static Map<String, String> readPostParams(InputStream inputStream) throws IOException {
+		byte[] data = new byte[inputStream.available()];
+		inputStream.read(data);
+		String content = new String(data);
+		StringTokenizer tok = new StringTokenizer(content, "?&=");
+		HashMap<String, String> params = new HashMap<>();
+		while (tok.hasMoreTokens()) {
+			params.put(tok.nextToken(), tok.nextToken());
+		}
+		return params;
 	}
 
 }

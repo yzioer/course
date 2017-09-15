@@ -32,6 +32,14 @@ public class SimulationStepper {
 		this.enablePeriodicUpdate();
 	}
 
+	public boolean isObsolete() {
+		return successor != null;
+	}
+	
+	public SimulationStepper getSuccessor() {
+		return successor;
+	}
+	
 	private SoftCache<Object, Object> refreshCache(SimulationLoader loader) throws IOException {
 		SoftCache<Object, Object> cache = new SoftCache<>();
 		cache.put(UtilityRanking.class, createRanking(loader.loadSimulation()));
