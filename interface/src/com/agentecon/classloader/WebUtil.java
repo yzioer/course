@@ -92,16 +92,4 @@ public class WebUtil {
 		return readHttp(address);
 	}
 
-	public static Map<String, String> readPostParams(InputStream inputStream) throws IOException {
-		byte[] data = new byte[inputStream.available()];
-		inputStream.read(data);
-		String content = new String(data);
-		StringTokenizer tok = new StringTokenizer(content, "?&=");
-		HashMap<String, String> params = new HashMap<>();
-		while (tok.hasMoreTokens()) {
-			params.put(tok.nextToken(), tok.nextToken());
-		}
-		return params;
-	}
-
 }

@@ -9,9 +9,13 @@
 package com.agentecon.web.methods;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.function.BiConsumer;
 
 import com.agentecon.classloader.SimulationHandle;
 import com.agentecon.runner.SimulationLoader;
@@ -19,36 +23,69 @@ import com.agentecon.runner.SimulationStepper;
 import com.agentecon.web.data.JsonData;
 
 public class ListMethod extends WebApiMethod {
-	
+
 	private transient HashMap<String, SimulationHandle> handles;
 	private transient HashMap<SimulationHandle, SimulationStepper> simulations;
+	private Executor simulationUpdateExecutor;
 
 	public ListMethod() {
 		this.handles = new HashMap<>();
 		this.simulations = new HashMap<>();
+		this.simulationUpdateExecutor = Executors.newSingleThreadExecutor();
 	}
 
 	public void add(SimulationHandle handle) {
 		this.handles.put(handle.getBranch(), handle);
 	}
-	
+
+	protected synchronized void update(SimulationHandle handle, SimulationStepper stepper) {
+		simulations.put(handle, stepper);
+	}
+
+	public synchronized void notifyRepositoryChanged(String repo) {
+		simulations.forEach(new BiConsumer<SimulationHandle, SimulationStepper>() {
+
+			@Override
+			public void accept(SimulationHandle t, SimulationStepper u) {
+				simulationUpdateExecutor.execute(new Runnable() {
+
+					@Override
+					public void run() {
+						try {
+							try {
+								update(t, u.refreshSimulation(repo));
+							} catch (SocketTimeoutException e) {
+								System.out.println("Pausing simulation updates for a minute due to " + e.toString());
+								Thread.sleep(60000);
+								simulationUpdateExecutor.execute(this);
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						} catch (InterruptedException e) {
+						}
+					}
+				});
+			}
+		});
+	}
+
 	public synchronized SimulationStepper getSimulation(SimulationHandle handle) throws IOException {
 		SimulationStepper stepper = this.simulations.get(handle);
-		if (stepper == null){
+		if (stepper == null) {
 			stepper = new SimulationStepper(handle);
 			simulations.put(handle, stepper);
-		} else if (stepper.isObsolete()){
+		} else if (stepper.isObsolete()) {
 			stepper = stepper.getSuccessor();
 			simulations.put(handle, stepper);
 		}
 		return stepper;
 	}
-	
-	public SimulationStepper getSimulation(String name) throws IOException{
+
+	public SimulationStepper getSimulation(String name) throws IOException {
 		SimulationHandle handle = handles.get(name);
 		return getSimulation(handle);
 	}
-	
+
 	public SimulationHandle getHandle(String simulation) {
 		return handles.get(simulation);
 	}
@@ -59,16 +96,16 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	class SimulationList extends JsonData {
-		
+
 		public Collection<SimulationInfo> sims = new ArrayList<>();
-		
+
 		public SimulationList(Collection<SimulationHandle> collection) {
-			for (SimulationHandle handle: collection){
+			for (SimulationHandle handle : collection) {
 				this.sims.add(new SimulationInfo(handle));
 			}
 		}
 	}
-	
+
 	class SimulationInfo {
 		
 		public String owner;

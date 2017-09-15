@@ -26,19 +26,17 @@ public class SimulationLoader extends RemoteJarLoader {
 		return checksum;
 	}
 	
-	public SimulationLoader refresh(boolean[] changed) throws SocketTimeoutException, IOException{
+	public SimulationLoader refresh() throws SocketTimeoutException, IOException{
 		Iterator<RemoteLoader> iter = subloaders.values().iterator();
 		while (iter.hasNext()){
 			RemoteLoader next = iter.next();
 			if (!next.isUptoDate()){
 				iter.remove();
-				changed[0] = true;
 			}
 		}
 		if (isUptoDate()){
 			return this;
 		} else {
-			changed[0] = true;
 			SimulationLoader newLoader = new SimulationLoader(source);
 			newLoader.subloaders.putAll(this.subloaders);
 			return newLoader;

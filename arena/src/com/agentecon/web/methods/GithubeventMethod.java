@@ -9,9 +9,18 @@
 package com.agentecon.web.methods;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.util.function.Consumer;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import fi.iki.elonen.NanoHTTPD;
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
+import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 
 public class GithubeventMethod extends WebApiMethod {
@@ -25,7 +34,37 @@ public class GithubeventMethod extends WebApiMethod {
 	@Override
 	public Response execute(IHTTPSession session, Parameters params) throws IOException {
 		System.out.println("Received github event with the following parameters: " + params.toString());
+		
+		if (session.getMethod() == Method.POST) {
+			// note: stream should not be closed, otherwise we can't send back an answer
+			InputStream inputStream = session.getInputStream();
+			byte[] data = new byte[inputStream.available()];
+			inputStream.read(data);
+			String content = new String(data);
+			System.out.println("Received " + content);
+			JsonObject object = new Gson().fromJson(content, JsonObject.class);
+			JsonObject headcommit = object.getAsJsonObject("head_commit");
+			JsonArray changeList = headcommit.getAsJsonArray("modified");
+			if (hasChangeJavaFiles(changeList)) {
+				JsonObject repository = object.getAsJsonObject("repository");
+				JsonPrimitive repoName = repository.getAsJsonPrimitive("name");
+				simulations.notifyRepositoryChanged(repoName.getAsString());
+			}
+		}
+		
 		return NanoHTTPD.newFixedLengthResponse("");
+	}
+
+	private boolean hasChangeJavaFiles(JsonArray changeList) {
+		boolean[] java = new boolean[1];
+		changeList.forEach(new Consumer<JsonElement>() {
+
+			@Override
+			public void accept(JsonElement t) {
+				java[0] = t.getAsString().endsWith(".java");
+			}
+		});
+		return java[0];
 	}
 
 }

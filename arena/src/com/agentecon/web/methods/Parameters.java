@@ -9,17 +9,13 @@
 package com.agentecon.web.methods;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-import com.agentecon.classloader.WebUtil;
-
 import fi.iki.elonen.NanoHTTPD.IHTTPSession;
-import fi.iki.elonen.NanoHTTPD.Method;
 
 public class Parameters {
 
@@ -31,11 +27,6 @@ public class Parameters {
 
 	public Parameters(IHTTPSession session) throws IOException {
 		this.params = session.getParms();
-		if (session.getMethod() == Method.POST) {
-			// note: stream should not be closed, otherwise we can't send back an answer
-			InputStream stream = session.getInputStream();
-			this.params.putAll(WebUtil.readPostParams(stream));
-		}
 	}
 
 	public String getSimulation() {

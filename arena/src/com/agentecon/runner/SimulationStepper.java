@@ -29,17 +29,16 @@ public class SimulationStepper {
 		this.simulation = new SimulationCache(loader);
 		this.cachedData = refreshCache(loader);
 		this.successor = null;
-		this.enablePeriodicUpdate();
 	}
 
 	public boolean isObsolete() {
 		return successor != null;
 	}
-	
+
 	public SimulationStepper getSuccessor() {
 		return successor;
 	}
-	
+
 	private SoftCache<Object, Object> refreshCache(SimulationLoader loader) throws IOException {
 		SoftCache<Object, Object> cache = new SoftCache<>();
 		cache.put(UtilityRanking.class, createRanking(loader.loadSimulation()));
@@ -60,38 +59,14 @@ public class SimulationStepper {
 		return rec;
 	}
 
-	private SimulationStepper refreshSimulation() throws SocketTimeoutException, IOException {
+	public SimulationStepper refreshSimulation(String repo) throws SocketTimeoutException, IOException {
 		SimulationLoader loader = SimulationStepper.this.loader;
-		boolean[] changed = new boolean[] { false };
-		SimulationLoader newLoader = loader.refresh(changed);
-		if (changed[0]) {
-			return new SimulationStepper(newLoader);
+		if (loader.usesRepository(repo)) {
+			System.out.println("Refreshing " + this);
+			return new SimulationStepper(loader.refresh());
 		} else {
-			return null;
+			return this;
 		}
-	}
-
-	public void enablePeriodicUpdate() {
-		Thread t = new Thread() {
-			public void run() {
-				try {
-					while (successor == null) {
-						Thread.sleep(60000);
-						try {
-							successor = refreshSimulation();
-						} catch (SocketTimeoutException e) {
-							// try again in a minute
-						} catch (IOException e) {
-							throw new RuntimeException(e);
-						}
-					}
-				} catch (InterruptedException e) {
-				}
-			}
-		};
-		t.setDaemon(true);
-		t.start();
-
 	}
 
 	private UtilityRanking createRanking(ISimulation sim) {
@@ -123,6 +98,11 @@ public class SimulationStepper {
 
 	public void putCached(Object string, Object chart) {
 		cachedData.put(string, chart);
+	}
+	
+	@Override
+	public String toString() {
+		return "Simulation stepper for " + loader;
 	}
 
 }
