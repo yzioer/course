@@ -82,6 +82,7 @@ public class SimulationServer extends VisServer {
 				}
 			} catch (RuntimeException e) {
 				String msg = "Failed to handle call due to " + e.toString();
+				e.printStackTrace();
 				System.out.println(msg);
 				return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR, getMimeTypeForFile(".html"), msg);
 			} catch (IOException e) {
