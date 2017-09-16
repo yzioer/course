@@ -24,9 +24,9 @@ import fi.iki.elonen.NanoHTTPD.Method;
 import fi.iki.elonen.NanoHTTPD.Response;
 
 public class GithubeventMethod extends WebApiMethod {
-	
+
 	private transient ListMethod simulations;
-	
+
 	public GithubeventMethod(ListMethod simulations) {
 		this.simulations = simulations;
 	}
@@ -34,24 +34,30 @@ public class GithubeventMethod extends WebApiMethod {
 	@Override
 	public Response execute(IHTTPSession session, Parameters params) throws IOException {
 		System.out.println("Received github event with the following parameters: " + params.toString());
-		
+
 		if (session.getMethod() == Method.POST) {
 			// note: stream should not be closed, otherwise we can't send back an answer
 			InputStream inputStream = session.getInputStream();
 			byte[] data = new byte[inputStream.available()];
 			inputStream.read(data);
 			String content = new String(data);
-			System.out.println("Received " + content);
 			JsonObject object = new Gson().fromJson(content, JsonObject.class);
+			JsonObject repository = object.getAsJsonObject("repository");
+			JsonPrimitive repoName = repository.getAsJsonPrimitive("name");
+			JsonArray commits = object.getAsJsonArray("commits");
 			JsonObject headcommit = object.getAsJsonObject("head_commit");
-			JsonArray changeList = headcommit.getAsJsonArray("modified");
-			if (hasChangeJavaFiles(changeList)) {
-				JsonObject repository = object.getAsJsonObject("repository");
-				JsonPrimitive repoName = repository.getAsJsonPrimitive("name");
+			if (headcommit == null || commits.size() > 1) {
+				// if the latest commit is not described or if there were 
+				// multiple commits, just assume the worst. :)
 				simulations.notifyRepositoryChanged(repoName.getAsString());
+			} else {
+				JsonArray changeList = headcommit.getAsJsonArray("modified");
+				if (hasChangeJavaFiles(changeList)) {
+					simulations.notifyRepositoryChanged(repoName.getAsString());
+				}
 			}
 		}
-		
+
 		return NanoHTTPD.newFixedLengthResponse("");
 	}
 
