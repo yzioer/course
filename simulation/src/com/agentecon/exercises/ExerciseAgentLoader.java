@@ -43,8 +43,12 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
 	private static IAgentFactory[] createFactories(String classname) throws SocketTimeoutException, IOException {
 		ArrayList<CompilingAgentFactory> factories = new ArrayList<>();
-		CompilingAgentFactory defaultFactory = new CompilingAgentFactory(classname, "meisser", "course");
-		factories.add(defaultFactory);
+		try {
+			CompilingAgentFactory defaultFactory = new CompilingAgentFactory(classname, "meisser", "course");
+			factories.add(defaultFactory);
+		} catch (IOException e) {
+			System.out.println("Cannot load agents from github.com/meisser/course due to: " + e);
+		}
 		Stream<CompilingAgentFactory> stream = TEAMS.parallelStream().map(team -> {
 			try {
 				return new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));

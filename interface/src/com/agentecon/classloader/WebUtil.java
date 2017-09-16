@@ -9,14 +9,24 @@ import java.nio.charset.Charset;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
 
 import com.agentecon.util.IOUtils;
 
 public class WebUtil {
 
+	/**
+	 * In order to access the github API, an authentication code is necessary.
+	 * To generate one, login to github.com and visit https://github.com/settings/tokens
+	 * There, generate a new access token with "repo" access. The token looks something like
+	 * "1c4dd4ab3e197284fbe2010d91a8a34dc71525f7". Then, create a new text file named
+	 * "github-secret.txt" with content "?access_token=1c4dd4ab3e197284fbe2010d91a8a34dc71525f7"
+	 * (without the "). This file must be placed one directory above your github repo, e.g.
+	 * next to the folder "team004" on your local hard drive if you are in team 4.
+	 * Note that github scans all uploaded files for access tokens and if it detects one,
+	 * it immediately deactivates it for security reasons. Thus, never write it into a file
+	 * that is part of your repository. That's also why the example token mentioned here is
+	 * no longer valid. 
+	 */
 	private final static String API_ADDRESS = "https://api.github.com";
 	private final static String ACCESS_SECRETS = loadSecrets();
 
@@ -29,9 +39,14 @@ public class WebUtil {
 			return "";
 		}
 	}
-	
-	public static String addSecret(String address) {
+
+	public static boolean hasAuthorizationCode() {
+		return ACCESS_SECRETS.length() > 0;
+	}
+
+	public static String addSecret(String address) throws IOException {
 		if (address.contains(API_ADDRESS)) {
+			checkAuthorizationCode();
 			if (address.contains("?")) {
 				return address + "&" + ACCESS_SECRETS.substring(1);
 			} else {
@@ -41,7 +56,7 @@ public class WebUtil {
 			return address;
 		}
 	}
-	
+
 	public static String readHttp(String address) throws FileNotFoundException, IOException {
 		address = addSecret(address);
 		String content = "";
@@ -90,6 +105,12 @@ public class WebUtil {
 	public static String readGitApi(String owner, String repo, String command, String path, String branch) throws IOException {
 		String address = API_ADDRESS + "/repos/" + owner + "/" + repo + "/" + command + "/" + path + "?ref=" + branch;
 		return readHttp(address);
+	}
+
+	public static void checkAuthorizationCode() throws IOException {
+		if (!hasAuthorizationCode()) {
+			throw new IOException("In order to dynamically load agents from github, follow the instructions in com.agentecon.classloader.WebUtil.java .");
+		}
 	}
 
 }

@@ -25,7 +25,7 @@ import fi.iki.elonen.NanoHTTPD.Response;
 
 public class GithubeventMethod extends WebApiMethod {
 	
-	private ListMethod simulations;
+	private transient ListMethod simulations;
 	
 	public GithubeventMethod(ListMethod simulations) {
 		this.simulations = simulations;
