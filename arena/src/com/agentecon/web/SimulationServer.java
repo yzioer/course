@@ -5,6 +5,7 @@ import java.util.StringTokenizer;
 
 import com.agentecon.classloader.GitSimulationHandle;
 import com.agentecon.classloader.LocalSimulationHandle;
+import com.agentecon.sim.SimulationConfig;
 import com.agentecon.web.methods.AgentsMethod;
 import com.agentecon.web.methods.ChildrenMethod;
 import com.agentecon.web.methods.DownloadCSVMethod;
@@ -32,7 +33,7 @@ public class SimulationServer extends VisServer {
 
 		this.simulations = new ListMethod();
 		LocalSimulationHandle local = new LocalSimulationHandle();
-		if (local.isPresent()) {
+		if (local.isPresent() && !SimulationConfig.isServerConfig()) {
 			this.simulations.add(new LocalSimulationHandle());
 		}
 		this.simulations.add(new GitSimulationHandle("meisser", "course", "master"));
