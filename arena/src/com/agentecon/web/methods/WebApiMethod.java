@@ -29,6 +29,10 @@ public abstract class WebApiMethod {
 		this.name = deriveName();
 		this.examplePath = createExamplePath();
 	}
+	
+	public Descriptor getDescriptor() {
+		return new Descriptor(name, examplePath);
+	}
 
 	protected String deriveName() {
 		String className = getClass().getSimpleName();

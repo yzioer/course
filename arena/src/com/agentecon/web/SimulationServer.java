@@ -15,6 +15,7 @@ import com.agentecon.web.methods.ListMethod;
 import com.agentecon.web.methods.MethodsMethod;
 import com.agentecon.web.methods.MetricsMethod;
 import com.agentecon.web.methods.MiniChartMethod;
+import com.agentecon.web.methods.Parameters;
 import com.agentecon.web.methods.RankingMethod;
 import com.agentecon.web.methods.SizeTypesMethod;
 import com.agentecon.web.methods.TradeGraphMethod;
@@ -36,9 +37,13 @@ public class SimulationServer extends VisServer {
 		if (local.isPresent() && !SimulationConfig.isServerConfig()) {
 			this.simulations.add(new LocalSimulationHandle());
 		}
-		this.simulations.add(new GitSimulationHandle("meisser", "course", "master"));
-		this.simulations.add(new GitSimulationHandle("meisser", "course", "ex1-hermit"));
-		this.simulations.add(new GitSimulationHandle("meisserecon", "agentecon", "demo"));
+		try {
+			this.simulations.add(new GitSimulationHandle("meisser", "course", "master"));
+			this.simulations.add(new GitSimulationHandle("meisser", "course", "ex1-hermit"));
+			this.simulations.add(new GitSimulationHandle("meisserecon", "agentecon", "demo"));
+		} catch (IOException e) {
+			System.out.println("Disabled remote repositories. " + e.getMessage());
+		}
 		// this.simulations.add(new GitSimulationHandle(owner, repo, "multigoodtag"));
 
 		this.methods = new MethodsMethod();
@@ -57,8 +62,8 @@ public class SimulationServer extends VisServer {
 
 	@Override
 	public Response serve(IHTTPSession session) {
-//		Method method = session.getMethod();
-//		assert method == Method.GET : "Received a " + method;
+		// Method method = session.getMethod();
+		// assert method == Method.GET : "Received a " + method;
 		String uri = session.getUri();
 		Response res = createResponse(session, uri);
 		res.addHeader("Access-Control-Allow-Origin", "*");
@@ -78,6 +83,7 @@ public class SimulationServer extends VisServer {
 				}
 			} catch (RuntimeException e) {
 				String msg = "Failed to handle call due to " + e.toString();
+				e.printStackTrace();
 				System.out.println(msg);
 				return NanoHTTPD.newFixedLengthResponse(Status.INTERNAL_ERROR, getMimeTypeForFile(".html"), msg);
 			} catch (IOException e) {

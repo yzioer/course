@@ -17,14 +17,15 @@ public class GitSimulationHandle extends SimulationHandle {
 	private String branch;
 	private HashMap<String, HashSet<String>> cachedTree;
 
-	public GitSimulationHandle(String owner, String repo) {
+	public GitSimulationHandle(String owner, String repo) throws IOException {
 		this(owner, repo, "master");
 	}
 
-	public GitSimulationHandle(String owner, String repo, String branch) {
+	public GitSimulationHandle(String owner, String repo, String branch) throws IOException {
 		super(owner, repo);
 		this.branch = branch;
 		this.cachedTree = new HashMap<>();
+		WebUtil.checkAuthorizationCode();
 	}
 
 	public String getPath() {

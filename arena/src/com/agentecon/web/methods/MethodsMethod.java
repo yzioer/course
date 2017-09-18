@@ -10,6 +10,7 @@ package com.agentecon.web.methods;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 import com.agentecon.web.data.JsonData;
 
@@ -36,7 +37,7 @@ public class MethodsMethod extends WebApiMethod {
 	}
 	
 	class MethodList extends JsonData {
-		public Collection<WebApiMethod> methods = MethodsMethod.this.methods.values();
+		public Collection<Descriptor> methods = MethodsMethod.this.methods.values().stream().map(m -> m.getDescriptor()).collect(Collectors.toList());
 	}
 
 }
