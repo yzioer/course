@@ -16,7 +16,7 @@ $x_{potatoes}(x_{land}, x_{work}) = x_{work}^{0.6} x_{land}^{0.2}$
 
 Plugging the production function and the budget constraint into the utility function, this leads to the following simplified maximization problem:
 
-$max U(h_{work}) = log(24 - h_{work}) + log(x_{work}^{0.6} x_{land}^{0.2})$
+$max\ U(h_{work}) = log(24 - h_{work}) + log(x_{work}^{0.6} x_{land}^{0.2})$
 
 If you want, you can solve this problem mathematically. Alternatively, you can also just play around with your [Hermit class](../src/com/agentecon/exercise1/Hermit.java) to find out how to achieve a better utility. To do so, adjust the function 'produce', in which the hermit decides how much time to spend on growing food.
 
