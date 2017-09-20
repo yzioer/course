@@ -1,6 +1,7 @@
 package com.agentecon.agent;
 
 import com.agentecon.classloader.RemoteLoader;
+import com.agentecon.classloader.SimulationHandle;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IConsumerListener;
 import com.agentecon.firm.IFirm;
@@ -38,6 +39,15 @@ public abstract class Agent implements IAgent, Cloneable {
 			return ((RemoteLoader)loader).getOwner() + "-" + findType(clazz);
 		} else {
 			return findType(clazz);
+		}
+	}
+	
+	public String getVersion() {
+		ClassLoader loader = getClass().getClassLoader();
+		if (loader instanceof RemoteLoader){
+			return ((RemoteLoader)loader).getVersionString();
+		} else {
+			return "Local";
 		}
 	}
 	

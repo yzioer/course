@@ -2,7 +2,10 @@
 
 package com.agentecon.goods;
 
-//Immutable
+/**
+ * Describes a good by name and persistence.
+ * "1 - persistence" is the rate of decay, i.e. how fast the good depreciates per day.
+ */
 public class Good implements Comparable<Good> {
 	
 	private String name;

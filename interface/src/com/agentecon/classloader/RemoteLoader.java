@@ -45,6 +45,10 @@ public abstract class RemoteLoader extends ClassLoader {
 	public RemoteLoader getSubloader(SimulationHandle handle) {
 		return this.subloaders.get(handle);
 	}
+	
+	public String getVersionString() {
+		return version;
+	}
 
 	public boolean isUptoDate() throws IOException {
 		return source.getVersion().equals(version);

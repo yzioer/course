@@ -48,8 +48,12 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 		if (remoteTeams) {
 			Stream<CompilingAgentFactory> stream = TEAMS.parallelStream().map(team -> {
 				try {
-					return new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));
+					CompilingAgentFactory factory = new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));
+					factory.preload();
+					return factory;
 				} catch (IOException e) {
+					return null;
+				} catch (ClassNotFoundException e) {
 					return null;
 				}
 			}).filter(factory -> factory != null);

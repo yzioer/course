@@ -8,13 +8,12 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.function.BiConsumer;
 
 public class LocalSimulationHandle extends SimulationHandle {
 
+	private long version;
 	private File basePath;
-	private HashMap<String, Long> touchedFiles;
+//	private HashSet<String> touchedFiles;
 
 	public LocalSimulationHandle() {
 		this(new File(".."));
@@ -23,7 +22,8 @@ public class LocalSimulationHandle extends SimulationHandle {
 	public LocalSimulationHandle(File basePath) {
 		super(System.getProperty("user.name").toLowerCase(), "local");
 		this.basePath = basePath;
-		this.touchedFiles = new HashMap<>();
+		this.version = basePath.lastModified();
+//		this.touchedFiles = new HashSet<>();
 		assert this.basePath.isDirectory() : this.basePath.getAbsolutePath() + " is not a folder";
 		// assert getJarfile().isFile() : getJarfile().getAbsolutePath() + "
 		// does not exist";
@@ -76,7 +76,8 @@ public class LocalSimulationHandle extends SimulationHandle {
 	}
 
 	private void notifyTouched(File file) {
-		touchedFiles.put(file.getPath(), file.lastModified());
+//		touchedFiles.add(file.getPath());
+		version = Math.max(version, file.lastModified());
 	}
 
 	@Override
@@ -106,17 +107,10 @@ public class LocalSimulationHandle extends SimulationHandle {
 
 	@Override
 	public String getVersion() {
-		long[] version = new long[]{0};
-		touchedFiles.forEach(new BiConsumer<String, Long>() {
-
-			@Override
-			public void accept(String t, Long u) {
-				if (new File(t).lastModified() != u){
-					version[0]++;
-				}
-			}
-		});
-		return version[0] + " modified files";
+//		for (String file: touchedFiles) {
+//			version = Math.max(version, new File(file).lastModified());
+//		}
+		return "local";
 	}
 
 }

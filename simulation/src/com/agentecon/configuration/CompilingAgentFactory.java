@@ -55,29 +55,39 @@ public class CompilingAgentFactory implements IAgentFactory {
 		ClassLoader loader = getClass().getClassLoader();
 		return loader instanceof RemoteJarLoader ? (RemoteJarLoader)loader : null;
 	}
+	
+	public void preload() throws ClassNotFoundException {
+		loader.loadClass(classname);
+	}
 
 	@Override
 	public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
 		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends IConsumer> clazz = (Class<? extends IConsumer>) loader.loadClass(classname);
-			Constructor<? extends IConsumer> constructor = clazz.getConstructor(IAgentIdGenerator.class, Endowment.class, IUtility.class);
-			assert clazz.getClassLoader() == loader;
-			return constructor.newInstance(id, endowment, utilityFunction);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (NoSuchMethodException e) {
-			throw new RuntimeException(e);
-		} catch (SecurityException e) {
-			throw new RuntimeException(e);
-		} catch (InstantiationException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalArgumentException e) {
-			throw new RuntimeException(e);
-		} catch (InvocationTargetException e) {
-			throw new RuntimeException(e);
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends IConsumer> clazz = (Class<? extends IConsumer>) loader.loadClass(classname);
+				Constructor<? extends IConsumer> constructor = clazz.getConstructor(IAgentIdGenerator.class, Endowment.class, IUtility.class);
+				assert clazz.getClassLoader() == loader;
+				return constructor.newInstance(id, endowment, utilityFunction);
+			} catch (ClassNotFoundException e) {
+				throw new RuntimeException(e);
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			} catch (SecurityException e) {
+				throw new RuntimeException(e);
+			} catch (InstantiationException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalArgumentException e) {
+				throw new RuntimeException(e);
+			} catch (InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+		} catch (RuntimeException e) {
+			System.out.println("Could not load consumer from " + this);
+			e.printStackTrace();
+			return null;
 		}
 	}
 

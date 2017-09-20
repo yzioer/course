@@ -18,7 +18,6 @@ import com.agentecon.consumer.Consumer;
 import com.agentecon.consumer.IUtility;
 import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.firm.IFirm;
-import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
 import com.agentecon.goods.Inventory;
 import com.agentecon.goods.Quantity;
@@ -33,20 +32,17 @@ import com.agentecon.research.IInnovation;
  */
 public class Hermit extends Consumer implements IFounder {
 
-	private Good manhours;
 	private IProductionFunction prodFun;
+	private double workFraction = 0.2;
 
 	public Hermit(IAgentIdGenerator id, Endowment end, IUtility utility) {
 		super(id, end, utility);
-		this.manhours = end.getDaily()[0].getGood();
-		assert this.manhours.equals(HermitConfiguration.MAN_HOUR);
 	}
 
 	@Override
 	public IFirm considerCreatingFirm(IStatistics statistics, IInnovation research, IAgentIdGenerator id) {
 		if (this.prodFun == null) {
-			// instead of creating a firm, the hermit will create a production function for
-			// himself
+			// instead of creating a firm, the hermit will create a production function for himself
 			this.prodFun = research.createProductionFunction(HermitConfiguration.POTATOE);
 		}
 		return null;
@@ -58,10 +54,8 @@ public class Hermit extends Consumer implements IFounder {
 		produce(getInventory());
 	}
 	
-	private double workFraction = 0.2;
-
 	private void produce(Inventory inventory) {
-		IStock currentManhours = inventory.getStock(manhours);
+		IStock currentManhours = inventory.getStock(HermitConfiguration.MAN_HOUR);
 
 		// Play here. Maybe you find a better fraction than 60%?
 		// getUtilityFunction().getWeights() might help you finding out
@@ -72,14 +66,8 @@ public class Hermit extends Consumer implements IFounder {
 
 		// The hide function creates allows to hide parts of the inventory from the
 		// production function, preserving it for later consumption.
-		Inventory productionInventory = inventory.hide(manhours, plannedLeisureTime);
+		Inventory productionInventory = inventory.hide(HermitConfiguration.MAN_HOUR, plannedLeisureTime);
 		prodFun.produce(productionInventory);
-	}
-
-	protected double calculateWorkAmount(IStock currentManhours) {
-		double weight = prodFun.getWeight(manhours).weight;
-		double fixedCost = prodFun.getFixedCost(manhours);
-		return (currentManhours.getAmount() * weight + fixedCost) / (1 + weight);
 	}
 
 	@Override

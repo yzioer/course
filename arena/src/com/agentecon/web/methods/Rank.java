@@ -11,11 +11,13 @@ package com.agentecon.web.methods;
 public class Rank implements Comparable<Rank> {
 	
 	private String type;
+	private String version;
 	private double averageUtility;
 	private transient int count;
 
-	public Rank(String type){
+	public Rank(String type, String date){
 		this.type = type;
+		this.version = date;
 	}
 	
 	public String getType(){

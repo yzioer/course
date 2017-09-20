@@ -15,7 +15,6 @@ import com.agentecon.web.methods.ListMethod;
 import com.agentecon.web.methods.MethodsMethod;
 import com.agentecon.web.methods.MetricsMethod;
 import com.agentecon.web.methods.MiniChartMethod;
-import com.agentecon.web.methods.Parameters;
 import com.agentecon.web.methods.RankingMethod;
 import com.agentecon.web.methods.SizeTypesMethod;
 import com.agentecon.web.methods.TradeGraphMethod;

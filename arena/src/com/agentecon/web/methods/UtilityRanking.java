@@ -14,6 +14,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.agentecon.agent.Agent;
 import com.agentecon.agent.AgentRef;
 import com.agentecon.agent.IAgent;
 import com.agentecon.consumer.IConsumer;
@@ -21,7 +22,6 @@ import com.agentecon.consumer.IConsumerListener;
 import com.agentecon.goods.Inventory;
 import com.agentecon.sim.SimulationListenerAdapter;
 import com.agentecon.util.IAverage;
-import com.agentecon.util.InstantiatingHashMap;
 import com.agentecon.util.MovingAverage;
 
 public class UtilityRanking extends SimulationListenerAdapter {
@@ -34,7 +34,7 @@ public class UtilityRanking extends SimulationListenerAdapter {
 
 	@Override
 	public void notifyConsumerCreated(IConsumer consumer) {
-		ConsumerListener listener = new ConsumerListener(consumer);
+		ConsumerListener listener = new ConsumerListener((Agent) consumer);
 		list.add(listener);
 		consumer.addListener(listener);
 	}
@@ -49,15 +49,14 @@ public class UtilityRanking extends SimulationListenerAdapter {
 	}
 	
 	public Collection<Rank> getRanking(){
-		HashMap<String, Rank> ranking = new InstantiatingHashMap<String, Rank>() {
-
-			@Override
-			protected Rank create(String key) {
-				return new Rank(key);
-			}
-		};
+		HashMap<String, Rank> ranking = new HashMap<String, Rank>();
 		for (ConsumerListener listener: list){
-			ranking.get(listener.getType()).add(listener.getAverage());
+			Rank rank = ranking.get(listener.getType());
+			if (rank == null) {
+				rank = new Rank(listener.getType(), listener.getVersion());
+				ranking.put(listener.getType(), rank);
+			}
+			rank.add(listener.getAverage());
 		}
 		ArrayList<Rank> list = new ArrayList<>(ranking.values());
 		Collections.sort(list);
@@ -67,13 +66,19 @@ public class UtilityRanking extends SimulationListenerAdapter {
 	class ConsumerListener implements IConsumerListener, Comparable<ConsumerListener> {
 
 		private AgentRef agent;
+		private String version;
 		private IAverage averageUtility;
 
-		public ConsumerListener(IAgent agent) {
+		public ConsumerListener(Agent agent) {
 			this.agent = agent.getReference();
+			this.version = agent.getVersion();
 			this.averageUtility = new MovingAverage(0.98);
 		}
 		
+		public String getVersion() {
+			return version;
+		}
+
 		public String getType(){
 			return agent.get().getType();
 		}

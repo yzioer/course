@@ -8,6 +8,10 @@ import java.util.stream.Collectors;
 import com.agentecon.production.IPriceProvider;
 import com.agentecon.production.PriceUnknownException;
 
+/**
+ * This is the inventory of an individual agent.
+ * Some of the goods stored in here might depreciate, others don't.
+ */
 public class Inventory {
 
 	private final Good money;
@@ -145,6 +149,18 @@ public class Inventory {
 		}
 	}
 
+	public Quantity[] getQuantities(Good[] goods) {
+		Quantity[] inputAmounts = new Quantity[goods.length];
+		for (int i = 0; i < inputAmounts.length; i++) {
+			inputAmounts[i] = getStock(goods[i]).getQuantity();
+		}
+		return inputAmounts;
+	}
+	
+	public List<Quantity> getQuantities() {
+		return inv.values().stream().filter(g -> g.hasSome()).map(g -> g.getQuantity()).collect(Collectors.toList());
+	}
+	
 	@Override
 	public String toString() {
 		String list = null;
@@ -162,18 +178,6 @@ public class Inventory {
 		} else {
 			return "Inventory with " + list;
 		}
-	}
-
-	public Quantity[] getQuantities(Good[] goods) {
-		Quantity[] inputAmounts = new Quantity[goods.length];
-		for (int i = 0; i < inputAmounts.length; i++) {
-			inputAmounts[i] = getStock(goods[i]).getQuantity();
-		}
-		return inputAmounts;
-	}
-	
-	public List<Quantity> getQuantities() {
-		return inv.values().stream().filter(g -> g.hasSome()).map(g -> g.getQuantity()).collect(Collectors.toList());
 	}
 
 }
