@@ -2,6 +2,8 @@ package com.agentecon.goods;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.agentecon.production.IPriceProvider;
 import com.agentecon.production.PriceUnknownException;
@@ -168,6 +170,10 @@ public class Inventory {
 			inputAmounts[i] = getStock(goods[i]).getQuantity();
 		}
 		return inputAmounts;
+	}
+	
+	public List<Quantity> getQuantities() {
+		return inv.values().stream().filter(g -> g.hasSome()).map(g -> g.getQuantity()).collect(Collectors.toList());
 	}
 
 }

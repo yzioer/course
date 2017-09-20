@@ -51,15 +51,20 @@ public class HermitConfiguration extends SimulationConfig implements IInnovation
 
 	public HermitConfiguration(IAgentFactory factory, int agents) {
 		super(ROUNDS);
-		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100) };
-		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, DAILY_ENDOWMENT) };
-		Endowment end = new Endowment(getMoney(), initialEndowment, dailyEndowment);
+		Endowment end = createEndowment();
 		addEvent(new ConsumerEvent(agents, end, this) {
 			@Override
 			protected IConsumer createConsumer(IAgentIdGenerator id, Endowment end, IUtility util) {
 				return factory.createConsumer(id, end, util);
 			}
 		});
+	}
+
+	public Endowment createEndowment() {
+		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100) };
+		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, DAILY_ENDOWMENT) };
+		Endowment end = new Endowment(getMoney(), initialEndowment, dailyEndowment);
+		return end;
 	}
 	
 	@Override
