@@ -4,11 +4,15 @@
 
     <div v-if="loading">Loading...</div>
     <h2>Ranking</h2>
-    <ol class="agentlist" v-if="!loadingRanking">
-      <li v-for="rank in ranking">
-        {{ `${rank.type}: ${rank.averageUtility}` }}
-      </li>
-    </ol>
+    <table class="agentlist" v-if="!loadingRanking">
+      <tr><td>Rank</td><td>Agent</td><td>Utility</td><td>Version</td></tr>
+      <tr v-for="(rank,index) in ranking">
+        <td>{{index + 1}}</td>
+        <td>{{`${rank.type}`}}</td>
+	<td>{{`${rank.averageUtility}`}}</td>
+        <td>{{`${rank.version}`}}</td>
+      </tr>
+    </table>
     <h2>Visualizations</h2>
     <ul class="linklist" v-if="!loading">
       <!-- <li>
@@ -75,6 +79,13 @@ export default {
 
 .agentlist
   padding: 0
+
+  tr:nth-child(even)
+    background-color: #f2f2f2
+
+  th, td
+    padding: 10px
+    text-align: left
 
   li
     text-align: left
