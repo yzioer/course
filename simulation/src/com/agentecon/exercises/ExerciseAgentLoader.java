@@ -27,8 +27,8 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
 	private static final Collection<String> TEAMS = createRepos(15);
 
-	public ExerciseAgentLoader(String classname) throws SocketTimeoutException, IOException {
-		super(createFactories(classname));
+	public ExerciseAgentLoader(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
+		super(createFactories(classname, remoteTeams));
 	}
 
 	private static Collection<String> createRepos(int count) {
@@ -41,24 +41,23 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 		return Arrays.asList(repos);
 	}
 
-	private static IAgentFactory[] createFactories(String classname) throws SocketTimeoutException, IOException {
+	private static IAgentFactory[] createFactories(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
 		ArrayList<CompilingAgentFactory> factories = new ArrayList<>();
-		try {
-			CompilingAgentFactory defaultFactory = new CompilingAgentFactory(classname, "meisser", "course");
-			factories.add(defaultFactory);
-		} catch (IOException e) {
-			System.out.println("Cannot load agents from github.com/meisser/course due to: " + e);
+		CompilingAgentFactory defaultFactory = new CompilingAgentFactory(classname, "meisser", "course");
+		factories.add(defaultFactory);
+		if (remoteTeams) {
+			Stream<CompilingAgentFactory> stream = TEAMS.parallelStream().map(team -> {
+				try {
+					return new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));
+				} catch (IOException e) {
+					return null;
+				}
+			}).filter(factory -> factory != null);
+			factories.addAll(stream.collect(Collectors.toList()));
+		} else {
+			LocalSimulationHandle local = new LocalSimulationHandle(new File("../exercises/src"));
+			factories.add(new CompilingAgentFactory(classname, local));
 		}
-		Stream<CompilingAgentFactory> stream = TEAMS.parallelStream().map(team -> {
-			try {
-				return new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));
-			} catch (IOException e) {
-				return null;
-			}
-		}).filter(factory -> factory != null);
-		factories.addAll(stream.collect(Collectors.toList()));
-		LocalSimulationHandle local = new LocalSimulationHandle(new File("../exercises/src"));
-		factories.add(new CompilingAgentFactory(classname, local));
 		return factories.toArray(new IAgentFactory[factories.size()]);
 	}
 

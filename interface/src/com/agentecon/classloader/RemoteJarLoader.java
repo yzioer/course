@@ -4,7 +4,6 @@ package com.agentecon.classloader;
 
 import java.io.BufferedInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.SocketTimeoutException;
@@ -28,10 +27,6 @@ public class RemoteJarLoader extends RemoteLoader {
 
 	public RemoteJarLoader(String owner, String repo, String branch) throws SocketTimeoutException, IOException {
 		this(new GitSimulationHandle(owner, repo, branch));
-	}
-
-	public RemoteJarLoader(File basePath) throws IOException {
-		this(new LocalSimulationHandle(basePath));
 	}
 
 	public RemoteJarLoader(SimulationHandle source) throws SocketTimeoutException, IOException {

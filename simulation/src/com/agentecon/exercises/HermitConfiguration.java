@@ -46,7 +46,7 @@ public class HermitConfiguration extends SimulationConfig implements IInnovation
 	public static final Quantity FIXED_COSTS = new Quantity(MAN_HOUR, 6.0);
 
 	public HermitConfiguration() throws IOException {
-		this(new ExerciseAgentLoader(AGENT_CLASS_NAME), 16);
+		this(new ExerciseAgentLoader(AGENT_CLASS_NAME, isServerConfig()), 16);
 	}
 
 	public HermitConfiguration(IAgentFactory factory, int agents) {
@@ -79,7 +79,7 @@ public class HermitConfiguration extends SimulationConfig implements IInnovation
 
 	@Override
 	public IProductionFunction createProductionFunction(Good desiredOutput) {
-		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FIXED_COSTS, new Weight(LAND, 0.25, true), new Weight(MAN_HOUR, 0.75));
+		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FIXED_COSTS, new Weight(LAND, 0.2, true), new Weight(MAN_HOUR, 0.6));
 	}
 
 	@Override

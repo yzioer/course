@@ -9,5 +9,5 @@ public interface IConfiguration {
 	public boolean shouldTryAgain();
 
 	public String getComment();
-
+	
 }

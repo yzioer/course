@@ -87,5 +87,9 @@ public class SimulationConfig implements IDiscountRate {
 	public double getCurrentDiscountRate() {
 		return 1.0 / getRounds();
 	}
+	
+	public static boolean isServerConfig() {
+		return System.getProperty("agentecon.server") != null;
+	}
 
 }
