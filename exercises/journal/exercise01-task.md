@@ -12,9 +12,9 @@ $h_{leisure} + h_{work} = 24$
 
 The hours spent working are turned into potatoes via a Cobb-Douglas production function with fixed costs, with $x_{land}=100$ being constant:
 
-$x_{potatoes}(x_{land}, h_{work}) = h_{work}^{0.6} x_{land}^{0.2}$
+$x_{potatoes}(x_{land}, h_{work}) = (h_{work}-6)^{0.6} x_{land}^{0.2}$
 
-Plugging the production function and the budget constraint into the utility function, this leads to the following simplified maximization problem:
+The fixed costs of six hours represent the daily amount of work needed before actual production can start, for example for maintaining the required infrastructure. Plugging the production function and the budget constraint into the utility function, this leads to the following simplified maximization problem:
 
 $max\ U(h_{work}) = log(24 - h_{work}) + log(h_{work}^{0.6} x_{land}^{0.2})$
 
@@ -24,4 +24,4 @@ It is possible to edit this class directly here on github.com (make sure the cur
 
 Document your findings in the [lab journal](exercise01-journal.md) as you try out different ideas to make your hermit behave optimally.
 
-The deadline for submitting your hermit and the lab journal to github is 2017-09-21 at 24:00.
+The deadline for submitting your hermit and the lab journal to github is 2017-09-28 at 24:00.
