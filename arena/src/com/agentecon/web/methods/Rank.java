@@ -8,16 +8,29 @@
  */
 package com.agentecon.web.methods;
 
+import java.net.URL;
+
+import com.agentecon.agent.Agent;
+
 public class Rank implements Comparable<Rank> {
 	
 	private String type;
 	private String version;
+	private String url;
 	private double averageUtility;
 	private transient int count;
 
-	public Rank(String type, String date){
+	public Rank(String type, Agent agent){
 		this.type = type;
-		this.version = date;
+		this.version = agent.getVersion();
+		URL source = agent.getSourceUrl();
+		if (source == null) {
+			url = "local";
+//		} else if (source.getProtocol().equals("file")) {
+//			url = source.getPath();
+		} else {
+			url = source.toExternalForm();
+		}
 	}
 	
 	public String getType(){

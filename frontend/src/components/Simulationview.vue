@@ -5,11 +5,12 @@
     <div v-if="loading">Loading...</div>
     <h2>Ranking</h2>
     <table class="agentlist" v-if="!loadingRanking">
-      <tr><td>Rank</td><td>Agent</td><td>Utility</td><td>Version</td></tr>
+      <tr><td>Rank</td><td>Agent</td><td>Utility</td><td>Source</td><td>Version</td></tr>
       <tr v-for="(rank,index) in ranking">
         <td>{{index + 1}}</td>
         <td>{{`${rank.type}`}}</td>
 	<td>{{`${rank.averageUtility}`}}</td>
+	<td><a :href="`${rank.url}`">source</a></td>
         <td>{{`${rank.version}`}}</td>
       </tr>
     </table>

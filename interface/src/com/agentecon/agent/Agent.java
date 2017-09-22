@@ -1,5 +1,8 @@
 package com.agentecon.agent;
 
+import java.net.URL;
+
+import com.agentecon.classloader.LocalSimulationHandle;
 import com.agentecon.classloader.RemoteLoader;
 import com.agentecon.classloader.SimulationHandle;
 import com.agentecon.consumer.IConsumer;
@@ -32,34 +35,44 @@ public abstract class Agent implements IAgent, Cloneable {
 		this.ref = new AgentRef(this);
 		assert type != null;
 	}
-	
+
 	protected String inferType(Class<? extends Agent> clazz) {
 		ClassLoader loader = clazz.getClassLoader();
-		if (loader instanceof RemoteLoader){
-			return ((RemoteLoader)loader).getOwner() + "-" + findType(clazz);
+		if (loader instanceof RemoteLoader) {
+			return ((RemoteLoader) loader).getOwner() + "-" + findType(clazz);
 		} else {
 			return findType(clazz);
 		}
 	}
-	
+
 	public String getVersion() {
 		ClassLoader loader = getClass().getClassLoader();
-		if (loader instanceof RemoteLoader){
-			return ((RemoteLoader)loader).getVersionString();
+		if (loader instanceof RemoteLoader) {
+			return ((RemoteLoader) loader).getVersionString();
 		} else {
 			return "Local";
 		}
 	}
-	
-	public static String findAuthor(Class<? extends IAgent> clazz){
+
+	public URL getSourceUrl() {
+		ClassLoader loader = getClass().getClassLoader();
+		if (loader instanceof RemoteLoader) {
+			SimulationHandle source = ((RemoteLoader) loader).getSource();
+			return source.getBrowsableURL(getClass().getName());
+		} else {
+			return null;
+		}
+	}
+
+	public static String findAuthor(Class<? extends IAgent> clazz) {
 		ClassLoader loader = clazz.getClassLoader();
-		if (loader instanceof RemoteLoader){
-			return ((RemoteLoader)loader).getOwner();
+		if (loader instanceof RemoteLoader) {
+			return ((RemoteLoader) loader).getOwner();
 		} else {
 			return "Local";
 		}
 	}
-	
+
 	public static String findType(Class<?> clazz) {
 		String name = clazz.getSimpleName();
 		while (name.length() == 0) {
@@ -87,12 +100,12 @@ public abstract class Agent implements IAgent, Cloneable {
 	public boolean isAlive() {
 		return age >= 0;
 	}
-	
+
 	public void age() {
 		this.age++;
 	}
-	
-	public int getAge(){
+
+	public int getAge() {
 		return age;
 	}
 
@@ -128,10 +141,10 @@ public abstract class Agent implements IAgent, Cloneable {
 	public final IStock getMoney() {
 		return inv.getMoney();
 	}
-	
-	public final double getDailyEndowment(Good good){
-		for (IStock stock: end.getDaily()){
-			if (stock.getGood().equals(good)){
+
+	public final double getDailyEndowment(Good good) {
+		for (IStock stock : end.getDaily()) {
+			if (stock.getGood().equals(good)) {
 				return stock.getAmount();
 			}
 		}
@@ -147,7 +160,7 @@ public abstract class Agent implements IAgent, Cloneable {
 	public double getWealth(IStatistics stats) {
 		return inv.calculateValue(stats.getGoodsMarketStats());
 	}
-	
+
 	@Override
 	public int hashCode() {
 		return number;
@@ -168,11 +181,11 @@ public abstract class Agent implements IAgent, Cloneable {
 			throw new java.lang.RuntimeException(e);
 		}
 	}
-	
+
 	public void refreshRef() {
 		this.ref.set(this);
 	}
-	
+
 	@Override
 	public String toString() {
 		return getType() + " with " + inv;
