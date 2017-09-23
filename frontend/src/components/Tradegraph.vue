@@ -91,6 +91,10 @@ export default {
     this.initPanning();
     this.initClickcage();
     this.updateTradegraph();
+
+    // show mini charts of two root nodes initially
+    this.$emit('addminichart', 'consumers', this.colors.consumers[0]);
+    this.$emit('addminichart', 'firms', this.colors.firms[0]);
   },
   watch: {
     graphdata() {

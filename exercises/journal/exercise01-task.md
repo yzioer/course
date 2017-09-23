@@ -12,16 +12,20 @@ $h_{leisure} + h_{work} = 24$
 
 The hours spent working are turned into potatoes via a Cobb-Douglas production function with fixed costs, with $x_{land}=100$ being constant:
 
-$x_{potatoes}(x_{land}, h_{work}) = h_{work}^{0.6} x_{land}^{0.2}$
+$x_{potatoes}(x_{land}, h_{work}) = (h_{work}-6)^{0.6} x_{land}^{0.2}$
 
-Plugging the production function and the budget constraint into the utility function, this leads to the following simplified maximization problem:
+The fixed costs of six hours represent the daily amount of work needed before actual production can start, for example for maintaining the required infrastructure. Plugging the production function and the budget constraint into the utility function, this leads to the following simplified maximization problem:
 
-$max\ U(h_{work}) = log(24 - h_{work}) + log(h_{work}^{0.6} x_{land}^{0.2})$
+$max\ U(h_{work}) = log(24 - h_{work}) + log((h_{work}-6)^{0.6} x_{land}^{0.2})$
 
 If you want, you can solve this problem mathematically. Alternatively, you can also just play around with your [Hermit class](../src/com/agentecon/exercise1/Hermit.java) to find out how to achieve a better utility. To do so, adjust the function 'produce', in which the hermit decides how much time to spend on growing food.
 
-It is possible to edit this class directly here on github.com (make sure the current url matches your team and you are logged in) and then check the [resulting ranking online](http://meissereconomics.com/vis/simulation?sim=ex1-hermit). However, in practice, it is much more efficient to edit and test a local copy of your agents before uploading (pushing) them to github, a process which is described [here](http://meissereconomics.com/course/setup).
+It is possible to edit this class directly here on github.com and then check the [resulting ranking online](http://meissereconomics.com/vis/simulation?sim=ex1-hermit-1). However, in practice, it is much more efficient to edit and test a local copy of your agents before uploading (pushing) them to github, a process which is described [here](http://meissereconomics.com/course/setup). Note that the ranking is not based on total lifetime utility, but on an exponentially moving average [as defined here](https://github.com/meisser/course/blob/master/arena/src/com/agentecon/web/methods/UtilityRanking.java), whereas the score s for day t is calculated as follows:
+
+$s_t = 0.02 u_t + 0.98 s_{t-1}$
+
+$u_t$ is the utility experienced on day t, and $s_{-1}$ is set to 0 (the simulation starts with day 0). In contrast to just using total experienced utility, this method of ranking the hermits is more forgiving in case the hermit experiments with the work-life balance a little in the beginning of the simulation. Note that the duration of the simulation is currently set to 1000 days. I will change that number before creating the final ranking.
 
 Document your findings in the [lab journal](exercise01-journal.md) as you try out different ideas to make your hermit behave optimally.
 
-The deadline for submitting your hermit and the lab journal to github is 2017-09-21 at 24:00.
+The deadline for submitting your hermit and the lab journal to github is 2017-09-28 at 24:00.

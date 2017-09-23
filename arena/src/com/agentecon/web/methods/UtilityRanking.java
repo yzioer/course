@@ -53,7 +53,7 @@ public class UtilityRanking extends SimulationListenerAdapter {
 		for (ConsumerListener listener: list){
 			Rank rank = ranking.get(listener.getType());
 			if (rank == null) {
-				rank = new Rank(listener.getType(), listener.getVersion());
+				rank = new Rank(listener.getType(), listener.getAgent());
 				ranking.put(listener.getType(), rank);
 			}
 			rank.add(listener.getAverage());
@@ -66,21 +66,19 @@ public class UtilityRanking extends SimulationListenerAdapter {
 	class ConsumerListener implements IConsumerListener, Comparable<ConsumerListener> {
 
 		private AgentRef agent;
-		private String version;
 		private IAverage averageUtility;
 
-		public ConsumerListener(Agent agent) {
+		public ConsumerListener(IAgent agent) {
 			this.agent = agent.getReference();
-			this.version = agent.getVersion();
 			this.averageUtility = new MovingAverage(0.98);
 		}
 		
-		public String getVersion() {
-			return version;
+		public Agent getAgent() {
+			return (Agent) agent.get();
 		}
 
 		public String getType(){
-			return agent.get().getType();
+			return getAgent().getType();
 		}
 		
 		public double getAverage(){

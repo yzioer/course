@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -45,16 +46,16 @@ public class GithubeventMethod extends WebApiMethod {
 			JsonObject repository = object.getAsJsonObject("repository");
 			JsonPrimitive repoName = repository.getAsJsonPrimitive("name");
 			JsonArray commits = object.getAsJsonArray("commits");
-			JsonObject headcommit = object.getAsJsonObject("head_commit");
-			if (headcommit == null || commits.size() > 1) {
-				// if the latest commit is not described or if there were 
-				// multiple commits, just assume the worst. :)
-				simulations.notifyRepositoryChanged(repoName.getAsString());
-			} else {
-				JsonArray changeList = headcommit.getAsJsonArray("modified");
+			JsonElement headcommit = object.get("head_commit");
+			if (headcommit instanceof JsonObject && commits.size() == 1) {
+				JsonArray changeList = ((JsonObject) headcommit).getAsJsonArray("modified");
 				if (hasChangeJavaFiles(changeList)) {
 					simulations.notifyRepositoryChanged(repoName.getAsString());
 				}
+			} else {
+				// if the latest commit is not described or if there were 
+				// multiple commits, just assume the worst. :)
+				simulations.notifyRepositoryChanged(repoName.getAsString());
 			}
 		}
 
