@@ -12,7 +12,6 @@ import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -25,20 +24,19 @@ import com.agentecon.configuration.CompilingAgentFactory;
 
 public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
-	private static final Collection<String> TEAMS = createRepos(15);
+	private static final Collection<String> TEAMS = createRepos(1,2,3,4,5,7,10);
 
 	public ExerciseAgentLoader(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
 		super(createFactories(classname, remoteTeams));
 	}
 
-	private static Collection<String> createRepos(int count) {
-		assert count < 100;
-		String[] repos = new String[count];
-		for (int i = 0; i < repos.length; i++) {
+	private static Collection<String> createRepos(int... numbers) {
+		ArrayList<String> repos = new ArrayList<>();
+		for (int i: numbers) {
 			String number = Integer.toString(i);
-			repos[i] = "team" + (number.length() == 1 ? "00" : "0") + number;
+			repos.add("team" + (number.length() == 1 ? "00" : "0") + number);
 		}
-		return Arrays.asList(repos);
+		return repos;
 	}
 
 	private static IAgentFactory[] createFactories(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
