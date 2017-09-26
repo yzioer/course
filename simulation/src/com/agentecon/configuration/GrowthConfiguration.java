@@ -26,6 +26,7 @@ import com.agentecon.events.ConsumerEvent;
 import com.agentecon.events.GrowthEvent;
 import com.agentecon.events.IUtilityFactory;
 import com.agentecon.events.SimEvent;
+import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.RealEstateAgent;

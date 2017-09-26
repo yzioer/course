@@ -1,6 +1,5 @@
-package com.agentecon.configuration;
+package com.agentecon.exercises;
 
-import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
@@ -12,50 +11,49 @@ import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.classloader.CompilingClassLoader;
 import com.agentecon.classloader.GitSimulationHandle;
 import com.agentecon.classloader.LocalSimulationHandle;
-import com.agentecon.classloader.RemoteJarLoader;
 import com.agentecon.classloader.RemoteLoader;
 import com.agentecon.classloader.SimulationHandle;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IUtility;
 
-public class CompilingAgentFactory implements IAgentFactory {
-	
+public class ExerciseAgentFactory implements IAgentFactory {
+
 	private String classname;
 	private RemoteLoader loader;
-	
-	public CompilingAgentFactory(String classname, String owner, String repo) throws SocketTimeoutException, IOException {
+
+	public ExerciseAgentFactory(String classname, String owner, String repo) throws SocketTimeoutException, IOException {
 		this(classname, owner, repo, "master");
 	}
 
-	public CompilingAgentFactory(String classname, String owner, String repo, String branch) throws SocketTimeoutException, IOException {
-		this(classname, new GitSimulationHandle(owner, repo, branch));
-	}
-	
-	public CompilingAgentFactory(String classname, File basePath) throws SocketTimeoutException, IOException {
-		this(classname, new LocalSimulationHandle(basePath));
+	public ExerciseAgentFactory(String classname, String owner, String repo, String branch) throws SocketTimeoutException, IOException {
+		this(classname, new GitSimulationHandle(owner, repo, branch, false));
 	}
 
-	public CompilingAgentFactory(String classname, SimulationHandle handle) throws SocketTimeoutException, IOException {
+	public ExerciseAgentFactory(String classname) throws SocketTimeoutException, IOException {
+		this(classname, new LocalSimulationHandle(false));
+	}
+
+	public ExerciseAgentFactory(String classname, SimulationHandle handle) throws SocketTimeoutException, IOException {
 		this.classname = classname;
-		RemoteJarLoader parent = getSimulationJarLoader();
-		if (parent == null){
-			this.loader = new CompilingClassLoader(getSimulationJarLoader(), handle);
+		RemoteLoader parent = getSimulationLoader();
+		if (parent == null) {
+			this.loader = new CompilingClassLoader(parent, handle);
 		} else {
 			RemoteLoader loader = parent.getSubloader(handle);
-			if (loader == null){
-				this.loader = new CompilingClassLoader(getSimulationJarLoader(), handle);
-				parent.registerSubloader(handle, this.loader);
+			if (loader == null) {
+				this.loader = new CompilingClassLoader(parent, handle);
+				parent.registerSubloader(this.loader);
 			} else {
 				this.loader = loader;
 			}
 		}
 	}
 
-	private RemoteJarLoader getSimulationJarLoader() {
+	private RemoteLoader getSimulationLoader() {
 		ClassLoader loader = getClass().getClassLoader();
-		return loader instanceof RemoteJarLoader ? (RemoteJarLoader)loader : null;
+		return loader instanceof RemoteLoader ? (RemoteLoader) loader : null;
 	}
-	
+
 	public void preload() throws ClassNotFoundException {
 		loader.loadClass(classname);
 	}

@@ -59,13 +59,14 @@ public class SimulationStepper {
 		return rec;
 	}
 
-	public SimulationStepper refreshSimulation(String repo) throws SocketTimeoutException, IOException {
+	public SimulationStepper refreshSimulation(String repo) throws SocketTimeoutException, IOException, NothingChangedException {
 		SimulationLoader loader = SimulationStepper.this.loader;
 		if (loader.usesRepository(repo)) {
-			System.out.println("Refreshing " + this);
-			return new SimulationStepper(loader.refresh());
+			SimulationStepper newstepper = new SimulationStepper(new SimulationLoader(loader));
+			System.out.println("Refreshed " + this);
+			return newstepper;
 		} else {
-			return this;
+			throw new NothingChangedException();
 		}
 	}
 
@@ -99,7 +100,7 @@ public class SimulationStepper {
 	public void putCached(Object string, Object chart) {
 		cachedData.put(string, chart);
 	}
-	
+
 	@Override
 	public String toString() {
 		return "Simulation stepper for " + loader;

@@ -10,9 +10,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import com.agentecon.oldarena.Persistable;
-
-public class Chart extends Persistable {
+public class Chart {
 
 	private String parentSimulation;
 

@@ -18,6 +18,7 @@ import java.util.concurrent.Executors;
 import java.util.function.BiConsumer;
 
 import com.agentecon.classloader.SimulationHandle;
+import com.agentecon.runner.NothingChangedException;
 import com.agentecon.runner.SimulationLoader;
 import com.agentecon.runner.SimulationStepper;
 import com.agentecon.web.data.JsonData;
@@ -60,6 +61,8 @@ public class ListMethod extends WebApiMethod {
 								simulationUpdateExecutor.execute(this);
 							} catch (IOException e) {
 								e.printStackTrace();
+							} catch (NothingChangedException e) {
+								// good, no need to update
 							}
 						} catch (InterruptedException e) {
 						}
@@ -107,7 +110,7 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	class SimulationInfo {
-		
+
 		public String owner;
 		public String path;
 		public String sourceUrl;
@@ -117,6 +120,6 @@ public class ListMethod extends WebApiMethod {
 			this.path = handle.getBranch();
 			this.sourceUrl = handle.getBrowsableURL(SimulationLoader.SIM_CLASS).toExternalForm();
 		}
-		
+
 	}
 }

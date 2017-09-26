@@ -6,9 +6,8 @@
  * Feel free to reuse this code under the MIT License
  * https://opensource.org/licenses/MIT
  */
-package com.agentecon.configuration;
+package com.agentecon.exercises;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 
@@ -16,6 +15,8 @@ import com.agentecon.IAgentFactory;
 import com.agentecon.ISimulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
+import com.agentecon.configuration.AgentFactoryMultiplex;
+import com.agentecon.configuration.LimitingAgentFactory;
 import com.agentecon.consumer.Consumer;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IUtility;
@@ -23,7 +24,6 @@ import com.agentecon.consumer.LogUtilWithFloor;
 import com.agentecon.consumer.Weight;
 import com.agentecon.events.ConsumerEvent;
 import com.agentecon.events.IUtilityFactory;
-import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.firm.production.CobbDouglasProductionWithFixedCost;
 import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
@@ -52,6 +52,11 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	public static final Quantity FIXED_COSTS = HermitConfiguration.FIXED_COSTS;
 
+	@SafeVarargs
+	public FarmingConfiguration(Class<? extends Consumer>... agents) {
+		this(new AgentFactoryMultiplex(agents), 30);
+	}
+	
 	public FarmingConfiguration() throws IOException {
 		this(new AgentFactoryMultiplex(new IAgentFactory() {
 
@@ -60,9 +65,9 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 				return new Consumer(id, endowment, utilityFunction);
 			}
 
-		}, new LimitingAgentFactory(1, new CompilingAgentFactory(EXPERIMENTAL_FARMER, new File("../exercises/src"))),
-				new LimitingAgentFactory(1, new CompilingAgentFactory(HermitConfiguration.AGENT_CLASS_NAME, new File("../exercises/src"))),
-				new LimitingAgentFactory(30, new CompilingAgentFactory(FARMER, new File("../exercises/src")))), 60);
+		}, new LimitingAgentFactory(1, new ExerciseAgentFactory(EXPERIMENTAL_FARMER)),
+				new LimitingAgentFactory(1, new ExerciseAgentFactory(HermitConfiguration.AGENT_CLASS_NAME)),
+				new LimitingAgentFactory(30, new ExerciseAgentFactory(FARMER))), 60);
 	}
 
 	public FarmingConfiguration(IAgentFactory factory, int agents) {

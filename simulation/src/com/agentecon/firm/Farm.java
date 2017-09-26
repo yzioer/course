@@ -10,8 +10,8 @@ package com.agentecon.firm;
 
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
-import com.agentecon.configuration.FarmingConfiguration;
 import com.agentecon.consumer.IMarketParticipant;
+import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.finance.Firm;
 import com.agentecon.firm.decisions.ExpectedRevenueBasedStrategy;
 import com.agentecon.firm.decisions.IFinancials;

@@ -4,23 +4,47 @@ package com.agentecon.classloader;
 
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.Collection;
+import java.util.function.BiConsumer;
 
 public class CompilingClassLoader extends RemoteLoader {
 
 	private AgentCompiler compiler;
+	
+	public CompilingClassLoader(SimulationHandle source) throws SocketTimeoutException, IOException {
+		this(null, source);
+	}
 
-	public CompilingClassLoader(RemoteJarLoader simulationJar, SimulationHandle source) throws SocketTimeoutException, IOException {
-		super(simulationJar == null ? CompilingClassLoader.class.getClassLoader() : simulationJar, source);
-		this.compiler = new AgentCompiler(simulationJar, source);
+	public CompilingClassLoader(RemoteLoader parent, SimulationHandle source) throws SocketTimeoutException, IOException {
+		super(parent == null ? CompilingClassLoader.class.getClassLoader() : parent, source);
+		this.compiler = new AgentCompiler(parent, source);
 	}
 
 	@Override
-	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		byte[] data = this.compiler.findClass(name);
-		if (data == null) {
-			throw new ClassNotFoundException(name + " could not be found on " + getSource());
-		} else {
-			return super.defineClass(name, data, 0, data.length);
+	public void forEach(String packageName, BiConsumer<String, byte[]> biConsumer) throws IOException {
+		Collection<String> files = source.listSourceFiles(packageName);
+		for (String f : files) {
+			try {
+				byte[] data = getByteCode(f);
+				biConsumer.accept(f, data);
+			} catch (ClassNotFoundException e) {
+				throw new NoClassDefFoundError(f + " not found");
+			}
+		}
+	}
+
+	@Override
+	protected byte[] loadBytecode(String name) throws ClassNotFoundException {
+		try {
+			if (compiler.alreadyCompiledClass(name) || source.isClassPresent(name)) {
+				byte[] data = this.compiler.findClass(name);
+				assert data != null;
+				return data;
+			} else {
+				throw new ClassNotFoundException(name + " could not be found on " + getSource());
+			}
+		} catch (IOException e) {
+			throw new ClassNotFoundException(name + " not found", e);
 		}
 	}
 

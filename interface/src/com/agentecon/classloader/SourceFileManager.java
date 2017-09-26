@@ -27,12 +27,12 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 
 	private SimulationHandle handle;
 	private HashMap<String, ByteArrayOutputStream> byteCode;
-	private RemoteJarLoader simulationJar;
+	private RemoteLoader parent;
 
-	public SourceFileManager(RemoteJarLoader simulationJar, SimulationHandle handle, DiagnosticListener<JavaFileObject> listener) {
+	public SourceFileManager(RemoteLoader parent, SimulationHandle handle, DiagnosticListener<JavaFileObject> listener) {
 		super(findCompiler(listener).getStandardFileManager(listener, null, null));
 		this.handle = handle;
-		this.simulationJar = simulationJar;
+		this.parent = parent;
 		this.byteCode = new HashMap<>();
 	}
 
@@ -77,9 +77,9 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 					}
 				});
 				return list;
-			} else if (location.equals(StandardLocation.CLASS_PATH) && kinds.contains(Kind.CLASS) && simulationJar != null) {
+			} else if (location.equals(StandardLocation.CLASS_PATH) && kinds.contains(Kind.CLASS) && parent != null) {
 				ArrayList<JavaFileObject> list = copyList(objects);
-				addJarClasses(packageName, recurse, list);
+				addJarClasses(packageName, list);
 				return list;
 			} else {
 				return objects;
@@ -89,16 +89,12 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 		}
 	}
 
-	private void addJarClasses(String packageName, boolean recurse, ArrayList<JavaFileObject> list) {
-		simulationJar.forEach(new BiConsumer<String, byte[]>() {
+	private void addJarClasses(String packageName, ArrayList<JavaFileObject> list) throws IOException {
+		parent.forEach(packageName, new BiConsumer<String, byte[]>() {
 
 			@Override
 			public void accept(String name, byte[] byteCode) {
-				if (name.startsWith(packageName)) {
-					if (recurse || name.substring(packageName.length() + 1).indexOf('.') == -1) {
-						list.add(getClassFile(name, byteCode));
-					}
-				}
+				list.add(getClassFile(name, byteCode));
 			}
 		});
 	}
@@ -147,7 +143,7 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 
 	@Override
 	public String inferBinaryName(Location location, JavaFileObject file) {
-		if (file instanceof SimpleJavaFileObject){
+		if (file instanceof SimpleJavaFileObject) {
 			String name = file.getName();
 			String extension = file.getKind().extension;
 			return name.substring(0, name.length() - extension.length()).replace('/', '.');
@@ -185,8 +181,12 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 			return getJavaSourceFile(className);
 		} else if (byteCode.containsKey(className) && kind == Kind.CLASS) {
 			return getClassFile(className, byteCode.get(className).toByteArray());
-		} else if (simulationJar != null && simulationJar.hasClass(className)) {
-			return getClassFile(className, simulationJar.getByteCode(className));
+		} else if (parent != null) {
+			try {
+				return getClassFile(className, parent.getByteCode(className));
+			} catch (ClassNotFoundException e) {
+				return null;
+			}
 		} else {
 			return null;
 		}
@@ -209,7 +209,7 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 
 	public JavaFileObject getClassFileOutput(final String className) {
 		ByteArrayOutputStream outStream = new ByteArrayOutputStream();
-		if (!byteCode.containsKey(className)){
+		if (!byteCode.containsKey(className)) {
 			byteCode.put(className, outStream);
 		}
 		return new SimpleJavaFileObject(URI.create(className.replace('.', '/') + ".class"), Kind.CLASS) {

@@ -6,15 +6,12 @@
  * Feel free to reuse this code under the MIT License
  * https://opensource.org/licenses/MIT
  */
-package com.agentecon.configuration;
+package com.agentecon.agent;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 import com.agentecon.IAgentFactory;
-import com.agentecon.agent.Endowment;
-import com.agentecon.agent.IAgentIdGenerator;
-import com.agentecon.consumer.Consumer;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IUtility;
 
@@ -29,10 +26,10 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 		assert factories.length >= 1;
 	}
 
-	public AgentFactoryMultiplex(Class<? extends Consumer>[] agents) {
+	public AgentFactoryMultiplex(Class<? extends IConsumer>[] agents) {
 		this.factories = new IAgentFactory[agents.length];
 		for (int i=0; i<agents.length; i++) {
-			final Class<? extends Consumer> current = agents[i];
+			final Class<? extends IConsumer> current = agents[i];
 			this.factories[i] = new IAgentFactory() {
 				
 				@Override

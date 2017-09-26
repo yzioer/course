@@ -25,9 +25,13 @@ public class AgentCompiler implements DiagnosticListener<JavaFileObject> {
 	private JavaCompiler compiler;
 	private SourceFileManager manager;
 
-	public AgentCompiler(RemoteJarLoader simulationJar, SimulationHandle source) {
+	public AgentCompiler(RemoteLoader simulationJar, SimulationHandle source) {
 		this.compiler = ToolProvider.getSystemJavaCompiler();
 		this.manager = new SourceFileManager(simulationJar, source, this);
+	}
+	
+	public boolean alreadyCompiledClass(String name) {
+		return manager.getByteCode(name) != null;
 	}
 
 	public byte[] findClass(String name) throws ClassNotFoundException {
@@ -49,7 +53,11 @@ public class AgentCompiler implements DiagnosticListener<JavaFileObject> {
 
 	@Override
 	public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
-		throw new RuntimeException(diagnostic.toString());
+		if (diagnostic.getKind() == javax.tools.Diagnostic.Kind.ERROR) { 
+			throw new RuntimeException(diagnostic.toString());
+		} else {
+			System.out.println("Compiler warns: " + diagnostic);
+		}
 	}
 
 }

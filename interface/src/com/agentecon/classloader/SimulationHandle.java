@@ -7,16 +7,19 @@ import java.util.Collection;
 
 public abstract class SimulationHandle {
 	
+	protected static final String SOURCE_FOLDER = "src";
+	
 	public static final String JAVA_SUFFIX = ".java";
-	public static final String JAR_PATH = "simulation/jar/simulation.jar";
 
 	private String owner, name;
+	private String[] projects;
 
-	public SimulationHandle(String owner, String name) {
+	public SimulationHandle(String owner, String repo, boolean simulation) {
 		this.owner = owner;
-		this.name = name;
+		this.name = repo;
+		this.projects = simulation ? new String[] {"simulation"} : new String[] {"exercises"};
 	}
-
+	
 	public String getRepo() {
 		return name;
 	}
@@ -25,15 +28,23 @@ public abstract class SimulationHandle {
 		return owner;
 	}
 	
+	protected String[] getProjects() {
+		return projects;
+	}
+	
 	public abstract String getBranch();
 	
-	public abstract boolean isPresent() throws IOException;
+	public abstract boolean isClassPresent(String path) throws IOException;
+	
+	protected String toFilePath(String classname) {
+		int usdIndex = classname.indexOf('$');
+		if (usdIndex >= 0) {
+			classname = classname.substring(0, usdIndex);
+		}
+		return SOURCE_FOLDER + "/" + classname.replace('.', '/') + ".java";
+	}
 	
 	public abstract String getPath();
-	
-	public abstract long getJarDate() throws IOException;
-	
-	public abstract InputStream openJar() throws IOException;
 	
 	public abstract URL getBrowsableURL(String classname);
 	

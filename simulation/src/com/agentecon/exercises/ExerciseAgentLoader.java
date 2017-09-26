@@ -8,7 +8,6 @@
  */
 package com.agentecon.exercises;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
 import java.util.ArrayList;
@@ -17,10 +16,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.agentecon.IAgentFactory;
+import com.agentecon.agent.AgentFactoryMultiplex;
 import com.agentecon.classloader.GitSimulationHandle;
 import com.agentecon.classloader.LocalSimulationHandle;
-import com.agentecon.configuration.AgentFactoryMultiplex;
-import com.agentecon.configuration.CompilingAgentFactory;
 
 public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
@@ -40,13 +38,13 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 	}
 
 	private static IAgentFactory[] createFactories(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
-		ArrayList<CompilingAgentFactory> factories = new ArrayList<>();
-		CompilingAgentFactory defaultFactory = new CompilingAgentFactory(classname, "meisser", "course");
-		factories.add(defaultFactory);
+		ArrayList<ExerciseAgentFactory> factories = new ArrayList<>();
 		if (remoteTeams) {
-			Stream<CompilingAgentFactory> stream = TEAMS.parallelStream().map(team -> {
+			ExerciseAgentFactory defaultFactory = new ExerciseAgentFactory(classname, "meisser", "course");
+			factories.add(defaultFactory);
+			Stream<ExerciseAgentFactory> stream = TEAMS.parallelStream().map(team -> {
 				try {
-					CompilingAgentFactory factory = new CompilingAgentFactory(classname, new GitSimulationHandle("meisser", team));
+					ExerciseAgentFactory factory = new ExerciseAgentFactory(classname, new GitSimulationHandle("meisser", team, false));
 					factory.preload();
 					return factory;
 				} catch (IOException e) {
@@ -57,8 +55,8 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 			}).filter(factory -> factory != null);
 			factories.addAll(stream.collect(Collectors.toList()));
 		} else {
-			LocalSimulationHandle local = new LocalSimulationHandle(new File("../exercises/src"));
-			factories.add(new CompilingAgentFactory(classname, local));
+			LocalSimulationHandle local = new LocalSimulationHandle(false);
+			factories.add(new ExerciseAgentFactory(classname, local));
 		}
 		return factories.toArray(new IAgentFactory[factories.size()]);
 	}
