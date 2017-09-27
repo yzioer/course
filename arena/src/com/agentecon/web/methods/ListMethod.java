@@ -36,7 +36,7 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	public void add(SimulationHandle handle) {
-		this.handles.put(handle.getBranch(), handle);
+		this.handles.put(handle.getIdentifier(), handle);
 	}
 
 	protected synchronized void update(SimulationHandle handle, SimulationStepper stepper) {
@@ -85,12 +85,12 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	public SimulationStepper getSimulation(String name) throws IOException {
-		SimulationHandle handle = handles.get(name);
+		SimulationHandle handle = getHandle(name);
 		return getSimulation(handle);
 	}
 
-	public SimulationHandle getHandle(String simulation) {
-		return handles.get(simulation);
+	public SimulationHandle getHandle(String name) {
+		return handles.get(SimulationHandle.toIdentifier(name));
 	}
 
 	@Override
