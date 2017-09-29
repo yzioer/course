@@ -1,4 +1,4 @@
-# Exercise 2 - The Famer
+# Exercise 2 - The Farmer
 
 Instead of farming for itself in solitude as in exercise 1, your agent is now interacting with others through a common market. In fact, there will be multiple instances of your agent class in the simulation and not just one. The resulting score is the average of these instances.
 
