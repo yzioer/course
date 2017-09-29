@@ -18,4 +18,4 @@ If your farmers manage to achieve a similar utility as the hermit on its own, yo
 
 Document your findings in the [lab journal](exercise02-journal.md) as you try out different ideas to make your agent behave well.
 
-The deadline for submitting your hermit and the lab journal to github is 2017-10-05 at 24:00.
+The deadline for submitting your farmer and the lab journal to github is 2017-10-05 at 24:00.
