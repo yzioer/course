@@ -24,17 +24,26 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 	private IAgentFactory[] factories;
 
 	public AgentFactoryMultiplex(IAgentFactory... factories) throws IOException {
-		this.factories = factories;
-		this.current = 1;
-		assert factories.length >= 1;
+		if (factories.length == 0) {
+			this.factories = new IAgentFactory[] { new IAgentFactory() {
+
+				@Override
+				public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+					return null;
+				}
+			} };
+		} else {
+			this.factories = factories;
+		}
+		this.current = 0;
 	}
 
 	public AgentFactoryMultiplex(Class<? extends Consumer>[] agents, int maxPerType) {
 		this.factories = new IAgentFactory[agents.length];
-		for (int i=0; i<agents.length; i++) {
+		for (int i = 0; i < agents.length; i++) {
 			final Class<? extends Consumer> current = agents[i];
 			this.factories[i] = new LimitingAgentFactory(maxPerType, new IAgentFactory() {
-				
+
 				@Override
 				public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
 					try {

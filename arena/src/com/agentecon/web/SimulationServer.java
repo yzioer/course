@@ -32,10 +32,10 @@ public class SimulationServer extends VisServer {
 		super(port);
 
 		this.simulations = new ListMethod();
-		if (!SimulationConfig.isServerConfig()) {
+//		if (!SimulationConfig.isServerConfig()) {
 			this.simulations.add(new LocalSimulationHandle());
-			new LocalSimulationUpdater(this.simulations).start();
-		}
+//			new LocalSimulationUpdater(this.simulations).start();
+//		}
 		try {
 //			this.simulations.add(new GitSimulationHandle("meisserecon", "agentecon", "demo-2", true));
 			this.simulations.add(new GitSimulationHandle("meisser", "course", "master", true));

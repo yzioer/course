@@ -17,7 +17,6 @@ import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.agent.IAgents;
 import com.agentecon.configuration.AgentFactoryMultiplex;
-import com.agentecon.configuration.LimitingAgentFactory;
 import com.agentecon.consumer.Consumer;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IUtility;
@@ -61,7 +60,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 	}
 
 	public FarmingConfiguration() throws IOException {
-		this(new AgentFactoryMultiplex(new LimitingAgentFactory(AGENTS, new ExerciseAgentFactory(FARMER))), AGENTS);
+		this(new ExerciseAgentLoader(FARMER), AGENTS);
 	}
 
 	public FarmingConfiguration(IAgentFactory factory, int agents) {

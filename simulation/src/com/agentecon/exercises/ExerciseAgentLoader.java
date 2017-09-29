@@ -16,16 +16,31 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.agentecon.IAgentFactory;
-import com.agentecon.agent.AgentFactoryMultiplex;
+import com.agentecon.agent.Endowment;
+import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.classloader.GitSimulationHandle;
-import com.agentecon.classloader.LocalSimulationHandle;
+import com.agentecon.configuration.AgentFactoryMultiplex;
+import com.agentecon.consumer.IConsumer;
+import com.agentecon.consumer.IUtility;
+import com.agentecon.sim.SimulationConfig;
 
 public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
 	private static final Collection<String> TEAMS = createRepos(1,2,3,4,5,7,10);
+	
+	private IAgentFactory defaultFactory;
+	
+	public ExerciseAgentLoader(String classname) throws SocketTimeoutException, IOException {
+		this(classname, SimulationConfig.isServerConfig());
+	}
 
 	public ExerciseAgentLoader(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
 		super(createFactories(classname, remoteTeams));
+		if (remoteTeams) {
+			defaultFactory = new ExerciseAgentFactory(classname, "meisser", "course");
+		} else {
+			defaultFactory = new ExerciseAgentFactory(classname);
+		}
 	}
 
 	private static Collection<String> createRepos(int... numbers) {
@@ -40,8 +55,6 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 	private static IAgentFactory[] createFactories(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
 		ArrayList<ExerciseAgentFactory> factories = new ArrayList<>();
 		if (remoteTeams) {
-			ExerciseAgentFactory defaultFactory = new ExerciseAgentFactory(classname, "meisser", "course");
-			factories.add(defaultFactory);
 			Stream<ExerciseAgentFactory> stream = TEAMS.parallelStream().map(team -> {
 				try {
 					ExerciseAgentFactory factory = new ExerciseAgentFactory(classname, new GitSimulationHandle("meisser", team, false));
@@ -54,11 +67,13 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 				}
 			}).filter(factory -> factory != null);
 			factories.addAll(stream.collect(Collectors.toList()));
-		} else {
-			LocalSimulationHandle local = new LocalSimulationHandle(false);
-			factories.add(new ExerciseAgentFactory(classname, local));
 		}
 		return factories.toArray(new IAgentFactory[factories.size()]);
+	}
+	
+	@Override
+	protected IConsumer createDefault(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+		return defaultFactory.createConsumer(id, endowment, utilityFunction);
 	}
 
 }
