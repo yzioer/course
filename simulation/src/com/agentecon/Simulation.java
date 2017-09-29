@@ -12,7 +12,6 @@ import com.agentecon.agent.IAgents;
 import com.agentecon.configuration.IConfiguration;
 import com.agentecon.events.SimEvent;
 import com.agentecon.exercises.FarmingConfiguration;
-import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.finance.StockMarket;
 import com.agentecon.goods.Good;
 import com.agentecon.market.IDiscountRate;
@@ -44,7 +43,7 @@ public class Simulation implements ISimulation, IStatistics, IIteratedSimulation
 	private MarketStatistics goodsMarketStats;
 
 	public Simulation() throws IOException {
-		this(new HermitConfiguration());
+		this(new FarmingConfiguration());
 	}
 	
 	public Simulation(IConfiguration metaConfig) {
