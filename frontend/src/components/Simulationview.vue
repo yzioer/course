@@ -4,7 +4,7 @@
     <div v-if="loading">Loading...</div>
     <div v-if="!loading">This simulation is based on the <a :href="simInfo.configurationSourceURL">{{simInfo.configurationName}} configuration</a> and runs for {{simInfo.days}} days.</div>
     <h2>Ranking</h2>
-    <p>The ranking is based on an exponentially moving average, measured at the last day of the simulation. If there are multiple instances of an agent type, the type score is the average score of its instances. The number of simulation days may change before the final ranking, so do not bet on it.</p>
+    <p>The ranking is based on an exponentially moving average, measured at the last day of the simulation. If there are multiple instances of an agent type, the type score is the average score of its instances. Your team does not appear in the ranking until you have pushed the agent class for the relevant exercise to github. The number of simulation days may change before the final ranking, so do not bet on it.</p>
     <table class="agentlist" v-if="!loadingRanking">
       <tr><td>Rank</td><td>Agent</td><td>Utility</td><td>Source</td><td>Version</td></tr>
       <tr v-for="(rank,index) in ranking">
