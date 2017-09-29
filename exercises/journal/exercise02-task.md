@@ -6,9 +6,9 @@ The utility and production functions are still the same as the last time, but ma
 
 Note that the simulation is configured such that in the efficient equilibrium, the optimal number of firms is lower than number of consumers. In fact, it is easy to see that with seven hermits working on six farms, total output is slightly higher than before:
 
-$(\frac{7}{6} 12.75-6)^{0.6} 100^{0.2} \frac{6}{7} = 7.97911$
+The hermit's optimal production: $(12.75-6)^{0.6} 100^{0.2}=7.899$
 
-$(12.75-6)^{0.6} 100^{0.2}=7.899$
+Seven hermits using the same amount of man-hours on six farms: \frac{6}{7} $(\frac{7}{6} 12.75-6)^{0.6} 100^{0.2} = 7.97911$
 
 The question is, will the agents be able to coordinate on such an equilibrium? Is it even an equilibrium? Is it stable? It is not clear a priori whether this is the case, as our market is not complete. I.e. we cannot trade shares yet, and we cannot trade land yet.
 
