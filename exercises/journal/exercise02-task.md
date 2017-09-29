@@ -14,7 +14,7 @@ The question is, will the agents be able to coordinate on such an equilibrium? I
 
 If you want, you can solve this problem mathematically. Alternatively, you can also just play around with your [Farmer class](../src/com/agentecon/exercise2/Farmer.java) and the [Farm](../src/com/agentecon/exercise2/Farmer.java) he is creating to find out how to achieve a better utility. After having pushed your code to github, you can check out the [resulting ranking online](http://meissereconomics.com/vis/simulation?sim=ex2-farmer).
 
-The main two variables to tune are the spendings and the dividends of the firm. These are calculated in the methods calculateBudget and calculateDividends. From a system dynamics point of view, they are control variables for the size of the firm will get. If your farmers manage to achieve a similar utility as the hermit on its own, you are already doing very well. Also, the competitive economy might get somewhate messy in comparison to what your agents do locally when they are only among themselves.
+The main two variables to tune are the spendings and the dividends of the firm. These are calculated in the methods calculateBudget and calculateDividends. From a system dynamics point of view, they are control variables for the size of the firm. If your farmers manage to achieve a similar utility as the hermit on its own, you are already doing very well. Also, the competitive economy might get somewhate messy in comparison to what your agents do locally when they are only among themselves.
 
 Document your findings in the [lab journal](exercise02-journal.md) as you try out different ideas to make your agent behave well.
 
