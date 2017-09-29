@@ -2,7 +2,7 @@ package com.agentecon.events;
 
 import com.agentecon.agent.Agent;
 import com.agentecon.agent.Endowment;
-import com.agentecon.firm.Producer;
+import com.agentecon.firm.OldProducer;
 import com.agentecon.production.IProductionFunction;
 import com.agentecon.world.ICountry;
 
@@ -22,7 +22,7 @@ public class FirmEvent extends SimEvent {
 	@Override
 	public void execute(int day, ICountry sim) {
 		for (int i = 0; i < getCardinality(); i++) {
-			sim.add(new Producer(sim, end, prodFun){
+			sim.add(new OldProducer(sim, end, prodFun){
 				
 				@Override
 				protected String inferType(Class<? extends Agent> clazz) {

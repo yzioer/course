@@ -23,7 +23,7 @@ import com.agentecon.production.IProductionFunction;
 import com.agentecon.production.PriceUnknownException;
 import com.agentecon.production.ProducerListeners;
 
-public class Producer extends Firm implements IProducer {
+public class OldProducer extends Firm implements IProducer {
 
 	protected InputFactor[] inputs;
 	protected OutputFactor output;
@@ -33,11 +33,11 @@ public class Producer extends Firm implements IProducer {
 
 	private ProducerListeners listeners;
 
-	public Producer(IAgentIdGenerator id, Endowment end, IProductionFunction prod) {
+	public OldProducer(IAgentIdGenerator id, Endowment end, IProductionFunction prod) {
 		this(id, end, prod, new ExpectedRevenueBasedStrategy(((CobbDouglasProduction) prod).getTotalWeight()));
 	}
 
-	public Producer(IAgentIdGenerator id, Endowment end, IProductionFunction prod, IFirmDecisions strategy) {
+	public OldProducer(IAgentIdGenerator id, Endowment end, IProductionFunction prod, IFirmDecisions strategy) {
 		super(id, end);
 		this.prod = prod;
 		this.strategy = strategy;
@@ -67,7 +67,7 @@ public class Producer extends Firm implements IProducer {
 			
 			@Override
 			public double getPriceBelief(Good good) throws PriceUnknownException {
-				return Producer.this.getFactor(good).getPrice();
+				return OldProducer.this.getFactor(good).getPrice();
 			}
 		};
 	}
@@ -168,8 +168,8 @@ public class Producer extends Firm implements IProducer {
 		return output.getPrice();
 	}
 
-	public Producer createNextGeneration(IAgentIdGenerator id, Endowment end, IProductionFunction prod) {
-		return new Producer(id, end, prod, strategy);
+	public OldProducer createNextGeneration(IAgentIdGenerator id, Endowment end, IProductionFunction prod) {
+		return new OldProducer(id, end, prod, strategy);
 	}
 
 	private Factor getFactor(Good good) {
@@ -200,8 +200,8 @@ public class Producer extends Firm implements IProducer {
 	}
 
 	@Override
-	public Producer clone() {
-		Producer klon = (Producer) super.clone();
+	public OldProducer clone() {
+		OldProducer klon = (OldProducer) super.clone();
 		klon.output = output.duplicate(klon.getStock(output.getGood()));
 		klon.inputs = new InputFactor[inputs.length];
 		klon.strategy = strategy.duplicate();

@@ -5,7 +5,7 @@ import java.util.Random;
 
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
-import com.agentecon.firm.Producer;
+import com.agentecon.firm.OldProducer;
 import com.agentecon.firm.production.LogProdFun;
 import com.agentecon.goods.IStock;
 import com.agentecon.goods.Inventory;
@@ -18,7 +18,7 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 	private Endowment end;
 	private FirstDayProduction prod;
 	private LogProdFun prodFun;
-	private ArrayList<Producer> firms;
+	private ArrayList<OldProducer> firms;
 
 	public EvolvingFirmEvent(IAgentIdGenerator id, int firmsPerType, String type, Endowment end, LogProdFun fun, Random rand) {
 		super(0, firmsPerType);
@@ -26,7 +26,7 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 		this.prodFun = fun;
 		this.firms = new ArrayList<>();
 		for (int i = 0; i < getCardinality(); i++) {
-			firms.add(new Producer(id, end, fun));
+			firms.add(new OldProducer(id, end, fun));
 		}
 		this.id = id;
 		initListener();
@@ -34,12 +34,12 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 
 	private void initListener() {
 		this.prod = new FirstDayProduction(firms.size());
-		for (Producer firm : firms) {
+		for (OldProducer firm : firms) {
 			firm.addProducerMonitor(prod);
 		}
 	}
 
-	private EvolvingFirmEvent(int cardinality, Endowment end, LogProdFun prodFun, ArrayList<Producer> firms) {
+	private EvolvingFirmEvent(int cardinality, Endowment end, LogProdFun prodFun, ArrayList<OldProducer> firms) {
 		super(0, cardinality);
 		this.end = end;
 		this.prodFun = prodFun;
@@ -50,9 +50,9 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 
 	@Override
 	public EvolvingEvent createNextGeneration() {
-		ArrayList<Producer> newFirms = new ArrayList<>();
+		ArrayList<OldProducer> newFirms = new ArrayList<>();
 		adaptEndowment();
-		for (Producer firm : firms) {
+		for (OldProducer firm : firms) {
 			newFirms.add(firm.createNextGeneration(id, end, prodFun));
 		}
 		return new EvolvingFirmEvent(getCardinality(), end, prodFun, newFirms);
@@ -73,7 +73,7 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 	@Override
 	public double getScore() {
 		Average avg = new Average();
-		for (Producer firm : firms) {
+		for (OldProducer firm : firms) {
 			avg.add(firm.getOutputPrice());
 		}
 		return avg.getAverage();
@@ -81,7 +81,7 @@ public class EvolvingFirmEvent extends EvolvingEvent {
 
 	@Override
 	public void execute(int day, ICountry sim) {
-		for (Producer firm : firms) {
+		for (OldProducer firm : firms) {
 			sim.add(firm);
 		}
 	}

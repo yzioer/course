@@ -15,6 +15,7 @@ import com.agentecon.IAgentFactory;
 import com.agentecon.ISimulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
+import com.agentecon.agent.IAgents;
 import com.agentecon.configuration.AgentFactoryMultiplex;
 import com.agentecon.configuration.LimitingAgentFactory;
 import com.agentecon.consumer.Consumer;
@@ -37,13 +38,15 @@ import com.agentecon.production.PriceUnknownException;
 import com.agentecon.research.IInnovation;
 import com.agentecon.research.IResearchProject;
 import com.agentecon.sim.SimulationConfig;
+import com.agentecon.util.Average;
 
 public class FarmingConfiguration extends SimulationConfig implements IInnovation, IUtilityFactory {
+
+	private static final int AGENTS = 32;
 
 	public static final String FARMER = "com.agentecon.exercise2.Farmer";
 	public static final String EXPERIMENTAL_FARMER = "com.agentecon.exercise2.ExperimentalFarmer";
 
-	public static final Good GOLD = new Good("Gold", 1.0);
 	public static final Good LAND = HermitConfiguration.LAND;
 	public static final Good POTATOE = HermitConfiguration.POTATOE;
 	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
@@ -54,27 +57,18 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	@SafeVarargs
 	public FarmingConfiguration(Class<? extends Consumer>... agents) {
-		this(new AgentFactoryMultiplex(agents), 30);
+		this(new AgentFactoryMultiplex(agents, AGENTS), AGENTS);
 	}
-	
+
 	public FarmingConfiguration() throws IOException {
-		this(new AgentFactoryMultiplex(new IAgentFactory() {
-
-			@Override
-			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-				return new Consumer(id, endowment, utilityFunction);
-			}
-
-		}, new LimitingAgentFactory(1, new ExerciseAgentFactory(EXPERIMENTAL_FARMER)),
-				new LimitingAgentFactory(1, new ExerciseAgentFactory(HermitConfiguration.AGENT_CLASS_NAME)),
-				new LimitingAgentFactory(30, new ExerciseAgentFactory(FARMER))), 60);
+		this(new AgentFactoryMultiplex(new LimitingAgentFactory(AGENTS, new ExerciseAgentFactory(FARMER))), AGENTS);
 	}
 
 	public FarmingConfiguration(IAgentFactory factory, int agents) {
 		super(ROUNDS);
-		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100), new Stock(GOLD, 1000) };
+		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100), new Stock(getMoney(), 1000) };
 		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, HermitConfiguration.DAILY_ENDOWMENT) };
-		Endowment end = new Endowment(GOLD, initialEndowment, dailyEndowment);
+		Endowment end = new Endowment(getMoney(), initialEndowment, dailyEndowment);
 		addEvent(new ConsumerEvent(agents, end, this) {
 			@Override
 			protected IConsumer createConsumer(IAgentIdGenerator id, Endowment end, IUtility util) {
@@ -88,12 +82,6 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 		return new LogUtilWithFloor(new Weight(POTATOE, 1.0), new Weight(MAN_HOUR, 1.0));
 	}
 
-	// Use gold as money
-	@Override
-	public Good getMoney() {
-		return GOLD;
-	}
-
 	@Override
 	public IInnovation getInnovation() {
 		return this;
@@ -102,7 +90,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 	@Override
 	public CobbDouglasProductionWithFixedCost createProductionFunction(Good desiredOutput) {
 		assert desiredOutput.equals(POTATOE);
-		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FIXED_COSTS, new Weight(LAND, 0.25, true), new Weight(MAN_HOUR, 0.75));
+		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FIXED_COSTS, new Weight(LAND, 0.2, true), new Weight(MAN_HOUR, 0.6));
 	}
 
 	@Override
@@ -110,29 +98,46 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 		return null;
 	}
 
+	@Override
 	public void diagnoseResult(PrintStream out, ISimulation sim) {
 		try {
+			IAgents agents = sim.getAgents();
+			System.out.println();
+			System.out.println("On the last day, there were " + agents);
+			Average avg = new Average();
+			for (IConsumer c : agents.getConsumers()) {
+				avg.add(c.getUtilityFunction().getLatestExperiencedUtility());
+			}
+			System.out.println("The average utility experienced by the consumer on the last day was: " + avg.toFullString());
+
 			IStatistics stats = sim.getStatistics();
 			CobbDouglasProductionWithFixedCost prodFun = createProductionFunction(POTATOE);
 			GoodStats manhours = stats.getGoodsMarketStats().getStats(MAN_HOUR);
 			double laborShare = prodFun.getWeight(MAN_HOUR).weight;
 			double optimalNumberOfFirms = manhours.getYesterday().getTotWeight() / FIXED_COSTS.getAmount() * (1 - laborShare);
 			int numberOfFirms = sim.getAgents().getFirms().size();
-			System.out.println(manhours + " implies optimal number of firms k=" + optimalNumberOfFirms + ", actual number of firms is " + numberOfFirms);
-			System.out.println(stats.getGoodsMarketStats());
+			System.out.println();
+			System.out.println("On the last simulation day, " + manhours + " were sold from consumers to firms.");
+			System.out.println("This implies optimal number of firms k=" + optimalNumberOfFirms + ". The actual number of firms is " + numberOfFirms + " (some of which might not be active).");
 
-			Inventory inv = new Inventory(GOLD, new Stock(LAND, 100));
+			Inventory inv = new Inventory(getMoney(), new Stock(LAND, 100));
 			double optimalCost = prodFun.getCostOfMaximumProfit(inv, stats.getGoodsMarketStats());
 			double optimalManhours = optimalCost / stats.getGoodsMarketStats().getPriceBelief(MAN_HOUR);
-			double fixedCosts = prodFun.getFixedCost(MAN_HOUR) * stats.getGoodsMarketStats().getPriceBelief(MAN_HOUR);
+//			double fixedCosts = prodFun.getFixedCost(MAN_HOUR) * stats.getGoodsMarketStats().getPriceBelief(MAN_HOUR);
 			inv.getStock(MAN_HOUR).add(optimalManhours);
 			Quantity prod = prodFun.produce(inv);
 			double profits = prod.getAmount() * stats.getGoodsMarketStats().getPriceBelief(POTATOE) - optimalCost;
 
-			double profitShare = 1.0 - laborShare;
-			double profits2 = (optimalCost - fixedCosts) / laborShare * profitShare - fixedCosts;
-			System.out.println("Firm should use " + optimalManhours + " " + MAN_HOUR + " to produce " + prod + " and yield a profit of " + profits + " (" + profits2 + ")");
+//			double profitShare = 1.0 - laborShare;
+//			double profits2 = (optimalCost - fixedCosts) / laborShare * profitShare - fixedCosts;
+			System.out.println("Given current market prices, a firm should use " + optimalManhours + " " + MAN_HOUR + " to produce " + prod + " and yield a profit of " + profits + ".");
+			double altInput = 12;
+			System.out.println("Using " + altInput + " man-hours would yield a profit of " + getProfits(prodFun, stats, altInput) + ".");
 
+			System.out.println();
+			System.out.println("Market statistics for the last day:");
+			System.out.println(stats.getGoodsMarketStats());
+			
 			double totalInput = manhours.getYesterday().getTotWeight();
 			double perFirm = totalInput / optimalNumberOfFirms;
 			if (perFirm > 0.0) {
@@ -141,42 +146,17 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 				System.out.println("With " + optimalNumberOfFirms + " firms the " + totalInput + " manhours could have produced " + output + " instead of "
 						+ stats.getGoodsMarketStats().getStats(POTATOE).getYesterday().getTotWeight());
 			}
-			double altInput = 12;
-			System.out.println("Using only " + altInput + " man-hours would yield a profit of " + getProfits(prodFun, stats, altInput));
 		} catch (PriceUnknownException e) {
 			e.printStackTrace(out);
 		}
 	}
 
-	private static double getProfits(IProductionFunction prodFun, IStatistics sim, double inputAmount) throws PriceUnknownException {
-		Inventory inv = new Inventory(GOLD, new Stock(LAND, 100));
+	private double getProfits(IProductionFunction prodFun, IStatistics sim, double inputAmount) throws PriceUnknownException {
+		Inventory inv = new Inventory(getMoney(), new Stock(LAND, 100));
 		double costs = inputAmount * sim.getGoodsMarketStats().getPriceBelief(MAN_HOUR);
 		inv.getStock(MAN_HOUR).add(inputAmount);
 		Quantity prod = prodFun.produce(inv);
 		return prod.getAmount() * sim.getGoodsMarketStats().getPriceBelief(POTATOE) - costs;
 	}
-
-//	public static void main(String[] args) throws SocketTimeoutException, IOException {
-//		IAgentFactory defaultFactory = new CompilingAgentFactory(FARMER, new File("../exercises/src")); // this factory loads your Farmer
-//		IAgentFactory normalConsumerFactory = new IAgentFactory() {
-//
-//			@Override
-//			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-//				return new Consumer(id, endowment, utilityFunction);
-//			}
-//		};
-//		// IAgentFactory meisserFactory = new RemoteAgentFactory("meisserecon", "agentecon"); // loads the Hermit implementation from the meisserecon repository
-//		// IAgentFactory other = new RemoteAgentFactory("user", "repo"); // maybe you want to load agents from someone else's repository for comparison?
-//
-//		// Create a multiplex factory that alternates between different factories when instantiating agents
-//		IAgentFactory factory = new AgentFactoryMultiplex(defaultFactory, normalConsumerFactory);
-//
-//		FarmingConfiguration config = new FarmingConfiguration(factory, 10); // Create the configuration
-//		Simulation sim = new Simulation(config); // Create the simulation
-//		ConsumerRanking ranking = new ConsumerRanking(); // Create a ranking
-//		sim.addListener(ranking); // register the ranking as a listener interested in what is going on
-//		sim.run(); // run the simulation
-//		ranking.print(System.out); // print the resulting ranking
-//	}
 
 }

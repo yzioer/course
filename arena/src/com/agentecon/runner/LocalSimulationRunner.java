@@ -46,15 +46,15 @@ public class LocalSimulationRunner {
 		sim.run();
 		// stats.print(System.out);
 		ranking.print(System.out);
-
-		System.out.println();
-		try {
-			writer.export(prices);
-			writer.export(stats);
-			System.out.println();
-		} catch (NoInterestingTimeSeriesFoundException e) {
-			System.out.println("Not creating an excel file for " + stats.getName() + " as there is no interesting data");
-		}
+//
+//		System.out.println();
+//		try {
+//			writer.export(prices);
+//			writer.export(stats);
+//			System.out.println();
+//		} catch (NoInterestingTimeSeriesFoundException e) {
+//			System.out.println("Not creating an excel file for " + stats.getName() + " as there is no interesting data");
+//		}
 		sim.getConfig().diagnoseResult(System.out, sim);
 	}
 

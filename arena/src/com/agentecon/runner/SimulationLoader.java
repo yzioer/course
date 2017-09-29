@@ -38,11 +38,8 @@ public class SimulationLoader {
 			}
 		} else {
 			this.classLoader = new CompilingClassLoader(handle);
-			for (RemoteLoader subloader : remote.getCachedSubloaders()) {
-				if (subloader.isUptoDate()) {
-					classLoader.registerSubloader(subloader);
-				}
-			}
+			// Do not recycle the sub-loaders, as their loaded classes still
+			// refer to superclasses from the old simulation loader
 		}
 	}
 

@@ -189,11 +189,6 @@ public class Agents implements IAgents, IAgentIdGenerator {
 		return seed;
 	}
 
-	@Override
-	public String toString() {
-		return consumers.size() + " consumers, " + producers.size() + " firms";
-	}
-
 	public void refreshReferences() {
 		for (Agent a : all.values()) {
 			a.refreshRef();
@@ -254,5 +249,10 @@ public class Agents implements IAgents, IAgentIdGenerator {
 	public int createUniqueAgentId() {
 		return agentId++;
 	}
-
+	
+	@Override
+	public String toString() {
+		return all.size() + " agents out of which " + consumers.size() + " are consumers and " + firms.size() + " firms.";
+	}
+	
 }

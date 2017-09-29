@@ -47,7 +47,7 @@ export default {
         width: 300,
         height: config.miniCharts.internalHeight,
         margin: {
-          l: 30,
+          l: 40,
           r: 30,
           t: 10,
           b: 30,

@@ -10,6 +10,7 @@ package com.agentecon.market;
 
 import java.util.Random;
 
+import com.agentecon.goods.Good;
 /**
  * Provides access to daily goods and stock market statistics.
  */
@@ -22,6 +23,8 @@ public interface IStatistics {
 	public Random getRandomNumberGenerator();
 	
 	public Average getAverageUtility();
+	
+	public Good getMoney();
 	
 	public IMarketStatistics getGoodsMarketStats();
 	

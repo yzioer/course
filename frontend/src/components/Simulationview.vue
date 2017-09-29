@@ -1,9 +1,10 @@
 <template>
   <div>
     <h1>Simulation '{{ this.$route.query.sim }}'</h1>
-
     <div v-if="loading">Loading...</div>
+    <div v-if="!loading">This simulation is based on the <a :href="simInfo.configurationSourceURL">{{simInfo.configurationName}} configuration</a> and runs for {{simInfo.days}} days.</div>
     <h2>Ranking</h2>
+    <p>The ranking is based on an exponentially moving average, measured at the last day of the simulation. If there are multiple instances of an agent type, the type score is the average score of its instances. The number of simulation days may change before the final ranking, so do not bet on it.</p>
     <table class="agentlist" v-if="!loadingRanking">
       <tr><td>Rank</td><td>Agent</td><td>Utility</td><td>Source</td><td>Version</td></tr>
       <tr v-for="(rank,index) in ranking">
@@ -23,7 +24,7 @@
       <li>
         <router-link :to="{name: 'trades', query: {sim: this.$route.query.sim, day: 0, selection: 'consumers,firms', step: 1}}">Trade</router-link>
       </li>
-    </ul>     
+    </ul>
   </div>
 </template>
 
@@ -37,6 +38,7 @@ export default {
       loading: true,
       loadingRanking: true,
       simDescription: '',
+      simInfo: null,
       ranking: null,
     };
   },
@@ -51,6 +53,7 @@ export default {
     .then(
       (response) => {
         this.simDescription = response.name;
+        this.simInfo = response;
         this.loading = false;
       },
     )

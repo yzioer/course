@@ -29,11 +29,11 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 		assert factories.length >= 1;
 	}
 
-	public AgentFactoryMultiplex(Class<? extends Consumer>[] agents) {
+	public AgentFactoryMultiplex(Class<? extends Consumer>[] agents, int maxPerType) {
 		this.factories = new IAgentFactory[agents.length];
 		for (int i=0; i<agents.length; i++) {
 			final Class<? extends Consumer> current = agents[i];
-			this.factories[i] = new IAgentFactory() {
+			this.factories[i] = new LimitingAgentFactory(maxPerType, new IAgentFactory() {
 				
 				@Override
 				public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
@@ -44,7 +44,7 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 						return null;
 					}
 				}
-			};
+			});
 		}
 	}
 
@@ -60,7 +60,7 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 	}
 
 	protected IConsumer createDefault(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-		return factories[0].createConsumer(id, endowment, utilityFunction);
+		return new Consumer(id, endowment, utilityFunction);
 	}
 
 }

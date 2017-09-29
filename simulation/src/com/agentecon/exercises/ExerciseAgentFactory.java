@@ -68,7 +68,8 @@ public class ExerciseAgentFactory implements IAgentFactory {
 				assert clazz.getClassLoader() == loader;
 				return constructor.newInstance(id, endowment, utilityFunction);
 			} catch (ClassNotFoundException e) {
-				throw new RuntimeException(e);
+				System.err.println("Could not load " + classname + " from " + loader + " due to " + e);
+				return null;
 			} catch (NoSuchMethodException e) {
 				throw new RuntimeException(e);
 			} catch (SecurityException e) {

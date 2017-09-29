@@ -10,7 +10,7 @@ package com.agentecon.learning;
 
 import com.agentecon.util.MovingCovarianceAlt;
 
-public class CovarianceControl {
+public class CovarianceControl implements IControl {
 
 	private MovingCovarianceAlt cov;
 	private IBelief belief;

@@ -18,7 +18,7 @@ public class Rank implements Comparable<Rank> {
 	private String version;
 	private String url;
 	private double averageUtility;
-	private transient int count;
+	private transient int instances;
 
 	public Rank(String type, Agent agent){
 		this.type = type;
@@ -37,10 +37,10 @@ public class Rank implements Comparable<Rank> {
 		return type;
 	}
 	
-	public void add(double lifeTimeUtility){
-		this.averageUtility *= count++;
-		this.averageUtility += lifeTimeUtility;
-		this.averageUtility /= count;
+	public void add(double score){
+		this.averageUtility *= instances++;
+		this.averageUtility += score;
+		this.averageUtility /= instances;
 	}
 	
 	@Override

@@ -34,13 +34,13 @@ import com.agentecon.research.IInnovation;
  * Unlike the Hermit, the farmer can decide to work at other farms and to buy from others. To formalize these relationships, the farmer does not produce himself anymore, but instead uses his land to
  * found a profit-maximizing firm.
  */
-public class Farmer extends Consumer implements IFounder {
+public class AlternateFarmer extends Consumer implements IFounder {
 
 	public static final double MINIMUM_WORKING_HOURS = 5;
 
 	private Good manhours;
 
-	public Farmer(IAgentIdGenerator id, Endowment end, IUtility utility) {
+	public AlternateFarmer(IAgentIdGenerator id, Endowment end, IUtility utility) {
 		super(id, end, utility);
 		this.manhours = end.getDaily()[0].getGood();
 		assert this.manhours.equals(HermitConfiguration.MAN_HOUR);
@@ -53,7 +53,7 @@ public class Farmer extends Consumer implements IFounder {
 			// I have plenty of land and feel lucky, let's see if we want to found a farm
 			IProductionFunction prod = research.createProductionFunction(FarmingConfiguration.POTATOE);
 			if (checkProfitability(statistics.getGoodsMarketStats(), myLand, prod)) {
-				IShareholder owner = Farmer.this;
+				IShareholder owner = AlternateFarmer.this;
 				IStock startingCapital = getMoney().hideRelative(0.5);
 				Firm farm = new Farm(id, owner, startingCapital, myLand, prod, statistics);
 				farm.getInventory().getStock(manhours).transfer(getStock(manhours), 14);
@@ -103,10 +103,7 @@ public class Farmer extends Consumer implements IFounder {
 	public static void main(String[] args) {
 		// Create the simulation configuration and specify which agent classes should participate
 		// The simulation will create multiple instances of every class.
-		FarmingConfiguration configuration = new FarmingConfiguration(Farmer.class);
-		
-		// In case you want to test a setting with two different types of farmers, you configure the simulation like this:
-//		FarmingConfiguration configuration = new FarmingConfiguration(Farmer.class, AlternateFarmer.class);
+		FarmingConfiguration configuration = new FarmingConfiguration(AlternateFarmer.class);
 
 		System.out.print("Creating and running the simulation...");
 		// Create the simulation based on that configuration

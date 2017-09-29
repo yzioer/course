@@ -69,7 +69,7 @@ public class Average implements Cloneable, IAverage {
 	}
 	
 	public String toFullString(){
-		return getAverage() + " (" + getMin() + ", " + getMax() + ")";
+		return getAverage() + " (min " + getMin() + ", max " + getMax() + ")";
 	}
 
 	@Override
