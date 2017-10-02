@@ -42,7 +42,11 @@ public class SimulationServer extends VisServer {
 			}
 		} else {
 			this.simulations.add(new LocalSimulationHandle());
-			new LocalSimulationUpdater(this.simulations).start();
+			if (SimulationConfig.shouldLoadRemoteTeams()) {
+				// only start local reloaded if we don't have remote teams in order to save github api calls
+			} else {
+				new LocalSimulationUpdater(this.simulations).start();
+			}
 		}
 
 		this.methods = new MethodsMethod();

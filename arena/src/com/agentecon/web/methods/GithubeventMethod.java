@@ -57,6 +57,9 @@ public class GithubeventMethod extends WebApiMethod {
 				// multiple commits, just assume the worst. :)
 				simulations.notifyRepositoryChanged(repoName.getAsString());
 			}
+		} else if (params.getParam("repo") != null){
+			// for local testing
+			simulations.notifyRepositoryChanged(params.getParam("repo"));
 		}
 
 		return NanoHTTPD.newFixedLengthResponse("");
