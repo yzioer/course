@@ -92,4 +92,8 @@ public class SimulationConfig implements IDiscountRate {
 		return System.getProperty("agentecon.server") != null;
 	}
 
+	public static boolean shouldLoadRemoteTeams() {
+		return isServerConfig() || System.getProperty("agentecon.remoteteams") != null;
+	}
+
 }

@@ -67,6 +67,13 @@ public class WebUtil {
 			URLConnection conn = url.openConnection();
 			InputStream stream = conn.getInputStream();
 			try {
+				String rateLimit = conn.getHeaderField("X-RateLimit-Remaining");
+				if (rateLimit != null){
+					int remaining = Integer.parseInt(rateLimit);
+					if (remaining < 1000){
+						System.out.println("Warning: only " + remaining + " API calls remaining");
+					}
+				}
 				content += new String(IOUtils.readData(stream));
 				nextPage = getNextPageUrl(conn);
 			} finally {

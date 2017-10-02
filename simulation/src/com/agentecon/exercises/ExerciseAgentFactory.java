@@ -89,5 +89,10 @@ public class ExerciseAgentFactory implements IAgentFactory {
 			return null;
 		}
 	}
+	
+	@Override
+	public String toString(){
+		return "Agent factory for " + classname + " from " + loader;
+	}
 
 }

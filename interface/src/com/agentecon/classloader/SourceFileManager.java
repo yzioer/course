@@ -79,7 +79,7 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 				return list;
 			} else if (location.equals(StandardLocation.CLASS_PATH) && kinds.contains(Kind.CLASS) && parent != null) {
 				ArrayList<JavaFileObject> list = copyList(objects);
-				addJarClasses(packageName, list);
+				addParentClasses(packageName, list);
 				return list;
 			} else {
 				return objects;
@@ -89,11 +89,11 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 		}
 	}
 
-	private void addJarClasses(String packageName, ArrayList<JavaFileObject> list) throws IOException {
-		parent.forEach(packageName, new BiConsumer<String, byte[]>() {
+	private void addParentClasses(String packageName, ArrayList<JavaFileObject> list) throws IOException {
+		parent.forEach(packageName, new BiConsumer<String, IByteCodeSource>() {
 
 			@Override
-			public void accept(String name, byte[] byteCode) {
+			public void accept(String name, IByteCodeSource byteCode) {
 				list.add(getClassFile(name, byteCode));
 			}
 		});
@@ -197,12 +197,22 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 		assert kind == Kind.CLASS;
 		return getClassFileOutput(className);
 	}
-
+	
 	public JavaFileObject getClassFile(final String className, byte[] data) {
+		return getClassFile(className, new IByteCodeSource() {
+
+			@Override
+			public InputStream openStream() {
+				return new ByteArrayInputStream(data);
+			}
+		});
+	}
+
+	public JavaFileObject getClassFile(final String className, IByteCodeSource data) {
 		return new SimpleJavaFileObject(URI.create(className.replace('.', '/') + ".class"), Kind.CLASS) {
 			@Override
-			public ByteArrayInputStream openInputStream() {
-				return new ByteArrayInputStream(data);
+			public InputStream openInputStream() {
+				return data.openStream();
 			}
 		};
 	}

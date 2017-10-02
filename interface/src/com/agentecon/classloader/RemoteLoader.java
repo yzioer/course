@@ -8,7 +8,9 @@
  */
 package com.agentecon.classloader;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -111,7 +113,7 @@ public abstract class RemoteLoader extends ClassLoader {
 		return data;
 	}
 
-	public void forEach(String packageName, BiConsumer<String, byte[]> biConsumer) throws IOException {
+	public void forEach(String packageName, BiConsumer<String, IByteCodeSource> biConsumer) throws IOException {
 		bytecode.forEach(new BiConsumer<String, byte[]>() {
 			
 			private final boolean recurse = false;
@@ -120,7 +122,13 @@ public abstract class RemoteLoader extends ClassLoader {
 			public void accept(String name, byte[] u) {
 				if (name.startsWith(packageName)) {
 					if (recurse || name.substring(packageName.length() + 1).indexOf('.') == -1) {
-						biConsumer.accept(name, u);
+						biConsumer.accept(name, new IByteCodeSource() {
+							
+							@Override
+							public InputStream openStream() {
+								return new ByteArrayInputStream(u);
+							}
+						});
 					}
 				}
 			}

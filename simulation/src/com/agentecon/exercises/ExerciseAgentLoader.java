@@ -31,7 +31,7 @@ public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 	private IAgentFactory defaultFactory;
 	
 	public ExerciseAgentLoader(String classname) throws SocketTimeoutException, IOException {
-		this(classname, SimulationConfig.isServerConfig());
+		this(classname, SimulationConfig.shouldLoadRemoteTeams());
 	}
 
 	public ExerciseAgentLoader(String classname, boolean remoteTeams) throws SocketTimeoutException, IOException {
