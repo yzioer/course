@@ -19,7 +19,7 @@ import java.util.function.BiConsumer;
 public abstract class RemoteLoader extends ClassLoader {
 
 	private String version;
-	private HashMap<String, byte[]> bytecode;
+	private HashMap<String, ByteCodeSource> bytecode;
 
 	protected SimulationHandle source;
 	protected HashMap<SimulationHandle, RemoteLoader> subLoaderCache;
@@ -28,12 +28,8 @@ public abstract class RemoteLoader extends ClassLoader {
 		super(parent);
 		this.version = source.getVersion();
 		this.source = source;
-		this.bytecode = new HashMap<String, byte[]>();
+		this.bytecode = new HashMap<>();
 		this.subLoaderCache = new HashMap<>();
-	}
-
-	protected void cache(String name, byte[] data) {
-		this.bytecode.put(name, data);
 	}
 
 	protected byte[] loadBytecode(String classname) throws ClassNotFoundException {
@@ -42,7 +38,7 @@ public abstract class RemoteLoader extends ClassLoader {
 
 	@Override
 	protected Class<?> findClass(String name) throws ClassNotFoundException {
-		byte[] data = getByteCode(name);
+		byte[] data = getByteCodeSource(name).getData();
 		return super.defineClass(name, data, 0, data.length);
 	}
 
@@ -103,32 +99,31 @@ public abstract class RemoteLoader extends ClassLoader {
 	public SimulationHandle getSource() {
 		return source;
 	}
-
-	public byte[] getByteCode(String name) throws ClassNotFoundException {
-		byte[] data = this.bytecode.get(name);
+	
+	public synchronized ByteCodeSource getByteCodeSource(String name){
+		ByteCodeSource data = this.bytecode.get(name);
 		if (data == null) {
-			data = loadBytecode(name);
-			cache(name, data);
+			data = new ByteCodeSource(name){
+				@Override
+				protected byte[] loadData() throws ClassNotFoundException{
+					return RemoteLoader.this.loadBytecode(name);
+				}
+			};
+			this.bytecode.put(name, data);
 		}
 		return data;
 	}
 
-	public void forEach(String packageName, BiConsumer<String, IByteCodeSource> biConsumer) throws IOException {
-		bytecode.forEach(new BiConsumer<String, byte[]>() {
+	public void forEach(String packageName, BiConsumer<String, ByteCodeSource> biConsumer) throws IOException {
+		bytecode.forEach(new BiConsumer<String, ByteCodeSource>() {
 			
 			private final boolean recurse = false;
 
 			@Override
-			public void accept(String name, byte[] u) {
+			public void accept(String name, ByteCodeSource u) {
 				if (name.startsWith(packageName)) {
 					if (recurse || name.substring(packageName.length() + 1).indexOf('.') == -1) {
-						biConsumer.accept(name, new IByteCodeSource() {
-							
-							@Override
-							public InputStream openStream() {
-								return new ByteArrayInputStream(u);
-							}
-						});
+						biConsumer.accept(name, u);
 					}
 				}
 			}

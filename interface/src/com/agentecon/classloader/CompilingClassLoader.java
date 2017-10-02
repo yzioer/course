@@ -2,9 +2,7 @@
 
 package com.agentecon.classloader;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.SocketTimeoutException;
 import java.util.Collection;
 import java.util.function.BiConsumer;
@@ -23,20 +21,10 @@ public class CompilingClassLoader extends RemoteLoader {
 	}
 
 	@Override
-	public void forEach(String packageName, BiConsumer<String, IByteCodeSource> biConsumer) throws IOException {
+	public void forEach(String packageName, BiConsumer<String, ByteCodeSource> biConsumer) throws IOException {
 		Collection<String> files = source.listSourceFiles(packageName);
 		for (String f : files) {
-			biConsumer.accept(f, new IByteCodeSource() {
-				
-				@Override
-				public InputStream openStream() {
-					try {
-						return new ByteArrayInputStream(getByteCode(f));
-					} catch (ClassNotFoundException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			});
+			biConsumer.accept(f, getByteCodeSource(f));
 		}
 	}
 

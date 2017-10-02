@@ -1,6 +1,5 @@
 package com.agentecon.classloader;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -90,10 +89,10 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 	}
 
 	private void addParentClasses(String packageName, ArrayList<JavaFileObject> list) throws IOException {
-		parent.forEach(packageName, new BiConsumer<String, IByteCodeSource>() {
+		parent.forEach(packageName, new BiConsumer<String, ByteCodeSource>() {
 
 			@Override
-			public void accept(String name, IByteCodeSource byteCode) {
+			public void accept(String name, ByteCodeSource byteCode) {
 				list.add(getClassFile(name, byteCode));
 			}
 		});
@@ -182,11 +181,7 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 		} else if (byteCode.containsKey(className) && kind == Kind.CLASS) {
 			return getClassFile(className, byteCode.get(className).toByteArray());
 		} else if (parent != null) {
-			try {
-				return getClassFile(className, parent.getByteCode(className));
-			} catch (ClassNotFoundException e) {
-				return null;
-			}
+			return getClassFile(className, parent.getByteCodeSource(className));
 		} else {
 			return null;
 		}
@@ -197,22 +192,20 @@ public class SourceFileManager extends ForwardingJavaFileManager<JavaFileManager
 		assert kind == Kind.CLASS;
 		return getClassFileOutput(className);
 	}
-	
-	public JavaFileObject getClassFile(final String className, byte[] data) {
-		return getClassFile(className, new IByteCodeSource() {
 
-			@Override
-			public InputStream openStream() {
-				return new ByteArrayInputStream(data);
-			}
-		});
+	public JavaFileObject getClassFile(final String className, byte[] data) {
+		return getClassFile(className, new ByteCodeSource(className, data));
 	}
 
-	public JavaFileObject getClassFile(final String className, IByteCodeSource data) {
+	public JavaFileObject getClassFile(final String className, ByteCodeSource data) {
 		return new SimpleJavaFileObject(URI.create(className.replace('.', '/') + ".class"), Kind.CLASS) {
 			@Override
-			public InputStream openInputStream() {
-				return data.openStream();
+			public InputStream openInputStream() throws IOException {
+				try {
+					return data.openStream();
+				} catch (ClassNotFoundException e) {
+					throw new IOException(e);
+				}
 			}
 		};
 	}
