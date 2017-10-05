@@ -14,6 +14,8 @@ import com.agentecon.finance.Producer;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.decisions.IFinancials;
 import com.agentecon.goods.IStock;
+import com.agentecon.learning.CovarianceControl;
+import com.agentecon.learning.IControl;
 import com.agentecon.learning.MarketingDepartment;
 import com.agentecon.market.IPriceMakerMarket;
 import com.agentecon.market.IStatistics;
@@ -21,10 +23,12 @@ import com.agentecon.production.IProductionFunction;
 
 public class Farm extends Producer {
 
+	private IControl control;
 	private MarketingDepartment marketing;
 
 	public Farm(IAgentIdGenerator id, IShareholder owner, IStock money, IStock land, IProductionFunction prodFun, IStatistics stats) {
 		super(id, owner, prodFun, stats.getMoney());
+		this.control = new CovarianceControl(10, 0.98);
 		this.marketing = new MarketingDepartment(getMoney(), stats.getGoodsMarketStats(), getStock(FarmingConfiguration.MAN_HOUR), getStock(FarmingConfiguration.POTATOE));
 		getStock(land.getGood()).absorb(land);
 		getMoney().absorb(money);
@@ -38,13 +42,9 @@ public class Farm extends Producer {
 	}
 
 	private double calculateBudget() {
-		return 100; // Why not spending 100? :)
-
-		// Things that might or might not be useful here:
-		// double fixedCosts = getProductionFunction().getFixedCost(FarmingConfiguration.MAN_HOUR);
-		// double manHoursPrice = marketing.getPriceBelief(FarmingConfiguration.MAN_HOUR);
-		// double availableCash = getMoney().getAmount();
-		// etc.
+//		System.out.println(getMoney().getAmount());
+//		return 100;
+		return getMoney().getAmount() * 0.2;
 	}
 
 	@Override
@@ -59,9 +59,8 @@ public class Farm extends Producer {
 
 	@Override
 	protected double calculateDividends(int day) {
-		double money = getMoney().getAmount();
-		double dividendRate = 0.1;
-		return money * dividendRate; // Simply pay out 10% of the current cash reserves as dividends
+		control.reportOutput(marketing.getFinancials(getInventory(), getProductionFunction()).getProfits());
+		return control.getCurrentInput();
 	}
 
 	private int daysWithoutProfit = 0;
@@ -76,7 +75,7 @@ public class Farm extends Producer {
 		} else {
 			daysWithoutProfit = 0;
 		}
-		return daysWithoutProfit > 100;
+		return daysWithoutProfit > 40;
 	}
 
 }
