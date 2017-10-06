@@ -49,7 +49,7 @@ public class DownloadCSVMethod extends SimSpecificMethod {
 		EMetrics metric = EMetrics.parse(params.getParam(CHOICE_PARAMETER));
 		SimulationStepper stepper = getSimulation(params);
 		ISimulation sim = stepper.getSimulation(0).getItem();
-		SimStats stats = metric.createAndRegister(sim);
+		SimStats stats = metric.createAndRegister(sim, params.getSelection());
 		sim.run();
 		ByteArrayOutputStream csvData = new ByteArrayOutputStream();
 		try (PrintStream writer = new PrintStream(csvData)) {

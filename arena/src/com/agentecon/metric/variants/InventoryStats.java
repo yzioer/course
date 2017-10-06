@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
 import com.agentecon.agent.IAgents;
 import com.agentecon.goods.Good;
@@ -33,7 +34,7 @@ public class InventoryStats extends SimStats {
 	// private HashMap<IFirm, HashMap<Good, TimeSeries>> individualInventories;
 	private TimeSeries moneySupply;
 
-	public InventoryStats(IAgents agents) {
+	public InventoryStats(ISimulation agents) {
 		super(agents);
 		this.money = 0.0;
 		this.moneySupply = new TimeSeries("Money Supply");
@@ -69,6 +70,7 @@ public class InventoryStats extends SimStats {
 
 	@Override
 	public void notifyGoodsMarketOpened(IMarket market) {
+		checkMoneySupply(-1);
 		market.addMarketListener(new IMarketListener() {
 
 			@Override
@@ -87,6 +89,7 @@ public class InventoryStats extends SimStats {
 	}
 
 	public void notifyMarketClosed(int day) {
+		IAgents agents = getAgents();
 		checkInventories(day, agents.getFirms(), firmInv);
 		checkInventories(day, agents.getConsumers(), consumerInv);
 		checkMoneySupply(day);
@@ -94,7 +97,7 @@ public class InventoryStats extends SimStats {
 
 	protected void checkMoneySupply(int day) {
 		double money = 0.0;
-		for (IAgent a : agents.getAgents()) {
+		for (IAgent a : getAgents().getAgents()) {
 			money += a.getMoney().getAmount();
 		}
 		if (this.money != money && allowMoneySupplyChange) {
@@ -103,9 +106,11 @@ public class InventoryStats extends SimStats {
 		} else {
 			assert Numbers.equals(this.money, money);
 		}
-		moneySupply.set(day, money);
+		if (day >= 0) {
+			moneySupply.set(day, money);
+		}
 	}
-	
+
 	private void checkInventories(int day, Collection<? extends IAgent> agents, HashMap<Good, MinMaxTimeSeries> inventories) {
 		HashMap<Good, Average> all = new InstantiatingHashMap<Good, Average>() {
 

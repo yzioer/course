@@ -14,6 +14,7 @@ import com.agentecon.finance.Producer;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.decisions.IFinancials;
 import com.agentecon.goods.IStock;
+import com.agentecon.learning.CovarianceControl;
 import com.agentecon.learning.MarketingDepartment;
 import com.agentecon.market.IPriceMakerMarket;
 import com.agentecon.market.IStatistics;
@@ -21,10 +22,12 @@ import com.agentecon.production.IProductionFunction;
 
 public class Farm extends Producer {
 
+	private CovarianceControl control;
 	private MarketingDepartment marketing;
 
 	public Farm(IAgentIdGenerator id, IShareholder owner, IStock money, IStock land, IProductionFunction prodFun, IStatistics stats) {
 		super(id, owner, prodFun, stats.getMoney());
+		this.control = new CovarianceControl(100, 0.95);
 		this.marketing = new MarketingDepartment(getMoney(), stats.getGoodsMarketStats(), getStock(FarmingConfiguration.MAN_HOUR), getStock(FarmingConfiguration.POTATOE));
 		getStock(land.getGood()).absorb(land);
 		getMoney().absorb(money);
@@ -38,13 +41,9 @@ public class Farm extends Producer {
 	}
 
 	private double calculateBudget() {
-		return 100; // Why not spending 100? :)
-
-		// Things that might or might not be useful here:
-		// double fixedCosts = getProductionFunction().getFixedCost(FarmingConfiguration.MAN_HOUR);
-		// double manHoursPrice = marketing.getPriceBelief(FarmingConfiguration.MAN_HOUR);
-		// double availableCash = getMoney().getAmount();
-		// etc.
+		double profits = marketing.getFinancials(getInventory(), getProductionFunction()).getProfits();
+		control.reportOutput(profits);
+		return control.getCurrentInput();
 	}
 
 	@Override
@@ -59,9 +58,14 @@ public class Farm extends Producer {
 
 	@Override
 	protected double calculateDividends(int day) {
-		double money = getMoney().getAmount();
-		double dividendRate = 0.1;
-		return money * dividendRate; // Simply pay out 10% of the current cash reserves as dividends
+		double spending = marketing.getFinancials(getInventory(), getProductionFunction()).getLatestCogs();
+		double targetSize = spending * 10;
+		double excessReserve = getMoney().getAmount() - targetSize;
+		if (excessReserve > 0) {
+			return excessReserve / 10;
+		} else {
+			return 0;
+		}
 	}
 
 	private int daysWithoutProfit = 0;

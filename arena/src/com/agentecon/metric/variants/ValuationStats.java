@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import com.agentecon.agent.IAgents;
+import com.agentecon.ISimulation;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IShareholder;
@@ -22,7 +22,7 @@ public class ValuationStats extends SimStats {
 	private TimeSeries outerValue;
 	private TimeSeries valueRatio;
 
-	public ValuationStats(IAgents agents) {
+	public ValuationStats(ISimulation agents) {
 		super(agents);
 		this.innerValue = new TimeSeries("Inner Value");
 		this.outerValue = new TimeSeries("Outer Value");
@@ -31,7 +31,7 @@ public class ValuationStats extends SimStats {
 
 	@Override
 	public void notifyDayEnded(IStatistics stats) {
-		Collection<? extends IShareholder> holders = agents.getShareholders();
+		Collection<? extends IShareholder> holders = getAgents().getShareholders();
 		double outerValue = 0.0;
 		double innerValue = 0.0;
 		IMarketStatistics stockStats = stats.getStockMarketStats();
@@ -42,7 +42,7 @@ public class ValuationStats extends SimStats {
 			for (Position pos : holder.getPortfolio().getPositions()) {
 				try {
 					double value = pos.getAmount() * stockStats.getPriceBelief(pos.getTicker());
-					IFirm heldCompany = agents.getFirm(pos.getTicker());
+					IFirm heldCompany = getAgents().getFirm(pos.getTicker());
 					if (holder instanceof IFirm) {
 						// only count real companies they hold
 						if (heldCompany instanceof IFirm) {

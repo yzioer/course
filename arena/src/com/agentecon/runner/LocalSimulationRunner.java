@@ -11,11 +11,11 @@ package com.agentecon.runner;
 import java.io.File;
 import java.io.IOException;
 import java.net.SocketTimeoutException;
+import java.util.ArrayList;
 
 import com.agentecon.ISimulation;
 import com.agentecon.classloader.LocalSimulationHandle;
 import com.agentecon.classloader.SimulationHandle;
-import com.agentecon.metric.NoInterestingTimeSeriesFoundException;
 import com.agentecon.metric.SimStats;
 import com.agentecon.metric.export.ExcelWriter;
 import com.agentecon.metric.variants.DividendStats;
@@ -37,7 +37,7 @@ public class LocalSimulationRunner {
 	private void run() throws IOException {
 		UtilityRanking ranking = new UtilityRanking();
 		SimStats prodStats = new ProductionStats();
-		SimStats stats = new DividendStats(sim.getAgents());
+		SimStats stats = new DividendStats(sim, new ArrayList<>());
 		SimStats prices = new MarketStats(true);
 		sim.addListener(prices);
 		sim.addListener(stats);

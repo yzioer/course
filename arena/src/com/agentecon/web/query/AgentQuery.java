@@ -39,7 +39,11 @@ public class AgentQuery {
 			this.id = Integer.parseInt(query);
 		}
 	}
-
+	
+	public EQueryType getType() {
+		return type;
+	}
+	
 	public static final String getExample() {
 		return Parameters.SELECTION + "=" + EQueryType.FIRMS_QUERY;
 	}

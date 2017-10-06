@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
-import com.agentecon.agent.IAgents;
+import com.agentecon.ISimulation;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.market.IStatistics;
 import com.agentecon.metric.SimStats;
@@ -21,7 +21,7 @@ public class Demographics extends SimStats {
 	private TimeSeries population, dependency, dailyutility;
 	private HashMap<String, AveragingTimeSeries> utilityOnDeath;
 
-	public Demographics(IAgents agents) {
+	public Demographics(ISimulation agents) {
 		super(agents);
 		this.retired = new TimeSeries("Retirees");
 		this.working = new TimeSeries("Workers");
@@ -45,7 +45,7 @@ public class Demographics extends SimStats {
 		for (AveragingTimeSeries pc : utilityOnDeath.values()) {
 			pc.push(day);
 		}
-		Collection<? extends IConsumer> cons = agents.getConsumers();
+		Collection<? extends IConsumer> cons = getAgents().getConsumers();
 		int retired = 0, working = 0, total = 0;
 		for (IConsumer c : cons) {
 			total++;

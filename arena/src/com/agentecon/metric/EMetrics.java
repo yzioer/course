@@ -8,6 +8,9 @@
  */
 package com.agentecon.metric;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgents;
 import com.agentecon.metric.variants.Demographics;
@@ -21,23 +24,28 @@ import com.agentecon.metric.variants.ProductionStats;
 import com.agentecon.metric.variants.StockMarketStats;
 import com.agentecon.metric.variants.UtilityStats;
 import com.agentecon.metric.variants.ValuationStats;
+import com.agentecon.web.query.AgentQuery;
 
 public enum EMetrics {
 	
 	DEMOGRAPHICS, DIVIDENDS, INVENTORY, MARKET, MONETARY, OWNERSHIP, FIRM, STOCKMARKET, PRODUCTION, UTILITY, VALUATION;
 	
-	public SimStats createAndRegister(ISimulation sim){
-		SimStats stats = instantiate(sim.getAgents());
+	public SimStats createAndRegister(ISimulation sim, List<String> list){
+		ArrayList<AgentQuery> queries = new ArrayList<>();
+		for (String query: list) {
+			queries.add(new AgentQuery(query));
+		}
+		SimStats stats = instantiate(sim, queries);
 		sim.addListener(stats);
 		return stats;
 	}
 	
-	private SimStats instantiate(IAgents sim){
+	private SimStats instantiate(ISimulation sim, ArrayList<AgentQuery> agents){
 		switch (this){
 		case DEMOGRAPHICS:
 			return new Demographics(sim);
 		case DIVIDENDS:
-			return new DividendStats(sim);
+			return new DividendStats(sim, agents);
 		case FIRM:
 			return new FirmStats();
 		case INVENTORY:

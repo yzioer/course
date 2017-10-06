@@ -42,7 +42,6 @@ public class SimulationRunner {
 		this.stats = new ArrayList<>();
 		this.latestRunStats = new ArrayList<>();
 
-		IAgents agents = sim.getAgents();
 		if (hasIterations(sim)) {
 			iter = (IIteratedSimulation) sim;
 			this.stats.add(new MarketStats(INCL_VOLUME));
@@ -51,16 +50,16 @@ public class SimulationRunner {
 		} else {
 			MarketStats mstats = new MarketStats(true);
 			this.stats.add(mstats);
-			StockMarketStats sstats = new StockMarketStats(agents);
+			StockMarketStats sstats = new StockMarketStats(sim);
 			this.stats.add(sstats);
-			this.stats.add(new ValuationStats(agents));
-			this.stats.add(new OwnershipStats(agents));
-			this.stats.add(new DividendStats(agents));
-			this.stats.add(new MonetaryStats(agents));
+			this.stats.add(new ValuationStats(sim));
+			this.stats.add(new OwnershipStats(sim));
+			this.stats.add(new DividendStats(sim, new ArrayList<>()));
+			this.stats.add(new MonetaryStats(sim));
 			// this.stats.add(new ProductionStats());
 			// this.stats.add(new SingleFirmStats());
 			// this.stats.add(new InventoryStats(sim));
-			this.stats.add(new Demographics(agents));
+			this.stats.add(new Demographics(sim));
 		}
 		this.latestRunStats.addAll(stats);
 		this.output = new ByteArrayOutputStream();

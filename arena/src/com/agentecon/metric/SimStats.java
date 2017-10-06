@@ -12,14 +12,18 @@ import com.agentecon.sim.SimulationListenerAdapter;
 
 public abstract class SimStats extends SimulationListenerAdapter {
 
-	protected final IAgents agents;
-
+	private final ISimulation sim;
+	
 	public SimStats() {
 		this(null);
 	}
 
-	public SimStats(IAgents agents) {
-		this.agents = agents;
+	public SimStats(ISimulation sim) {
+		this.sim = sim;
+	}
+	
+	protected IAgents getAgents() {
+		return sim.getAgents();
 	}
 
 	public abstract Collection<? extends Chart> getCharts(String simId);

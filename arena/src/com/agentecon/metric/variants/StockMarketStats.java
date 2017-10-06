@@ -10,8 +10,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
-import com.agentecon.agent.IAgents;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IConsumerListener;
 import com.agentecon.firm.Ticker;
@@ -37,7 +37,7 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 	private HashMap<Good, TimeSeries> peratio;
 	private AveragingTimeSeries investments, divestments, difference;
 
-	public StockMarketStats(IAgents agents) {
+	public StockMarketStats(ISimulation agents) {
 		super(agents);
 		this.investments = new AveragingTimeSeries("Inflows");
 		this.divestments = new AveragingTimeSeries("Outflows");
@@ -132,7 +132,7 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 			indexPoints.add(avgPrice);
 			sectorIndices.get(sector).add(avgPrice);
 
-			double dividends = agents.getFirm(firm).getShareRegister().getAverageDividend();
+			double dividends = getAgents().getFirm(firm).getShareRegister().getAverageDividend();
 			if (dividends > 1) {
 				double peratio = avgPrice.getAverage() / dividends;
 				indexRatio.add(peratio);

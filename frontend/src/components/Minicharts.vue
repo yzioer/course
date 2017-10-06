@@ -88,8 +88,8 @@ export default {
         .then(
           () => {
             // rescale to max/min range
-            const height = config.miniCharts.internalHeight;
-            const scale = (this.chartData[agent.id].max - this.chartData[agent.id].min) / height;
+            const invheight = 1.0 / config.miniCharts.height;
+            const range = this.chartData[agent.id].max - this.chartData[agent.id].min;
             const data = {
               x: [
                 [...Array(this.chartData[agent.id].data.length).keys()].map(
@@ -98,7 +98,7 @@ export default {
               ],
               y: [
                 this.chartData[agent.id].data.map(
-                  datapoint => (datapoint * scale) + this.chartData[agent.id].min,
+                  datapoint => (range * datapoint * invheight) + this.chartData[agent.id].min,
                 ),
               ],
             };

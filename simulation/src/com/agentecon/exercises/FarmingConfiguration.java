@@ -50,7 +50,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 	public static final Good POTATOE = HermitConfiguration.POTATOE;
 	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
 
-	private static final int ROUNDS = 2000;
+	private static final int ROUNDS = 3000;
 
 	public static final Quantity FIXED_COSTS = HermitConfiguration.FIXED_COSTS;
 

@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
-import com.agentecon.agent.IAgents;
+import com.agentecon.ISimulation;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IFirmListener;
 import com.agentecon.metric.SimStats;
@@ -13,12 +13,13 @@ import com.agentecon.metric.series.AveragingTimeSeries;
 import com.agentecon.metric.series.Chart;
 import com.agentecon.metric.series.TimeSeries;
 import com.agentecon.util.InstantiatingHashMap;
+import com.agentecon.web.query.AgentQuery;
 
 public class DividendStats extends SimStats {
 
 	private HashMap<String, AveragingTimeSeries> dividends;
 
-	public DividendStats(IAgents agents) {
+	public DividendStats(ISimulation agents, ArrayList<AgentQuery> selection) {
 		super(agents);
 		this.dividends = new InstantiatingHashMap<String, AveragingTimeSeries>() {
 

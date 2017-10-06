@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
-import com.agentecon.agent.IAgents;
+import com.agentecon.firm.IFirm;
 import com.agentecon.metric.SimStats;
 import com.agentecon.metric.series.AveragingTimeSeries;
 import com.agentecon.metric.series.Chart;
@@ -16,13 +17,10 @@ import com.agentecon.util.InstantiatingHashMap;
 
 public class MonetaryStats extends SimStats {
 
-	private static final int SKIP = 10;
-
-	private IAgents agents;
 	private HashMap<String, AveragingTimeSeries> cashByType;
 
-	public MonetaryStats(IAgents agents) {
-		this.agents = agents;
+	public MonetaryStats(ISimulation agents) {
+		super(agents);
 		this.cashByType = new InstantiatingHashMap<String, AveragingTimeSeries>() {
 
 			@Override
@@ -34,14 +32,18 @@ public class MonetaryStats extends SimStats {
 
 	@Override
 	public void notifyDayEnded(int day) {
-		for (IAgent a : agents.getAgents()) {
-			double money = a.getMoney().getAmount();
-			cashByType.get(a.getType()).add(money / SKIP);
-		}
-		if (day % SKIP == 0) {
-			for (AveragingTimeSeries ats : cashByType.values()) {
-				ats.pushSum(day);
+		double total = 0.0;
+		for (IAgent a : getAgents().getAgents()) {
+			if (a instanceof IFirm) {
+				double money = a.getMoney().getAmount();
+				total += money;
+				cashByType.get(a.getName()).add(money);
+				// cashByType.get(a.getType()).add(money);
 			}
+		}
+		// cashByType.get("Total").add(total);
+		for (AveragingTimeSeries ats : cashByType.values()) {
+			ats.pushSum(day);
 		}
 	}
 
