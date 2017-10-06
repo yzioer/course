@@ -120,7 +120,7 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 			IStock timeLeft = getStock(soldGood);
 			double endowment = getDailyEndowment(soldGood);
 			double worked = endowment - timeLeft.getAmount();
-			while (worked < minimumWorkAmount){
+			while (Numbers.isSmaller(worked, minimumWorkAmount)){
 				IOffer offer = market.getOffer(soldGood, true);
 				if (offer == null){
 					break;
