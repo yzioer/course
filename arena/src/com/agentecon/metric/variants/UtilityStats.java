@@ -1,5 +1,6 @@
 package com.agentecon.metric.variants;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,9 +45,7 @@ public class UtilityStats extends SimStats {
 
 	@Override
 	public Collection<? extends Chart> getCharts(String simId) {
-		Collection<TimeSeries> list = Arrays.asList(tot, min, max);
-		list.addAll(utilities.values());
-		Chart ch = new Chart(simId, "Average Utility", "Average daily utility per consumer in each iteration", list);
+		Chart ch = new Chart(simId, "Average Utility", "Average daily utility per consumer in each iteration", getTimeSeries());
 		return Collections.singleton(ch);
 	}
 	
@@ -57,7 +56,11 @@ public class UtilityStats extends SimStats {
 
 	@Override
 	public Collection<TimeSeries> getTimeSeries() {
-		return Arrays.asList(tot, min, max);
+		Collection<TimeSeries> list = new ArrayList<>(Arrays.asList(tot, min, max));
+		ArrayList<TimeSeries> individuals = new ArrayList<>(utilities.values());
+		Collections.sort(individuals);
+		list.addAll(individuals);
+		return list;
 	}
 	
 }

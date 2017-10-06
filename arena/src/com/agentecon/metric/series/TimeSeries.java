@@ -9,7 +9,7 @@ import java.util.Iterator;
 import com.agentecon.util.Average;
 import com.agentecon.util.Numbers;
 
-public class TimeSeries {
+public class TimeSeries implements Comparable<TimeSeries> {
 
 	private String name;
 	protected Line line;
@@ -244,6 +244,11 @@ public class TimeSeries {
 		assert Numbers.equals(ts.buildMovingAverage(1).get(0), 0.5f);
 		assert Numbers.equals(ts.buildMovingAverage(5).get(0), (1 + 2 + 3 + 4 + 5) / 6.0f);
 		assert Numbers.equals(ts.buildMovingAverage(5).get(10), (1 + 2 + 3 + 4 + 5) / 6.0f + 10);
+	}
+
+	@Override
+	public int compareTo(TimeSeries o) {
+		return getName().compareTo(o.getName());
 	}
 
 }

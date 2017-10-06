@@ -8,7 +8,7 @@ public class MoneyConfiguration extends FarmingConfiguration {
 	public MoneyConfiguration() {
 		super(Farmer.class);
 		
-//		addEvent(new HelicopterMoneyEvent(1000, 1, 100));
+//		addEvent(new HelicopterMoneyEvent(1000, 1, 1, 100));
 //		addEvent(new InterestEvent(0.01, 100));
 	}
 

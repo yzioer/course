@@ -9,8 +9,8 @@ public class HelicopterMoneyEvent extends SimEvent {
 	private int luckyAgentId;
 	private double amount;
 	
-	public HelicopterMoneyEvent(int day, int luckyAgentId, double amount) {
-		super(day);
+	public HelicopterMoneyEvent(int start, int interval, int luckyAgentId, double amount) {
+		super(start, interval);
 		this.luckyAgentId = luckyAgentId;
 		this.amount = amount;
 	}
