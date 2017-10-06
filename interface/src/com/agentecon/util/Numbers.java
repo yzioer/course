@@ -16,7 +16,7 @@ public class Numbers {
 	}
 
 	public static boolean isSmaller(double smaller, double bigger) {
-		return bigger - smaller < EPSILON;
+		return isBigger(bigger, smaller);
 	}
 
 	public static String toString(double d) {
@@ -55,6 +55,12 @@ public class Numbers {
 		} else {
 			return 1.0;
 		}
+	}
+	
+	public static void main(String[] args) {
+		double worked = 6.899999999999999d;
+		double target = 6.9d;
+		System.out.println(isSmaller(worked, target));
 	}
 
 }
