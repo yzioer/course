@@ -38,6 +38,10 @@ public class GitSimulationHandle extends SimulationHandle {
 		}
 		WebUtil.checkAuthorizationCode();
 	}
+	
+	public SimulationHandle copy(boolean simulation) throws IOException {
+		return new GitSimulationHandle(getOwner(), getRepo(), getBranch(), simulation);
+	}
 
 	public String getPath() {
 		return super.getOwner() + "/" + getRepo() + "/" + branch;

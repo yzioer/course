@@ -73,7 +73,11 @@ public class Line {
 	}
 
 	public int getEnd() {
-		return points.get(points.size() - 1).x;
+		if (points.size() == 0) {
+			return -1;
+		} else {
+			return points.get(points.size() - 1).x;
+		}
 	}
 
 	@Override

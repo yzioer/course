@@ -24,10 +24,6 @@ public class SimulationConfig implements IDiscountRate {
 
 	private ArrayList<Event> events = new ArrayList<Event>();
 
-	@SuppressWarnings("unused")
-	private SimulationConfig() {
-	}
-
 	public SimulationConfig(int rounds) {
 		this(rounds, 23);
 	}

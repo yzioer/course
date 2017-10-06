@@ -31,6 +31,10 @@ public class LocalSimulationHandle extends SimulationHandle {
 		this.version = System.currentTimeMillis();
 		assert base.isDirectory() : base.getAbsolutePath() + " is not a folder";
 	}
+	
+	public SimulationHandle copy(boolean simulation) {
+		return new LocalSimulationHandle(simulation);
+	}
 
 	public String getDescription() {
 		return "Simulation loader from local file system";

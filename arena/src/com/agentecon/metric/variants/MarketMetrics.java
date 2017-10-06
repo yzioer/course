@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IFirmListener;
@@ -34,7 +35,8 @@ public class MarketMetrics extends SimStats implements IMarketListener, IFirmLis
 	private HashMap<Good, AccumulatingAverage> production;
 	private ArrayList<AccumulatingAverage> all;
 
-	public MarketMetrics() {
+	public MarketMetrics(ISimulation sim) {
+		super(sim);
 		this.all = new ArrayList<>();
 		this.dividends = new AccumulatingAverage(MEMORY);
 		this.all.add(dividends);

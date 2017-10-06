@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IFirmListener;
@@ -20,7 +21,8 @@ public class FirmStats extends SimStats {
 	private int day;
 	private HashMap<String, FirmTimeSeries> data;
 
-	public FirmStats() {
+	public FirmStats(ISimulation sim) {
+		super(sim);
 		this.data = new HashMap<>();
 	}
 

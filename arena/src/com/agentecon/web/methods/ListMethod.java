@@ -34,6 +34,10 @@ public class ListMethod extends WebApiMethod {
 		this.simulations = new HashMap<>();
 		this.simulationUpdateExecutor = Executors.newSingleThreadExecutor();
 	}
+	
+	public Collection<String> getSimulations() {
+		return handles.keySet();
+	}
 
 	public void add(SimulationHandle handle) {
 		this.handles.put(handle.getIdentifier(), handle);

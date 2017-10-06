@@ -14,10 +14,6 @@ public abstract class SimStats extends SimulationListenerAdapter {
 
 	private final ISimulation sim;
 	
-	public SimStats() {
-		this(null);
-	}
-
 	public SimStats(ISimulation sim) {
 		this.sim = sim;
 	}

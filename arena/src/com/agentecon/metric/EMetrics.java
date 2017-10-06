@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.agentecon.ISimulation;
-import com.agentecon.agent.IAgents;
+import com.agentecon.metric.variants.CashStats;
 import com.agentecon.metric.variants.Demographics;
 import com.agentecon.metric.variants.DividendStats;
 import com.agentecon.metric.variants.FirmStats;
@@ -28,7 +28,7 @@ import com.agentecon.web.query.AgentQuery;
 
 public enum EMetrics {
 	
-	DEMOGRAPHICS, DIVIDENDS, INVENTORY, MARKET, MONETARY, OWNERSHIP, FIRM, STOCKMARKET, PRODUCTION, UTILITY, VALUATION;
+	CASH, DEMOGRAPHICS, DIVIDENDS, INVENTORY, MARKET, MONETARY, OWNERSHIP, FIRM, STOCKMARKET, PRODUCTION, UTILITY, VALUATION;
 	
 	public SimStats createAndRegister(ISimulation sim, List<String> list){
 		ArrayList<AgentQuery> queries = new ArrayList<>();
@@ -47,21 +47,23 @@ public enum EMetrics {
 		case DIVIDENDS:
 			return new DividendStats(sim, agents);
 		case FIRM:
-			return new FirmStats();
+			return new FirmStats(sim);
 		case INVENTORY:
 			return new InventoryStats(sim);
 		case MARKET:
-			return new MarketStats(true);
+			return new MarketStats(sim, true);
+		case CASH:
+			return new CashStats(sim);
 		case MONETARY:
 			return new MonetaryStats(sim);
 		case OWNERSHIP:
 			return new OwnershipStats(sim);
 		case PRODUCTION:
-			return new ProductionStats();
+			return new ProductionStats(sim);
 		case STOCKMARKET:
 			return new StockMarketStats(sim);
 		case UTILITY:
-			return new UtilityStats();
+			return new UtilityStats(sim);
 		case VALUATION:
 			return new ValuationStats(sim);
 		default:

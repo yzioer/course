@@ -7,6 +7,10 @@ import com.agentecon.world.ICountry;
 
 public abstract class SimEvent extends Event {
 	
+	public SimEvent(int step) {
+		this(step, 1);
+	}
+	
     public SimEvent(int step, int card) {
     	super(step, card);
 	}

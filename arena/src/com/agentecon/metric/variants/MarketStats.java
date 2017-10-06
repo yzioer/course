@@ -30,7 +30,8 @@ public class MarketStats extends SimStats implements IMarketListener {
 	private HashMap<Good, TimeSeries> volume;
 	private TimeSeries index;
 
-	public MarketStats(boolean inclVolume) {
+	public MarketStats(ISimulation sim, boolean inclVolume) {
+		super(sim);
 		this.index = new TimeSeries("Price Index");
 		this.averages = new InstantiatingHashMap<Good, Average>() {
 

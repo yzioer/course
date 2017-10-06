@@ -6,7 +6,7 @@
  * Feel free to reuse this code under the MIT License
  * https://opensource.org/licenses/MIT
  */
-package com.agentecon.exercise2;
+package com.agentecon.exercise3;
 
 import com.agentecon.Simulation;
 import com.agentecon.agent.Endowment;
@@ -35,6 +35,8 @@ import com.agentecon.research.IInnovation;
  * found a profit-maximizing firm.
  */
 public class Farmer extends Consumer implements IFounder {
+	
+	private static final double CAPITAL_BUFFER = 0.80;
 
 	public static final double MINIMUM_WORKING_HOURS = 5;
 
@@ -49,7 +51,7 @@ public class Farmer extends Consumer implements IFounder {
 	@Override
 	public IFirm considerCreatingFirm(IStatistics statistics, IInnovation research, IAgentIdGenerator id) {
 		IStock myLand = getStock(FarmingConfiguration.LAND);
-		if (myLand.hasSome() && statistics.getRandomNumberGenerator().nextDouble() < 0.05) {
+		if (myLand.hasSome() && statistics.getRandomNumberGenerator().nextDouble() < 0.05 && getAge() < 2000) {
 			// I have plenty of land and feel lucky, let's see if we want to found a farm
 			IProductionFunction prod = research.createProductionFunction(FarmingConfiguration.POTATOE);
 			if (checkProfitability(statistics.getGoodsMarketStats(), myLand, prod)) {
@@ -90,7 +92,7 @@ public class Farmer extends Consumer implements IFounder {
 		// Before calling the optimal trade function, we create a facade inventory that hides 80% of the money.
 		// That way, we can build up some savings to smoothen fluctuations and to create new firms. In equilibrium,
 		// the daily amount spent is the same, but more smooth over time.
-		Inventory reducedInv = inv.hideRelative(getMoney().getGood(), 0.8);
+		Inventory reducedInv = inv.hideRelative(getMoney().getGood(), CAPITAL_BUFFER);
 		super.trade(reducedInv, market);
 	}
 

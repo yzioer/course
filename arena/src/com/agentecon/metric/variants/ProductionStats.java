@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
 
+import com.agentecon.ISimulation;
 import com.agentecon.firm.IFirm;
 import com.agentecon.goods.Good;
 import com.agentecon.metric.SimStats;
@@ -23,7 +24,8 @@ public class ProductionStats extends SimStats {
 	private int day;
 	private InstantiatingHashMap<Good, ArrayList<FirmProductivityMonitor>> firmsByGood;
 
-	public ProductionStats() {
+	public ProductionStats(ISimulation sim) {
+		super(sim);
 		day = 0;
 		firmsByGood = new InstantiatingHashMap<Good, ArrayList<FirmProductivityMonitor>>() {
 

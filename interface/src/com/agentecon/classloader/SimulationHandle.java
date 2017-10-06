@@ -19,6 +19,8 @@ public abstract class SimulationHandle {
 		this.name = repo;
 		this.projects = simulation ? new String[] { "simulation" } : new String[] { "exercises" };
 	}
+	
+	public abstract SimulationHandle copy(boolean simulation) throws IOException;
 
 	public String getRepo() {
 		return name;

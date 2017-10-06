@@ -1,0 +1,9 @@
+diff a/exercises/src/com/agentecon/exercise2/Farm.java b/exercises/src/com/agentecon/exercise2/Farm.java	(rejected hunks)
+@@ -14,6 +14,7 @@
+ import com.agentecon.firm.IShareholder;
+ import com.agentecon.firm.decisions.IFinancials;
+ import com.agentecon.goods.IStock;
++import com.agentecon.learning.CovarianceControl;
+ import com.agentecon.learning.MarketingDepartment;
+ import com.agentecon.market.IPriceMakerMarket;
+ import com.agentecon.market.IStatistics;

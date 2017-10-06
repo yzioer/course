@@ -1,6 +1,7 @@
 package com.agentecon.web;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.StringTokenizer;
 
 import com.agentecon.classloader.GitSimulationHandle;
@@ -96,6 +97,16 @@ public class SimulationServer extends VisServer {
 			}
 		} else {
 			return super.serve(session);
+		}
+	}
+
+	@Override
+	protected String getStartPath() {
+		Collection<String> sims = simulations.getSimulations();
+		if (sims.size() == 1) {
+			return "/vis/simulation?sim=" + sims.iterator().next();
+		} else {
+			return super.getStartPath();
 		}
 	}
 

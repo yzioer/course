@@ -49,17 +49,12 @@ public class TimeSeries {
 	public void set(int pos, double average) {
 		assert!Double.isNaN(average);
 		assert!Double.isInfinite(average);
+		assert pos > line.getEnd() : "Adding points in the middle is not yet supported";
 		line.add(new Point(pos, (float) average));
 	}
 
 	public float getLatest() {
 		return line.getLatest();
-	}
-
-	public void setExact(int pos, double average) {
-		assert!Double.isNaN(average);
-		assert!Double.isInfinite(average);
-		line.add(new Point(pos, (float) average), 0);
 	}
 
 	public String getName() {
