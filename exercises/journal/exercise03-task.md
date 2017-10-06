@@ -24,7 +24,7 @@ Now, we start paying interest on cash holdings. What effect does the printing of
 
 You probably know that central banks increase interest rates to fight inflation, and decrease interest rates to encourage inflation. Is this in line with what you observe in the simulation? If not, why do you think that is the case?
 
-## Task 4: Lump sum subsidies
+## Task 3: Lump sum subsidies
 
 In classic theory, money is neutral in the long run. If there is twice as much money, prices will be twice as high, but everything else should stay the same. However, what if we do not distribute the freshly printed money evenly? Can an agent gain an advantage by getting money while others do not? To try this out, use the helicopter event to give a particular agent some additional money every day and try to test whether that agents enjoys a higher utility than the others as a result.
 
