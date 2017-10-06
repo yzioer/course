@@ -16,7 +16,7 @@ public class Numbers {
 	}
 
 	public static boolean isSmaller(double smaller, double bigger) {
-		return isBigger(bigger, smaller);
+		return bigger - smaller < EPSILON;
 	}
 
 	public static String toString(double d) {
