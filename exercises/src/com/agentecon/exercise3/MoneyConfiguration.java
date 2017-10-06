@@ -1,23 +1,15 @@
 package com.agentecon.exercise3;
 
-import java.util.Collection;
-
 import com.agentecon.Simulation;
 import com.agentecon.exercises.FarmingConfiguration;
-import com.agentecon.sim.Event;
 
 public class MoneyConfiguration extends FarmingConfiguration {
 	
 	public MoneyConfiguration() {
 		super(Farmer.class);
-	}
-
-	@Override
-	public Collection<Event> getEvents() {
-		Collection<Event> eventsFromFarmingConfig = super.getEvents();
-//		eventsFromFarmingConfig.add(new HelicopterMoneyEvent(1000, 1, 100));
-//		eventsFromFarmingConfig.add(new InterestEvent(0.01, 100));
-		return eventsFromFarmingConfig;
+		
+//		addEvent(new HelicopterMoneyEvent(1000, 1, 100));
+//		addEvent(new InterestEvent(0.01, 100));
 	}
 
 	public static void main(String[] args) {
