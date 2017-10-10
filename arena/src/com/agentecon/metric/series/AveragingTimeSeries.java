@@ -11,7 +11,7 @@ public class AveragingTimeSeries {
 	public AveragingTimeSeries(String key) {
 		this.series = new TimeSeries(key);
 	}
-	
+
 	public AveragingTimeSeries(String key, Line line) {
 		this.series = new TimeSeries(key, line);
 	}
@@ -20,10 +20,12 @@ public class AveragingTimeSeries {
 		this.tot += delta;
 		this.weight += 1.0;
 	}
-	
-	public void pushSum(int day){
-		this.series.set(day, tot);
-		reset();
+
+	public void pushSum(int day) {
+		if (weight > 0) {
+			this.series.set(day, tot);
+			reset();
+		}
 	}
 
 	public double push(int day) {
@@ -45,18 +47,18 @@ public class AveragingTimeSeries {
 	public TimeSeries getTimeSeries() {
 		return series;
 	}
-	
-	public String toString(){
+
+	public String toString() {
 		return series.toString();
 	}
-	
+
 	public double getCurrent() {
 		return weight == 0.0 ? 0.0 : tot / weight;
 	}
 
 	public static ArrayList<TimeSeries> unwrap(Collection<AveragingTimeSeries> values) {
 		ArrayList<TimeSeries> list = new ArrayList<>();
-		for (AveragingTimeSeries ats: values){
+		for (AveragingTimeSeries ats : values) {
 			list.add(ats.getTimeSeries());
 		}
 		return list;

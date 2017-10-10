@@ -8,28 +8,21 @@
  */
 package com.agentecon.configuration;
 
+import java.io.IOException;
 import java.io.PrintStream;
+import java.net.SocketTimeoutException;
 import java.util.Collection;
 
+import com.agentecon.IAgentFactory;
 import com.agentecon.ISimulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgent;
-import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.consumer.Consumer;
-import com.agentecon.consumer.Farmer;
-import com.agentecon.consumer.IConsumer;
-import com.agentecon.consumer.IUtility;
-import com.agentecon.consumer.LandSeller;
-import com.agentecon.consumer.LogUtilWithFloor;
-import com.agentecon.consumer.Weight;
-import com.agentecon.events.ConsumerEvent;
 import com.agentecon.events.GrowthEvent;
 import com.agentecon.events.IUtilityFactory;
-import com.agentecon.events.SimEvent;
+import com.agentecon.exercises.ExerciseAgentLoader;
 import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.exercises.HermitConfiguration;
-import com.agentecon.firm.IShareholder;
-import com.agentecon.firm.RealEstateAgent;
 import com.agentecon.firm.production.CobbDouglasProductionWithFixedCost;
 import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
@@ -41,77 +34,41 @@ import com.agentecon.market.IStatistics;
 import com.agentecon.production.IProductionFunction;
 import com.agentecon.production.PriceUnknownException;
 import com.agentecon.research.IInnovation;
-import com.agentecon.research.IResearchProject;
-import com.agentecon.sim.SimulationConfig;
 import com.agentecon.world.ICountry;
 
-public class GrowthConfiguration extends SimulationConfig implements IUtilityFactory, IInnovation {
-
-	private static final int MARKET_MAKERS = 5;
+public class GrowthConfiguration extends FarmingConfiguration implements IUtilityFactory, IInnovation {
 	
+	private static final int BASIC_AGENTS = 30;
+	public static final String BASIC_AGENT = "com.agentecon.exercise4.Farmer";
+
 	public static final Good LAND = HermitConfiguration.LAND;
 	public static final Good POTATOE = HermitConfiguration.POTATOE;
 	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
 
-	public GrowthConfiguration() {
-		super(10000);
-		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100), new Stock(getMoney(), 1000) };
+	@SafeVarargs
+	public GrowthConfiguration(Class<? extends Consumer>... agents) {
+		this(new AgentFactoryMultiplex(agents, BASIC_AGENTS), BASIC_AGENTS);
+	}
+	
+	public GrowthConfiguration() throws SocketTimeoutException, IOException {
+		this(new ExerciseAgentLoader(BASIC_AGENT), BASIC_AGENTS);
+	}
+	
+	public GrowthConfiguration(IAgentFactory loader, int agents) {
+		super(loader, agents);
 		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, HermitConfiguration.DAILY_ENDOWMENT) };
-		Endowment farmerEndowment = new Endowment(getMoney(), initialEndowment, dailyEndowment);
-		addEvent(new ConsumerEvent(10, farmerEndowment, this){
-			@Override
-			protected IConsumer createConsumer(IAgentIdGenerator id, Endowment end, IUtility util){
-				return new Farmer(id, end, util);
-			}
-		});
-		addEvent(new ConsumerEvent(20, farmerEndowment, this){
-			@Override
-			protected IConsumer createConsumer(IAgentIdGenerator id, Endowment end, IUtility util){
-				return new LandSeller(id, end, util);
-			}
-		});
-//		final Endowment consumerEndowment = new Endowment(getMoney(), dailyEndowment);
-//		addEvent(new GrowthEvent(0, 0.001) {
-//			
-//			@Override
-//			protected void execute(ICountry sim) {
-//				sim.add(new Consumer(sim.getAgents(), consumerEndowment, create(0)));
-//			}
-//		});
-		addEvent(new SimEvent(0, MARKET_MAKERS) {
+		Endowment workerEndowment = new Endowment(getMoney(), new IStock[0], dailyEndowment);
+		addEvent(new GrowthEvent(300, 0.001){
 
 			@Override
-			public void execute(int day, ICountry sim) {
-				for (int i = 0; i < getCardinality(); i++) {
-					Stock money = new Stock(getMoney(), 1000);
-					Stock land = new Stock(LAND, 100);
-					sim.add(new RealEstateAgent(sim, (IShareholder)sim.getAgents().getRandomConsumer(), money, land));
-				}
+			protected void execute(ICountry sim) {
+				sim.add(new Consumer(sim.getAgents(), workerEndowment, create(0)));
 			}
+			
 		});
+		addEvent(new InterestEvent(0.001, 1));
 	}
 
-	@Override
-	public IInnovation getInnovation() {
-		return this;
-	}
-
-	@Override
-	public CobbDouglasProductionWithFixedCost createProductionFunction(Good desiredOutput) {
-		assert desiredOutput.equals(POTATOE);
-		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FarmingConfiguration.FIXED_COSTS, new Weight(LAND, 0.2, true), new Weight(MAN_HOUR, 0.6));
-	}
-
-	@Override
-	public IResearchProject createResearchProject(Good desiredOutput) {
-		return null;
-	}
-	
-	@Override
-	public IUtility create(int number) {
-		return new LogUtilWithFloor(new Weight(POTATOE, 1.0), new Weight(MAN_HOUR, 1.0));
-	}
-	
 	public void diagnoseResult(PrintStream out, ISimulation sim) {
 		try {
 			IStatistics stats = sim.getStatistics();

@@ -6,7 +6,7 @@
  * Feel free to reuse this code under the MIT License
  * https://opensource.org/licenses/MIT
  */
-package com.agentecon.web.methods;
+package com.agentecon.metric.variants;
 
 import java.net.URL;
 

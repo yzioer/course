@@ -145,7 +145,7 @@ public class MarketMetrics extends SimStats implements IMarketListener, IFirmLis
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
+	public Collection<? extends Chart> getCharts() {
 		return Arrays.asList();
 	}
 

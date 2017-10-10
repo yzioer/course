@@ -94,11 +94,11 @@ public class OwnershipStats extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
+	public Collection<? extends Chart> getCharts() {
 		ArrayList<Chart> charts = new ArrayList<>();
 		for (Map.Entry<String, HashMap<String, TimeSeries>> owned : structure.entrySet()) {
 			Collection<TimeSeries> ts = owned.getValue().values();
-			Chart ch = new Chart(simId, owned.getKey() + " Owners", "Owners of an average firm of type " + owned.getKey(), ts);
+			Chart ch = new Chart(owned.getKey() + " Owners", "Owners of an average firm of type " + owned.getKey(), ts);
 			ch.setStacking("percent");
 			charts.add(ch);
 		}

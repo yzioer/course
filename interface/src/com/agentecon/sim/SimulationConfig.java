@@ -57,6 +57,14 @@ public class SimulationConfig implements IDiscountRate {
 	public int getRounds() {
 		return rounds;
 	}
+	
+	public IOptimalityIndicator[] getOptimalFirmCountIndicators() {
+		return new IOptimalityIndicator[0];
+	}
+	
+	public IOptimalityIndicator[] getOptimalProductionIndicators() {
+		return new IOptimalityIndicator[0];
+	}
 
 	public int getIntradayIterations() {
 		return marketRetries;

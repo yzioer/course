@@ -73,9 +73,9 @@ public class ValuationStats extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
-		return Arrays.asList(new Chart(simId, "Financial Sector Value", "Outer: Combined market cap of all financial firms. Inner: non-financial shares they own.", innerValue, outerValue),
-				new Chart(simId, "Financial Sector Value Ratio", "Outer: Combined market cap of all financial firms. Inner: non-financial shares they own.", valueRatio));
+	public Collection<? extends Chart> getCharts() {
+		return Arrays.asList(new Chart("Financial Sector Value", "Outer: Combined market cap of all financial firms. Inner: non-financial shares they own.", innerValue, outerValue),
+				new Chart("Financial Sector Value Ratio", "Outer: Combined market cap of all financial firms. Inner: non-financial shares they own.", valueRatio));
 	}
 
 	@Override

@@ -5,6 +5,7 @@ package com.agentecon.metric.series;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.StringTokenizer;
 
 import com.agentecon.util.Average;
 import com.agentecon.util.Numbers;
@@ -248,7 +249,43 @@ public class TimeSeries implements Comparable<TimeSeries> {
 
 	@Override
 	public int compareTo(TimeSeries o) {
-		return getName().compareTo(o.getName());
+		StringTokenizer mine = new StringTokenizer(name);
+		StringTokenizer other = new StringTokenizer(o.name);
+		while (true) {
+			if (mine.hasMoreTokens() && other.hasMoreTokens()) {
+				String myNext = mine.nextToken();
+				String otherNext = other.nextToken();
+				int diff = findDiff(myNext, otherNext);
+				if (diff != 0) {
+					return diff;
+				}
+			} else if (mine.hasMoreTokens()){
+				return 1;
+			} else if (other.hasMoreTokens()){
+				return -1;
+			} else {
+				return 0;
+			}
+		}
+	}
+
+	private int findDiff(String myNext, String otherNext) {
+		if (isNumber(myNext) && isNumber(otherNext)) {
+			int myNum = Integer.parseInt(myNext);
+			int otNum = Integer.parseInt(otherNext);
+			return Integer.compare(myNum, otNum);
+		} else {
+			return myNext.compareTo(otherNext);
+		}
+	}
+
+	private boolean isNumber(String myNext) {
+		for (char ch: myNext.toCharArray()) {
+			if (!Character.isDigit(ch)) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 }

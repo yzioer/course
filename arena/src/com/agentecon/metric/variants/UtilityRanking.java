@@ -6,7 +6,7 @@
  * Feel free to reuse this code under the MIT License
  * https://opensource.org/licenses/MIT
  */
-package com.agentecon.web.methods;
+package com.agentecon.metric.variants;
 
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -14,22 +14,40 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 
+import com.agentecon.ISimulation;
 import com.agentecon.agent.Agent;
 import com.agentecon.agent.AgentRef;
 import com.agentecon.agent.IAgent;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IConsumerListener;
 import com.agentecon.goods.Inventory;
-import com.agentecon.sim.SimulationListenerAdapter;
+import com.agentecon.metric.SimStats;
+import com.agentecon.metric.series.AveragingTimeSeries;
+import com.agentecon.metric.series.Chart;
+import com.agentecon.metric.series.TimeSeries;
 import com.agentecon.util.IAverage;
+import com.agentecon.util.InstantiatingHashMap;
 import com.agentecon.util.MovingAverage;
 
-public class UtilityRanking extends SimulationListenerAdapter {
-	
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+public class UtilityRanking extends SimStats {
+
+	private boolean enableTimeSeries;
+	private HashMap<String, AveragingTimeSeries> timeSeries;
 	private ArrayList<ConsumerListener> list;
 
-	public UtilityRanking() {
+	public UtilityRanking(ISimulation sim, boolean enableTimeSeries) {
+		super(sim);
+		this.enableTimeSeries = enableTimeSeries;
 		this.list = new ArrayList<>();
+		this.timeSeries = new InstantiatingHashMap<String, AveragingTimeSeries>() {
+
+			@Override
+			protected AveragingTimeSeries create(String key) {
+				return new AveragingTimeSeries(key);
+			}
+		};
 	}
 
 	@Override
@@ -37,6 +55,18 @@ public class UtilityRanking extends SimulationListenerAdapter {
 		ConsumerListener listener = new ConsumerListener((Agent) consumer);
 		list.add(listener);
 		consumer.addListener(listener);
+	}
+
+	@Override
+	public void notifyDayEnded(int day) {
+		if (enableTimeSeries) {
+			for (ConsumerListener cons: list) {
+				timeSeries.get(cons.getType()).add(cons.getAverage());
+			}
+			for (AveragingTimeSeries ts: timeSeries.values()) {
+				ts.push(day);
+			}
+		}
 	}
 
 	public void print(PrintStream out) {
@@ -47,10 +77,10 @@ public class UtilityRanking extends SimulationListenerAdapter {
 			out.println(rank++ + "\t" + l);
 		}
 	}
-	
-	public Collection<Rank> getRanking(){
+
+	public Collection<Rank> getRanking() {
 		HashMap<String, Rank> ranking = new HashMap<String, Rank>();
-		for (ConsumerListener listener: list){
+		for (ConsumerListener listener : list) {
 			Rank rank = ranking.get(listener.getType());
 			if (rank == null) {
 				rank = new Rank(listener.getType(), listener.getAgent());
@@ -72,16 +102,16 @@ public class UtilityRanking extends SimulationListenerAdapter {
 			this.agent = agent.getReference();
 			this.averageUtility = new MovingAverage(0.98);
 		}
-		
+
 		public Agent getAgent() {
 			return (Agent) agent.get();
 		}
 
-		public String getType(){
+		public String getType() {
 			return getAgent().getType();
 		}
-		
-		public double getAverage(){
+
+		public double getAverage() {
 			return averageUtility.getAverage();
 		}
 
@@ -114,7 +144,15 @@ public class UtilityRanking extends SimulationListenerAdapter {
 		}
 
 	}
-	
+
+	@Override
+	public Collection<? extends Chart> getCharts() {
+		throw new NotImplementedException();
+	}
+
+	@Override
+	public Collection<TimeSeries> getTimeSeries() {
+		return AveragingTimeSeries.unwrap(timeSeries.values());
+	}
+
 }
-
-

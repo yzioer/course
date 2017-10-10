@@ -138,18 +138,6 @@ public class SimulationRunner {
 		}
 	}
 
-	public Chart[] getCharts(String simId) {
-		ArrayList<Chart> charts = new ArrayList<>();
-		for (SimStats stat : stats) {
-			for (Chart ch : stat.getCharts(simId)) {
-				if (ch.hasContent()) {
-					charts.add(ch);
-				}
-			}
-		}
-		return charts.toArray(new Chart[] {});
-	}
-
 	public ArrayList<TimeSeries> getLatestRunTimeSeries() {
 		ArrayList<TimeSeries> list = new ArrayList<>();
 		for (SimStats stat : latestRunStats) {

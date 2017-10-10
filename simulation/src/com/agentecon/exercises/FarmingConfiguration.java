@@ -36,6 +36,7 @@ import com.agentecon.production.IProductionFunction;
 import com.agentecon.production.PriceUnknownException;
 import com.agentecon.research.IInnovation;
 import com.agentecon.research.IResearchProject;
+import com.agentecon.sim.IOptimalityIndicator;
 import com.agentecon.sim.SimulationConfig;
 import com.agentecon.util.Average;
 
@@ -44,15 +45,19 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 	private static final int AGENTS = 32;
 
 	public static final String FARMER = "com.agentecon.exercise2.Farmer";
-	public static final String EXPERIMENTAL_FARMER = "com.agentecon.exercise2.ExperimentalFarmer";
 
 	public static final Good LAND = HermitConfiguration.LAND;
 	public static final Good POTATOE = HermitConfiguration.POTATOE;
 	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
 
+	private static final double LAND_ENDOWMENT = 100;
+	
 	private static final int ROUNDS = 3000;
 
 	public static final Quantity FIXED_COSTS = HermitConfiguration.FIXED_COSTS;
+
+	
+	private int agentsWithLand;
 
 	@SafeVarargs
 	public FarmingConfiguration(Class<? extends Consumer>... agents) {
@@ -65,7 +70,8 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	public FarmingConfiguration(IAgentFactory factory, int agents) {
 		super(ROUNDS);
-		IStock[] initialEndowment = new IStock[] { new Stock(LAND, 100), new Stock(getMoney(), 1000) };
+		this.agentsWithLand = agents;
+		IStock[] initialEndowment = new IStock[] { new Stock(LAND, LAND_ENDOWMENT), new Stock(getMoney(), 1000) };
 		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, HermitConfiguration.DAILY_ENDOWMENT) };
 		Endowment end = new Endowment(getMoney(), initialEndowment, dailyEndowment);
 		addEvent(new ConsumerEvent(agents, end, this) {
@@ -74,6 +80,15 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 				return factory.createConsumer(id, end, util);
 			}
 		});
+	}
+	
+	@Override
+	public IOptimalityIndicator[] getOptimalFirmCountIndicators() {
+		return new IOptimalityIndicator[] {new OptimalFirmCountIndicator(createProductionFunction(POTATOE), MAN_HOUR, agentsWithLand)};
+	}
+	
+	public IOptimalityIndicator[] getOptimalProductionIndicators() {
+		return new IOptimalityIndicator[] {new OptimalProductionIndicator(new Quantity(LAND, LAND_ENDOWMENT), createProductionFunction(POTATOE), MAN_HOUR, agentsWithLand)};
 	}
 
 	@Override

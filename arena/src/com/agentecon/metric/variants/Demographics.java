@@ -27,7 +27,7 @@ public class Demographics extends SimStats {
 		this.working = new TimeSeries("Workers");
 		this.population = new TimeSeries("Population");
 		this.dependency = new TimeSeries("Dependency Ratio");
-		this.dailyutility = new TimeSeries("Utility today");
+		this.dailyutility = new TimeSeries("Average Daily Utility");
 		this.utilityOnDeath = new InstantiatingHashMap<String, AveragingTimeSeries>() {
 
 			@Override
@@ -81,15 +81,15 @@ public class Demographics extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
-		return Arrays.asList(new Chart(simId, "Population", "Retired, working and total population", retired, working, population),
-				new Chart(simId, "Dependency Ratio", "Retirees per workers", dependency), new Chart(simId, "Utility", "Accumulated life-time utility on day of death", getUtilityData()));
+	public Collection<? extends Chart> getCharts() {
+		return Arrays.asList(new Chart("Population", "Retired, working and total population", retired, working, population),
+				new Chart("Dependency Ratio", "Retirees per workers", dependency), new Chart("Utility", "Accumulated life-time utility on day of death", getUtilityData()));
 	}
 
 	@Override
 	public Collection<TimeSeries> getTimeSeries() {
 		ArrayList<TimeSeries> all = new ArrayList<>();
-		all.addAll(Arrays.asList(retired, working, population, dependency));
+		all.addAll(Arrays.asList(population, retired, working, dependency));
 		all.addAll(TimeSeries.prefix("Utility on death", getUtilityData()));
 		all.add(dailyutility);
 		return all;

@@ -197,11 +197,11 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
-		Chart ch1 = new Chart(simId, "Stock Market Prices", "Volume-weighted stock prices for each sector", prices.values());
-		Chart ch2 = new Chart(simId, "Stock Market Volumes", "Stock trading volumes of each sector", volumes.values());
-		Chart ch3 = new Chart(simId, "Price/Earning Ratios", "P/E ratios by sector", peratio.values());
-		Chart ch4 = new Chart(simId, "Investment Flows", "Worker investments versus retiree divestments", investments.getTimeSeries(), divestments.getTimeSeries());
+	public Collection<? extends Chart> getCharts() {
+		Chart ch1 = new Chart("Stock Market Prices", "Volume-weighted stock prices for each sector", prices.values());
+		Chart ch2 = new Chart("Stock Market Volumes", "Stock trading volumes of each sector", volumes.values());
+		Chart ch3 = new Chart("Price/Earning Ratios", "P/E ratios by sector", peratio.values());
+		Chart ch4 = new Chart("Investment Flows", "Worker investments versus retiree divestments", investments.getTimeSeries(), divestments.getTimeSeries());
 		return Arrays.asList(ch1, ch2, ch3, ch4);
 	}
 

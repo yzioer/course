@@ -42,7 +42,7 @@ public class Bid extends AbstractOffer {
 	}
 
 	@Override
-	public boolean isBid() {
+	public final boolean isBid() {
 		return true;
 	}
 	

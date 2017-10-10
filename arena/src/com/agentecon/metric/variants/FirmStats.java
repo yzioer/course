@@ -41,10 +41,10 @@ public class FirmStats extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
+	public Collection<? extends Chart> getCharts() {
 		ArrayList<Chart> charts = new ArrayList<>();
 		for (FirmTimeSeries ts : data.values()) {
-			charts.add(ts.createChart(simId));
+			charts.add(ts.createChart());
 		}
 		return charts;
 	}
@@ -63,11 +63,11 @@ public class FirmStats extends SimStats {
 			firm.addFirmMonitor(this);
 		}
 
-		public Chart createChart(String simId) {
+		public Chart createChart() {
 			if (cogs.isInteresting()) {
-				return new Chart(simId, name, "Results for producer " + name, Arrays.asList(revenue, cogs, cash, dividends));
+				return new Chart(name, "Results for producer " + name, Arrays.asList(revenue, cogs, cash, dividends));
 			} else {
-				return new Chart(simId, name, "Results for firm " + name, Arrays.asList(cash, dividends));
+				return new Chart(name, "Results for firm " + name, Arrays.asList(cash, dividends));
 			}
 		}
 

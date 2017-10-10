@@ -12,20 +12,17 @@ import java.util.List;
 
 public class Chart {
 
-	private String parentSimulation;
-
 	private String name;
 	private String subtitle;
 	private String stacking;
 	private List<TimeSeriesData> data = new ArrayList<TimeSeriesData>();
 
-	public Chart(String parentSim, String name, String subtitle, TimeSeries... series) {
-		this(parentSim, name, subtitle, Arrays.asList(series));
+	public Chart(String name, String subtitle, TimeSeries... series) {
+		this(name, subtitle, Arrays.asList(series));
 	}
 
-	public Chart(String parentSim, String name, String subtitle, Collection<? extends TimeSeries> series) {
+	public Chart(String name, String subtitle, Collection<? extends TimeSeries> series) {
 		this.name = name;
-		this.parentSimulation = parentSim;
 		this.subtitle = subtitle;
 		for (TimeSeries ts : series) {
 			TimeSeries comp = ts.compact();
@@ -45,10 +42,6 @@ public class Chart {
 
 	public String getName() {
 		return name;
-	}
-
-	public String getParent() {
-		return parentSimulation;
 	}
 
 	public String getSubtitle() {

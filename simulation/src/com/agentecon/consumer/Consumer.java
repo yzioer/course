@@ -22,6 +22,8 @@ import com.agentecon.util.Numbers;
 
 public class Consumer extends Agent implements IConsumer, IShareholder {
 
+	private static final double CAPITAL_BUFFER = 0.75;
+
 	private Good soldGood;
 	private IUtility utility;
 	protected TradingPortfolio portfolio;
@@ -51,7 +53,7 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 		if (isRetired()) {
 			inv = inv.hide(soldGood); // cannot work any more, hide hours
 		}
-		trade(inv, market);
+		trade(inv.hideRelative(getMoney().getGood(), CAPITAL_BUFFER), market);
 	}
 
 	protected void trade(Inventory inv, IPriceTakerMarket market) {
@@ -80,49 +82,41 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 			double[] allocs = utility.getOptimalAllocation(inv, offers);
 			assert allocs.length == offers.size();
 
-			boolean completedSales = true;
 			int pos = 0;
 			for (IOffer offer : offers) {
-				IStock s = inv.getStock(offer.getGood());
-				double excessStock = s.getAmount() - allocs[pos];
-				// double excessStock = Math.max(s.getAmount() - allocs[pos],
-				// s.getAmount() - 19); // work at least 5 hours
-				if (excessStock > Numbers.EPSILON && offer.getGood() == soldGood) {
-					double amountAcquired = offer.accept(this, money, s, new Quantity(s.getGood(), excessStock));
-					completedSales &= amountAcquired == excessStock;
-					trading = true;
-				}
-				pos++;
-			}
-			if (!completedSales) {
-				continue;
-			}
-			pos = 0;
-			for (IOffer offer : offers) {
-				IStock s = inv.getStock(offer.getGood());
-				double difference = allocs[pos] - s.getAmount();
-				if (difference > Numbers.EPSILON && offer.getGood() != soldGood && !money.isEmpty()) {
-					double moneyAmount = money.getAmount();
-					offer.accept(this, money, s, new Quantity(s.getGood(), difference));
-					spendings += (moneyAmount - money.getAmount());
-					trading = true;
+				if (offer.isBid()) {
+					IStock s = inv.getStock(offer.getGood());
+					double excessStock = s.getAmount() - allocs[pos];
+					if (excessStock > Numbers.EPSILON && offer.getGood() == soldGood) {
+						offer.accept(this, money, s, new Quantity(s.getGood(), excessStock));
+						trading = true;
+					}
+				} else {
+					IStock s = inv.getStock(offer.getGood());
+					double difference = allocs[pos] - s.getAmount();
+					if (difference > Numbers.EPSILON && offer.getGood() != soldGood && !money.isEmpty()) {
+						double moneyAmount = money.getAmount();
+						offer.accept(this, money, s, new Quantity(s.getGood(), difference));
+						spendings += (moneyAmount - money.getAmount());
+						trading = true;
+					}
 				}
 				pos++;
 			}
 		}
 		notifySpent(spendings);
 	}
-	
+
 	public void workAtLeast(IPriceTakerMarket market, double minimumWorkAmount) {
-		if (isRetired()){
+		if (isRetired()) {
 			// still not working
 		} else {
 			IStock timeLeft = getStock(soldGood);
 			double endowment = getDailyEndowment(soldGood);
 			double worked = endowment - timeLeft.getAmount();
-			while (Numbers.isSmaller(worked, minimumWorkAmount)){
+			while (Numbers.isSmaller(worked, minimumWorkAmount)) {
 				IOffer offer = market.getOffer(soldGood, true);
-				if (offer == null){
+				if (offer == null) {
 					break;
 				} else {
 					offer.accept(this, getMoney(), timeLeft, new Quantity(timeLeft.getGood(), minimumWorkAmount - worked));
@@ -160,7 +154,7 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 	public TradingPortfolio getPortfolio() {
 		return portfolio;
 	}
-	
+
 	@Override
 	public Consumer clone() {
 		Consumer klon = (Consumer) super.clone();

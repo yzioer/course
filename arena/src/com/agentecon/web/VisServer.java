@@ -52,7 +52,7 @@ public class VisServer extends BasicServer {
 		try {
 			return NanoHTTPD.newChunkedResponse(Status.OK, getMimeTypeForFile(child.getName()), new FileInputStream(child));
 		} catch (FileNotFoundException e) {
-			throw new java.lang.RuntimeException(e);
+			throw new java.lang.RuntimeException(child.getAbsolutePath());
 		}
 	}
 

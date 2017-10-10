@@ -49,7 +49,7 @@ public class Price implements Comparable<Price> {
 		}
 	}
 	
-	public int compareTo(Price o) {
+	public final int compareTo(Price o) {
 		return Double.compare(price, o.price);
 	}
 

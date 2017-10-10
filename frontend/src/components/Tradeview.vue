@@ -14,7 +14,7 @@
             <el-option v-for="item in config.stepSizeOptions" :key="item" :value="item"></el-option>
           </el-select>
         </div>
-        <div class="controls controls--ur">
+        <!-- <div class="controls controls--ur">
           <el-dropdown trigger="click" @command="handleDownload">
             <el-button type="primary">
               Download Metric<i class="el-icon-caret-bottom el-icon--right"></i>
@@ -25,7 +25,7 @@
               </template>
             </el-dropdown-menu>
           </el-dropdown>
-        </div>
+        </div> -->
         <tradegraph class="tradeview__tradechart" :graphdata="tradeGraphData" :selectednode="selectedNode" @simstopped="handleSimStopped" @nodeclicked="handleNodeClicked" @addminichart="handleAddMinichart" @showinfo="handleShowInfo" @showchildren="handleShowChildSelection" @hidecontextmenus="hideContextMenus"></tradegraph>
       </div>
       <div class="tradeview__side">

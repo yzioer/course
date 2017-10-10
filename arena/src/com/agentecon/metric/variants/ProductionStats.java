@@ -4,77 +4,132 @@ package com.agentecon.metric.variants;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import com.agentecon.ISimulation;
 import com.agentecon.firm.IFirm;
 import com.agentecon.goods.Good;
+import com.agentecon.goods.Quantity;
+import com.agentecon.market.IStatistics;
+import com.agentecon.market.MarketStatistics;
 import com.agentecon.metric.SimStats;
-import com.agentecon.metric.series.Chart;
+import com.agentecon.metric.series.IAgentType;
 import com.agentecon.metric.series.TimeSeries;
+import com.agentecon.metric.series.TimeSeriesCollector;
 import com.agentecon.production.IProducer;
+import com.agentecon.production.IProducerListener;
+import com.agentecon.sim.IOptimalityIndicator;
 import com.agentecon.util.InstantiatingHashMap;
 
 /**
- * Compares what the firms of one type produced with what they could have
- * produced given the input factors they acquired.
+ * Compares what the firms of one type produced with what they could have produced given the input factors they acquired.
  */
 public class ProductionStats extends SimStats {
 
-	private int day;
-	private InstantiatingHashMap<Good, ArrayList<FirmProductivityMonitor>> firmsByGood;
+	private IOptimalityIndicator[] indicators;
+	private Map<Good, TimeSeries> optimalProduction;
+	private Map<Good, MarketStatistics> usedInputs;
+	private TimeSeriesCollector collector;
 
 	public ProductionStats(ISimulation sim) {
 		super(sim);
-		day = 0;
-		firmsByGood = new InstantiatingHashMap<Good, ArrayList<FirmProductivityMonitor>>() {
+		this.collector = new TimeSeriesCollector();
+		this.indicators = sim.getConfig().getOptimalProductionIndicators();
+		this.optimalProduction = new InstantiatingHashMap<Good, TimeSeries>() {
 
 			@Override
-			protected ArrayList<FirmProductivityMonitor> create(Good key) {
-				return new ArrayList<FirmProductivityMonitor>();
+			protected TimeSeries create(Good key) {
+				return new TimeSeries("Optimal average " + key.getName().toLowerCase() + " output given inputs");
+			}
+		};
+		this.usedInputs = new InstantiatingHashMap<Good, MarketStatistics>() {
+
+			@Override
+			protected MarketStatistics create(Good key) {
+				return new MarketStatistics();
 			}
 		};
 	}
 
-	@Override
-	public void notifyDayStarted(int day) {
-		this.day = day;
+	protected void includeInput(Quantity[] inputs, Quantity output) {
+		MarketStatistics stats = usedInputs.get(output.getGood());
+		for (Quantity input : inputs) {
+			if (input.getAmount() > 0.0) {
+				stats.notifyTraded(null, null, input.getGood(), input.getAmount(), 1.0);
+			}
+		}
+	}
+
+	protected void addSingleInput(List<Quantity> list, Quantity input) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).getGood().equals(input.getGood())) {
+				list.set(i, new Quantity(input.getGood(), input.getAmount() + list.get(i).getAmount()));
+				return;
+			}
+		}
+		list.add(input);
 	}
 
 	@Override
 	public void notifyFirmCreated(IFirm firm) {
 		if (firm instanceof IProducer) {
 			IProducer prod = (IProducer) firm;
-			FirmProductivityMonitor monitor = new FirmProductivityMonitor(prod) {
+			prod.addProducerMonitor(new IProducerListener() {
 
 				@Override
-				protected int getDay() {
-					return day;
+				public void reportResults(IProducer inst, double revenue, double cogs, double expectedProfits) {
 				}
 
-			};
-			firmsByGood.get(prod.getOutput()).add(monitor);
-			prod.addProducerMonitor(monitor);
+				@Override
+				public void notifyProduced(IProducer inst, Quantity[] inputs, Quantity output) {
+					includeInput(inputs, output);
+					collector.record(getDay(), new IAgentType() {
+
+						@Override
+						public boolean isFirm() {
+							return true;
+						}
+
+						@Override
+						public boolean isConsumer() {
+							return false;
+						}
+
+						@Override
+						public String[] getTypeKeys() {
+							return new String[] { inst.getType(), output.getGood().getName().toLowerCase() + " producers" };
+						}
+
+						@Override
+						public String getIndividualKey() {
+							return inst.getName();
+						}
+					}, output.getAmount());
+				}
+			});
 		}
 	}
 
-	public Collection<? extends Chart> getCharts(String simId) {
-		ArrayList<Chart> charts = new ArrayList<>();
-		for (Map.Entry<Good, ArrayList<FirmProductivityMonitor>> e : firmsByGood.entrySet()) {
-			ArrayList<FirmProductivityMonitor> list = e.getValue();
-			charts.add(new Chart(simId, e.getKey() + " production", "Daily " + e.getKey() + " production by firm", list));
+	@Override
+	public void notifyDayEnded(IStatistics stats) {
+		for (MarketStatistics market: usedInputs.values()) {
+			market.notifyMarketClosed(stats.getDay());
 		}
-		return charts;
+		for (IOptimalityIndicator indicator : indicators) {
+			MarketStatistics volumeStatistics = usedInputs.get(indicator.getOutputGood());
+			optimalProduction.get(indicator.getOutputGood()).set(stats.getDay(), indicator.getOptimum(volumeStatistics));
+		}
+		collector.flushDay(stats.getDay(), false);
+		usedInputs.clear();
 	}
 
 	@Override
 	public Collection<TimeSeries> getTimeSeries() {
-		ArrayList<TimeSeries> list = new ArrayList<>();
-		for (Map.Entry<Good, ArrayList<FirmProductivityMonitor>> e : firmsByGood.entrySet()) {
-			ArrayList<FirmProductivityMonitor> firmlist = e.getValue();
-			list.addAll(TimeSeries.prefix(e.getKey() + " production", firmlist));
-		}
-		return list;
+		ArrayList<TimeSeries> all = new ArrayList<>();
+		all.addAll(optimalProduction.values());
+		all.addAll(collector.getTimeSeries());
+		return all;
 	}
 
 }

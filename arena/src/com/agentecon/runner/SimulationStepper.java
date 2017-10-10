@@ -7,10 +7,10 @@ import java.util.Collection;
 import com.agentecon.ISimulation;
 import com.agentecon.classloader.LocalSimulationHandle;
 import com.agentecon.classloader.SimulationHandle;
+import com.agentecon.metric.variants.Rank;
+import com.agentecon.metric.variants.UtilityRanking;
 import com.agentecon.util.LogClock;
 import com.agentecon.web.SoftCache;
-import com.agentecon.web.methods.Rank;
-import com.agentecon.web.methods.UtilityRanking;
 
 public class SimulationStepper {
 
@@ -71,7 +71,7 @@ public class SimulationStepper {
 	}
 
 	private UtilityRanking createRanking(ISimulation sim) {
-		UtilityRanking ranking = new UtilityRanking();
+		UtilityRanking ranking = new UtilityRanking(sim, false);
 		sim.addListener(ranking);
 		sim.run();
 		return ranking;

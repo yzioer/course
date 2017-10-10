@@ -8,6 +8,7 @@ import com.agentecon.classloader.GitSimulationHandle;
 import com.agentecon.classloader.LocalSimulationHandle;
 import com.agentecon.sim.SimulationConfig;
 import com.agentecon.web.methods.AgentsMethod;
+import com.agentecon.web.methods.ChartMethod;
 import com.agentecon.web.methods.ChildrenMethod;
 import com.agentecon.web.methods.DownloadCSVMethod;
 import com.agentecon.web.methods.GithubeventMethod;
@@ -38,6 +39,7 @@ public class SimulationServer extends VisServer {
 				this.simulations.add(new GitSimulationHandle("meisser", "course", "master", true));
 				this.simulations.add(new GitSimulationHandle("meisser", "course", "ex1-hermit-3", true));
 				this.simulations.add(new GitSimulationHandle("meisser", "course", "ex2-farmer-4", true));
+				this.simulations.add(new GitSimulationHandle("meisser", "course", "ex4-growth-1", true));
 			} catch (IOException e) {
 				System.out.println("Disabled remote repositories. " + e.getMessage());
 			}
@@ -60,6 +62,7 @@ public class SimulationServer extends VisServer {
 		this.methods.add(new TradeGraphMethod(this.simulations));
 		this.methods.add(new ChildrenMethod(this.simulations));
 		this.methods.add(new RankingMethod(this.simulations));
+		this.methods.add(new ChartMethod(this.simulations));
 		this.methods.add(new DownloadCSVMethod(this.simulations));
 		this.methods.add(new MiniChartMethod(this.simulations));
 	}
@@ -109,20 +112,6 @@ public class SimulationServer extends VisServer {
 			return super.getStartPath();
 		}
 	}
-
-	// protected Response serveSimulation(IHTTPSession session, String uri, StringTokenizer tok) throws IOException {
-	// if (tok.hasMoreTokens()) {
-	// String methodName = tok.nextToken();
-	// WebApiMethod calledMethod = methods.getMethod(methodName);
-	// if (calledMethod != null) {
-	// return serve(session, calledMethod.execute(new StringTokenizer(uri, "\\/"), new Parameters(session)));
-	// } else {
-	// return super.serve(session, "sim.html");
-	// }
-	// } else {
-	// return super.serve(session, "sim.html");
-	// }
-	// }
 
 	public static void main(String[] args) throws IOException, InterruptedException {
 		SimulationServer server = new SimulationServer(8080);

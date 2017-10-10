@@ -1,50 +1,31 @@
 package com.agentecon.metric.series;
 
-import java.util.ArrayList;
+import java.util.Collection;
 
 public class TimeSeriesData {
 
 	private String name;
-	private float[][] values;
-	private float[][] minmax;
+	private float[] xs;
+	private float[] ys;
 
-	public TimeSeriesData(String name, ArrayList<Point> points) {
+	public TimeSeriesData(String name, Collection<Point> points) {
 		this.name = name;
-		this.values = new float[points.size()][2];
+		this.xs = new float[points.size()];
+		this.ys = new float[points.size()];
 		int pos = 0;
 		for (Point p: points){
-			values[pos][0] = p.x;
-			values[pos][1] = p.y;
+			xs[pos] = p.x;
+			ys[pos] = p.y;
 			pos++;
 		}
 	}
 
-	public TimeSeriesData(String name, ArrayList<Point> points, ArrayList<MinMaxPoint> minmax) {
-		this(name, points);
-		this.minmax = new float[points.size()][3];
-		int pos = 0;
-		for (MinMaxPoint p: minmax){
-			values[pos][0] = p.x;
-			values[pos][1] = p.y;
-			values[pos][2] = p.max;
-			pos++;
-		}
-	}
-	
 	public String getName() {
 		return name;
 	}
 
-	public float[][] getValues() {
-		return values;
-	}
-
-	public float[][] getMinMax() {
-		return minmax;
-	}
-
 	public float getLastY() {
-		return values[values.length - 1][1];
+		return ys[ys.length - 1];
 	}
 
 }

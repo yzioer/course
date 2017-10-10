@@ -66,8 +66,8 @@ public class MonetaryStats extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
-		Chart ch = new Chart(simId, "Monetary Statistics", "All relevant data for calculating monetary velocity according to the Fisher equation.", getTimeSeries());
+	public Collection<? extends Chart> getCharts() {
+		Chart ch = new Chart("Monetary Statistics", "All relevant data for calculating monetary velocity according to the Fisher equation.", getTimeSeries());
 		ch.setStacking("normal");
 		return Collections.singleton(ch);
 	}

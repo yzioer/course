@@ -37,7 +37,7 @@ public class Ask extends AbstractOffer {
 	}
 
 	@Override
-	public boolean isBid() {
+	public final boolean isBid() {
 		return false;
 	}
 

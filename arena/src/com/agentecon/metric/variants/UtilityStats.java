@@ -44,8 +44,8 @@ public class UtilityStats extends SimStats {
 	}
 
 	@Override
-	public Collection<? extends Chart> getCharts(String simId) {
-		Chart ch = new Chart(simId, "Average Utility", "Average daily utility per consumer in each iteration", getTimeSeries());
+	public Collection<? extends Chart> getCharts() {
+		Chart ch = new Chart("Average Utility", "Average daily utility per consumer in each iteration", getTimeSeries());
 		return Collections.singleton(ch);
 	}
 	

@@ -11,6 +11,7 @@ package com.agentecon.web.methods;
 import java.io.IOException;
 import java.util.Collection;
 
+import com.agentecon.metric.variants.Rank;
 import com.agentecon.runner.SimulationStepper;
 import com.agentecon.web.data.JsonData;
 
