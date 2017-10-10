@@ -9,7 +9,7 @@ import com.agentecon.goods.Good;
 
 public class BestPriceMarket extends AbstractMarket {
 
-	private static final boolean REQUEUE_TO_END = true;
+	private static final boolean REQUEUE_TO_END = false;
 
 	private PriorityQueue<Bid> bids;
 	private PriorityQueue<Ask> asks;
