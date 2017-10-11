@@ -40,7 +40,7 @@ public class ProductionStats extends SimStats {
 
 			@Override
 			protected TimeSeries create(Good key) {
-				return new TimeSeries("Optimal average " + key.getName().toLowerCase() + " output given inputs");
+				return new TimeSeries("Optimal total " + key.getName().toLowerCase() + " output given inputs");
 			}
 		};
 		this.usedInputs = new InstantiatingHashMap<Good, MarketStatistics>() {
