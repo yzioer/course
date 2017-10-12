@@ -22,8 +22,6 @@ import com.agentecon.util.Numbers;
 
 public class Consumer extends Agent implements IConsumer, IShareholder {
 
-	private static final double CAPITAL_BUFFER = 0.75;
-
 	private Good soldGood;
 	private IUtility utility;
 	protected TradingPortfolio portfolio;
@@ -53,7 +51,7 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 		if (isRetired()) {
 			inv = inv.hide(soldGood); // cannot work any more, hide hours
 		}
-		trade(inv.hideRelative(getMoney().getGood(), CAPITAL_BUFFER), market);
+		trade(inv, market);
 	}
 
 	protected void trade(Inventory inv, IPriceTakerMarket market) {

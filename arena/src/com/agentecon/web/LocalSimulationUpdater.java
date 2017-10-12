@@ -17,9 +17,9 @@ public class LocalSimulationUpdater extends Thread {
 		try {
 			while (true) {
 				Thread.sleep(5000);
-				System.out.println("Checking for local changes... (doing so every 30 seconds)");
+				System.out.println("Checking for local changes... (doing so every 10 seconds)");
 				simulations.notifyRepositoryChanged(LocalSimulationHandle.REPO_NAME);
-				Thread.sleep(25000);
+				Thread.sleep(5000);
 			}
 		} catch (InterruptedException e) {
 		}

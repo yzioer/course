@@ -26,12 +26,14 @@ import com.agentecon.web.data.JsonData;
 public class ListMethod extends WebApiMethod {
 
 	private transient HashMap<String, SimulationHandle> handles;
+	private transient ArrayList<String> simulationNamesInCorrectOrder;
 	private transient HashMap<SimulationHandle, SimulationStepper> simulations;
-	private Executor simulationUpdateExecutor;
+	private transient Executor simulationUpdateExecutor;
 
 	public ListMethod() {
 		this.handles = new HashMap<>();
 		this.simulations = new HashMap<>();
+		this.simulationNamesInCorrectOrder = new ArrayList<>();
 		this.simulationUpdateExecutor = Executors.newSingleThreadExecutor();
 	}
 	
@@ -40,6 +42,7 @@ public class ListMethod extends WebApiMethod {
 	}
 
 	public void add(SimulationHandle handle) {
+		this.simulationNamesInCorrectOrder.add(handle.getIdentifier());
 		this.handles.put(handle.getIdentifier(), handle);
 	}
 
@@ -99,16 +102,16 @@ public class ListMethod extends WebApiMethod {
 
 	@Override
 	public JsonData getJsonAnswer(Parameters params) {
-		return new SimulationList(handles.values());
+		return new SimulationList(simulationNamesInCorrectOrder, handles);
 	}
 
 	class SimulationList extends JsonData {
 
 		public Collection<SimulationInfo> sims = new ArrayList<>();
 
-		public SimulationList(Collection<SimulationHandle> collection) {
-			for (SimulationHandle handle : collection) {
-				this.sims.add(new SimulationInfo(handle));
+		public SimulationList(ArrayList<String> simulationNamesInCorrectOrder, HashMap<String, SimulationHandle> handles) {
+			for (String name : simulationNamesInCorrectOrder) {
+				this.sims.add(new SimulationInfo(handles.get(name)));
 			}
 		}
 	}

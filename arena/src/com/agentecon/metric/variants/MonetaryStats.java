@@ -18,6 +18,7 @@ import com.agentecon.util.InstantiatingHashMap;
 
 public class MonetaryStats extends SimStats {
 
+	private TimeSeries velocity;
 	private TimeSeries moneySupply;
 	private HashMap<Good, TimeSeries> prices;
 	private HashMap<Good, TimeSeries> volumes;
@@ -39,30 +40,36 @@ public class MonetaryStats extends SimStats {
 				return new TimeSeries(key.getName() + " volume");
 			}
 		};
+		this.velocity = new TimeSeries("Velocity of Money");
 	}
 
 	@Override
 	public void notifyDayEnded(IStatistics stats) {
 		int day = stats.getDay();
 
-		double total = 0.0;
+		double moneySupply = 0.0;
 		for (IAgent a : getAgents().getAgents()) {
-			total += a.getMoney().getAmount();
+			moneySupply += a.getMoney().getAmount();
 		}
-		moneySupply.set(day, total);
+		this.moneySupply.set(day, moneySupply);
 
-		record(day, stats.getGoodsMarketStats());
-		record(day, stats.getStockMarketStats());
+		double transactionVolume = 0.0;
+		transactionVolume += record(day, stats.getGoodsMarketStats());
+		transactionVolume += record(day, stats.getStockMarketStats());
+		this.velocity.set(day, transactionVolume / moneySupply); // Fisher equation
 	}
 
-	private void record(int day, IMarketStatistics stats) {
+	private double record(int day, IMarketStatistics stats) {
+		double transactionVolume = 0.0;
 		for (Good good : stats.getTradedGoods()) {
 			Average priceData = stats.getStats(good).getYesterday();
 			if (priceData.getTotWeight() > 0) {
+				transactionVolume += priceData.getTotal();
 				prices.get(good).set(day, priceData.getAverage());
 				volumes.get(good).set(day, priceData.getTotWeight());
 			}
 		}
+		return transactionVolume;
 	}
 
 	@Override
@@ -76,6 +83,7 @@ public class MonetaryStats extends SimStats {
 	public Collection<TimeSeries> getTimeSeries() {
 		ArrayList<TimeSeries> list = new ArrayList<>();
 		list.add(moneySupply);
+		list.add(velocity);
 		list.addAll(prices.values());
 		list.addAll(volumes.values());
 		return list;
