@@ -75,6 +75,14 @@ public class TimeSeriesCollector {
 			firms.add(number);
 		}
 	}
+	
+	public void reportZeroIfNoData() {
+		for (AveragingTimeSeries ts : type.values()) {
+			ts.pushZeroIfNothing();
+		}
+		firms.pushZeroIfNothing();
+		consumers.pushZeroIfNothing();
+	}
 
 	public void flushDay(int day, boolean average) {
 		for (AveragingTimeSeries ts : type.values()) {

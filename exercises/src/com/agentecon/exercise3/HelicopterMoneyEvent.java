@@ -19,7 +19,7 @@ public class HelicopterMoneyEvent extends SimEvent {
 	public void execute(int day, ICountry sim) {
 		IAgent luckyJoe = sim.getAgents().getAgent(luckyAgentId);
 		if (luckyJoe != null) {
-			System.out.println("Giving " + luckyJoe + " some helicopter money.");
+//			System.out.println("Giving " + luckyJoe + " some helicopter money.");
 			luckyJoe.getMoney().add(amount);
 		}
 	}

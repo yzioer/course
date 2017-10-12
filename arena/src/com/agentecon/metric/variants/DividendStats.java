@@ -34,6 +34,7 @@ public class DividendStats extends SimStats {
 
 	@Override
 	public void notifyDayEnded(int day) {
+		collector.reportZeroIfNoData();
 		collector.flushDay(day, true);
 	}
 

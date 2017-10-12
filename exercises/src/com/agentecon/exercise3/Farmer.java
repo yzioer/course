@@ -46,7 +46,6 @@ public class Farmer extends Consumer implements IFounder {
 		super(id, end, utility);
 		this.manhours = end.getDaily()[0].getGood();
 		assert this.manhours.equals(HermitConfiguration.MAN_HOUR);
-		System.out.println("Farmer with capital buffer of " + CAPITAL_BUFFER);
 	}
 
 	@Override

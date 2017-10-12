@@ -14,7 +14,7 @@ import com.agentecon.util.MovingAverage;
 import com.agentecon.util.Numbers;
 
 public class ShareRegister implements IRegister {
-	
+
 	private Ticker ticker;
 	private Position rootPosition;
 	private MovingAverage dividend;
@@ -27,25 +27,25 @@ public class ShareRegister implements IRegister {
 		this.rootPosition = new Position(this, ticker, wallet.getGood(), SHARES_PER_COMPANY);
 		this.all.add(rootPosition);
 	}
-	
-	public void claimCompanyShares(Position owner){
+
+	public void claimCompanyShares(Position owner) {
 		owner.absorb(rootPosition);
 	}
-	
+
 	public void raiseCapital(IStockMarket dsm, IAgent owner, IStock wallet) {
-		if (!rootPosition.isEmpty()){
+		if (!rootPosition.isEmpty()) {
 			collectRootDividend(wallet);
 			Bid bid = dsm.getBid(getTicker());
-			if (bid != null){
+			if (bid != null) {
 				bid.accept(owner, wallet, rootPosition, rootPosition.getQuantity());
 			}
 		}
 	}
-	
-	public void collectRootDividend(IStock wallet){
+
+	public void collectRootDividend(IStock wallet) {
 		rootPosition.collectDividend(wallet);
 	}
-	
+
 	public void payDividend(IStock sourceWallet, double totalDividends) {
 		dividend.add(totalDividends);
 
@@ -66,19 +66,19 @@ public class ShareRegister implements IRegister {
 			}
 		}
 	}
-	
+
 	@Override
 	public double getAverageDividend() {
 		return dividend.getAverage();
 	}
-	
-	public Position createPosition(){
+
+	public Position createPosition() {
 		Position pos = new Position(this, getTicker(), rootPosition.getCurrency(), 0.0);
 		all.add(pos);
 		return pos;
 	}
-	
-	public void inherit(Position pos){
+
+	public void inherit(Position pos) {
 		pos.dispose(rootPosition);
 	}
 
@@ -93,11 +93,11 @@ public class ShareRegister implements IRegister {
 		}
 		return tot;
 	}
-	
-	public int getShareholderCount(){
+
+	public int getShareholderCount() {
 		return all.size();
 	}
-	
+
 	public double getFreeFloatShares() {
 		return SHARES_PER_COMPANY - rootPosition.getAmount();
 	}

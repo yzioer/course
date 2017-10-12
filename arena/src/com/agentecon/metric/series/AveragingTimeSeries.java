@@ -27,6 +27,12 @@ public class AveragingTimeSeries {
 			reset();
 		}
 	}
+	
+	public void pushZeroIfNothing() {
+		if (weight == 0.0) {
+			add(0.0);
+		}
+	}
 
 	public double push(int day) {
 		if (weight > 0) {
