@@ -3,6 +3,8 @@
 package com.agentecon.consumer;
 
 import com.agentecon.agent.IAgent;
+import com.agentecon.firm.Portfolio;
+import com.agentecon.goods.Inventory;
 
 public interface IConsumer extends IAgent, IMarketParticipant {
 	
@@ -22,7 +24,16 @@ public interface IConsumer extends IAgent, IMarketParticipant {
 	 * In case of death, the inventory and the portfolio are returned
 	 * so they can be inherited by others.
 	 */
-	public Inheritance considerDeath();
+	public default Inheritance considerDeath() {
+		return null;
+	}
+	
+	@Deprecated
+	public default Inventory considerDeath(Portfolio inheritance) {
+		Inheritance inh = considerDeath();
+		inheritance.absorb(inh.getPortfolio());
+		return inh.getInventory();
+	}
 	
 	/**
 	 * Receive an inheritance.

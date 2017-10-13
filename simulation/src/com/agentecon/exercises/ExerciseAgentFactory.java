@@ -70,7 +70,7 @@ public class ExerciseAgentFactory implements IAgentFactory {
 				System.err.println("Could not load " + classname + " from " + loader + " due to " + e);
 				return null;
 			} catch (NoSuchMethodException e) {
-				throw new RuntimeException(e);
+				return null;
 			} catch (SecurityException e) {
 				throw new RuntimeException(e);
 			} catch (InstantiationException e) {

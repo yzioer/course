@@ -1,7 +1,5 @@
 package com.agentecon.world;
 
-import java.util.Collection;
-import java.util.Iterator;
 import java.util.Random;
 
 import com.agentecon.agent.Agent;
@@ -13,9 +11,7 @@ import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.Portfolio;
 import com.agentecon.firm.Position;
 import com.agentecon.goods.Good;
-import com.agentecon.goods.IStock;
 import com.agentecon.goods.Inventory;
-import com.agentecon.goods.Stock;
 import com.agentecon.market.IStatistics;
 import com.agentecon.research.IFounder;
 import com.agentecon.research.IInnovation;
