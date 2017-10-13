@@ -29,7 +29,7 @@ public class AveragingTimeSeries {
 	}
 	
 	public void pushZeroIfNothing() {
-		if (weight == 0.0) {
+		if (weight == 0.0 && series.isInteresting()) {
 			add(0.0);
 		}
 	}

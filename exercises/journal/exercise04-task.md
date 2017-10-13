@@ -1,14 +1,6 @@
 # Exercise 4 - Growth
 
-This week's exercise is about growth and death. It is structured in three parts, one part that can be solved by running the simulation locally, one part that can be solved with pen and paper, and a competitive part that requires you to upload your agent to be run in the common simulation.
-
-## Task 0 - Growth
-
-We extend the existing simulation from the previous exercise by continuously adding additional agents. Unlike the initial agents, these additional agents do not get a land endowment, so the amount of land stays constant as the population grows.
-
-Run the [GrowthConfiguration](../src/com/agentecon/exercise4/GrowthConfiguration.java). You will find that firms start making profits after a while! Why do you think is that? Also, what is your interpretation of the diverging prices for man-hours and potatoes? Which agents benefit from the growing population, which agents do not?
-
-Sidenote: if you study the growth configuration in detail, you will notice that money is being printed to ensure money supply grows with the economy, thereby keeping prices in a useful range. This effect is only nominal and not relevant for solving this task.
+This week's exercise is about growth, savings, and death. The first part can be solved with pen and paper, and the second part is about verifying the solution in the simulation.
 
 ## Task 1: Savings Rule
 

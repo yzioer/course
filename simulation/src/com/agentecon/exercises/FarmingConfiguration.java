@@ -52,7 +52,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	private static final double LAND_ENDOWMENT = 100;
 	
-	private static final int ROUNDS = 10000;
+	private static final int ROUNDS = 2500;
 
 	public static final Quantity FIXED_COSTS = HermitConfiguration.FIXED_COSTS;
 
@@ -61,7 +61,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	@SafeVarargs
 	public FarmingConfiguration(Class<? extends Consumer>... agents) {
-		this(new AgentFactoryMultiplex(agents, AGENTS), AGENTS);
+		this(new AgentFactoryMultiplex(agents), AGENTS);
 	}
 
 	public FarmingConfiguration() throws IOException {

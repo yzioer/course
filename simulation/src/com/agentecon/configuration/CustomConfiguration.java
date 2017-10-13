@@ -7,28 +7,33 @@ import java.util.Collection;
 import com.agentecon.ISimulation;
 import com.agentecon.classloader.CompilingClassLoader;
 import com.agentecon.classloader.RemoteLoader;
+import com.agentecon.classloader.SimulationHandle;
 import com.agentecon.goods.Good;
 import com.agentecon.research.IInnovation;
 import com.agentecon.sim.Event;
 import com.agentecon.sim.SimulationConfig;
 
 public class CustomConfiguration extends SimulationConfig {
-	
+
 	private SimulationConfig delegate;
-	
+
 	public CustomConfiguration() throws IOException {
 		this("com.agentecon.exercise3.MoneyConfiguration");
 	}
-	
+
 	public CustomConfiguration(String classname) throws IOException {
 		this((RemoteLoader) CustomConfiguration.class.getClassLoader(), classname);
 	}
-	
+
 	public CustomConfiguration(RemoteLoader parent, String className) throws IOException {
 		super(10000);
 		try {
-			// use same source as parten
-			CompilingClassLoader loader = new CompilingClassLoader(parent, parent.getSource().copy(false));
+			// use same source as parent
+			SimulationHandle handle = parent.getSource().copy(false);
+			ClassLoader loader = parent.getSubloader(handle);
+			if (loader == null) {
+				loader = new CompilingClassLoader(parent, handle);
+			}
 			delegate = (SimulationConfig) loader.loadClass(className).newInstance();
 		} catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
 			throw new RuntimeException(e);
@@ -36,7 +41,7 @@ public class CustomConfiguration extends SimulationConfig {
 	}
 
 	@Override
-	public Good getMoney(){
+	public Good getMoney() {
 		return delegate.getMoney();
 	}
 
@@ -69,9 +74,9 @@ public class CustomConfiguration extends SimulationConfig {
 	public IInnovation getInnovation() {
 		return delegate.getInnovation();
 	}
-	
+
 	@Override
-	public String getName(){
+	public String getName() {
 		return delegate.getName();
 	}
 

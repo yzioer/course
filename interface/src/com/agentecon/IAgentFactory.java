@@ -9,4 +9,8 @@ public interface IAgentFactory {
 	
 	public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction);
 	
+	public default IConsumer createConsumer(IAgentIdGenerator id, int maxAge, Endowment endowment, IUtility utilityFunction) {
+		return createConsumer(id, endowment, utilityFunction);
+	}
+	
 }

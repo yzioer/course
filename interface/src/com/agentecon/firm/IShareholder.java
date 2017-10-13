@@ -1,10 +1,12 @@
 package com.agentecon.firm;
 
-import com.agentecon.agent.IAgent;
+import com.agentecon.goods.Inventory;
 
-public interface IShareholder extends IAgent {
+public interface IShareholder {
 	
 	public Portfolio getPortfolio();
+	
+	public Inventory getInventory();
 	
 	/**
 	 * This is the time to trade stocks on the stock market.

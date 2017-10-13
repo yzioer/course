@@ -32,5 +32,14 @@ public class LimitingAgentFactory implements IAgentFactory {
 			return null;
 		}
 	}
+	
+	@Override
+	public IConsumer createConsumer(IAgentIdGenerator id, int maxAge, Endowment endowment, IUtility utilityFunction) {
+		if (maxNumberOfAgents-- > 0){
+			return wrapped.createConsumer(id, maxAge, endowment, utilityFunction);
+		} else {
+			return null;
+		}
+	}
 
 }

@@ -29,6 +29,7 @@ public class Portfolio implements Cloneable {
 				p.dispose(existing);
 			}
 		}
+		other.inv.clear();
 	}
 
 	public void absorbPositions(double ratio, Portfolio other) {

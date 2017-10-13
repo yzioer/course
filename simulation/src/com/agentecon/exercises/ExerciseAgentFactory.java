@@ -37,12 +37,11 @@ public class ExerciseAgentFactory implements IAgentFactory {
 		this.classname = classname;
 		RemoteLoader parent = getSimulationLoader();
 		if (parent == null) {
-			this.loader = new CompilingClassLoader(parent, handle);
+			this.loader = new CompilingClassLoader(handle);
 		} else {
 			RemoteLoader loader = parent.getSubloader(handle);
 			if (loader == null) {
 				this.loader = new CompilingClassLoader(parent, handle);
-				parent.registerSubloader(this.loader);
 			} else {
 				this.loader = loader;
 			}
@@ -56,6 +55,38 @@ public class ExerciseAgentFactory implements IAgentFactory {
 
 	public void preload() throws ClassNotFoundException {
 		loader.loadClass(classname);
+	}
+	
+	@Override
+	public IConsumer createConsumer(IAgentIdGenerator id, int maxAge, Endowment endowment, IUtility utilityFunction) {
+		try {
+			try {
+				@SuppressWarnings("unchecked")
+				Class<? extends IConsumer> clazz = (Class<? extends IConsumer>) loader.loadClass(classname);
+				Constructor<? extends IConsumer> constructor = clazz.getConstructor(IAgentIdGenerator.class, int.class, Endowment.class, IUtility.class);
+				assert clazz.getClassLoader() == loader;
+				return constructor.newInstance(id, maxAge, endowment, utilityFunction);
+			} catch (ClassNotFoundException e) {
+				System.err.println("Could not load " + classname + " from " + loader + " due to " + e);
+				return null;
+			} catch (NoSuchMethodException e) {
+				throw new RuntimeException(e);
+			} catch (SecurityException e) {
+				throw new RuntimeException(e);
+			} catch (InstantiationException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalAccessException e) {
+				throw new RuntimeException(e);
+			} catch (IllegalArgumentException e) {
+				throw new RuntimeException(e);
+			} catch (InvocationTargetException e) {
+				throw new RuntimeException(e);
+			}
+		} catch (RuntimeException e) {
+			System.out.println("Could not load consumer from " + this);
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override

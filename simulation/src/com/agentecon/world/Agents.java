@@ -5,6 +5,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.Random;
 import java.util.Set;
 
@@ -14,6 +15,7 @@ import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.agent.IAgents;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IMarketParticipant;
+import com.agentecon.consumer.Inheritance;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IMarketMaker;
 import com.agentecon.firm.IShareholder;
@@ -35,6 +37,7 @@ public class Agents implements IAgents, IAgentIdGenerator {
 	// private ArrayList<Fundamentalist> fundies;
 	private ArrayList<IMarketMaker> marketMakers;
 	private ArrayList<IShareholder> shareholders;
+	private LinkedList<Inheritance> pendingInheritances;
 
 	private HashSet<String> consumerTypes;
 	private HashSet<String> firmTypes;
@@ -50,9 +53,20 @@ public class Agents implements IAgents, IAgentIdGenerator {
 		this.marketMakers = new ArrayList<>();
 		this.consumerTypes = new HashSet<>();
 		this.firmTypes = new HashSet<>();
+		this.pendingInheritances = new LinkedList<>();
 		this.listeners = listeners;
 		this.seed = seed;
 		this.agentId = newAgentId;
+	}
+	
+	@Override
+	public Collection<Inheritance> getPendingInheritances() {
+		return pendingInheritances;
+	}
+	
+	public void addInheritance(Inheritance left) {
+		this.pendingInheritances.add(left);
+		this.shareholders.add(left);
 	}
 
 	public Collection<IFirm> getFirms() {
@@ -109,7 +123,13 @@ public class Agents implements IAgents, IAgentIdGenerator {
 			producers.add((IGoodsTrader) agent);
 		}
 		if (agent instanceof IConsumer) {
-			consumers.add((IConsumer) agent);
+			IConsumer consumer = (IConsumer) agent;
+			if (newAgent && !pendingInheritances.isEmpty()) {
+				Inheritance inh = pendingInheritances.removeFirst();
+				shareholders.remove(inh);
+				consumer.inherit(inh);
+			}
+			consumers.add(consumer);
 			consumerTypes.add(agent.getType());
 		}
 		if (listeners != null && newAgent) {
@@ -161,6 +181,9 @@ public class Agents implements IAgents, IAgentIdGenerator {
 
 	public Agents renew(long seed) {
 		Agents copy = new Agents(listeners, seed, agentId);
+		for (Inheritance inh: this.pendingInheritances) {
+			copy.addInheritance(inh);
+		}
 		for (Agent a : all.values()) {
 			if (a.isAlive()) {
 				copy.include(a, false);
@@ -175,6 +198,9 @@ public class Agents implements IAgents, IAgentIdGenerator {
 		long seed = getCurrentSeed();
 		assert rand == null;
 		Agents duplicate = new Agents(listeners, seed, agentId);
+		for (Inheritance inh: pendingInheritances) {
+			duplicate.addInheritance(inh.clone());
+		}
 		for (Agent a : all.values()) {
 			duplicate.include(a.clone(), false);
 		}
@@ -254,5 +280,5 @@ public class Agents implements IAgents, IAgentIdGenerator {
 	public String toString() {
 		return all.size() + " agents out of which " + consumers.size() + " are consumers and " + firms.size() + " firms.";
 	}
-	
+
 }

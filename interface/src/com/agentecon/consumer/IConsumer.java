@@ -3,8 +3,6 @@
 package com.agentecon.consumer;
 
 import com.agentecon.agent.IAgent;
-import com.agentecon.firm.Portfolio;
-import com.agentecon.goods.Inventory;
 
 public interface IConsumer extends IAgent, IMarketParticipant {
 	
@@ -21,15 +19,21 @@ public interface IConsumer extends IAgent, IMarketParticipant {
 
 	/**
 	 * Get one day older and die if the maximum age is reached.
-	 * In case of death, the inventory must be returned and the remaining
-	 * portfolio transferred to the 'inheritance' portfolio.
+	 * In case of death, the inventory and the portfolio are returned
+	 * so they can be inherited by others.
 	 */
-	public Inventory considerDeath(Portfolio inheritance);
+	public Inheritance considerDeath();
+	
+	/**
+	 * Receive an inheritance.
+	 */
+	public void inherit(Inheritance removeFirst);
 	
 	public boolean isRetired();
 	
 	public IUtility getUtilityFunction();
 	
 	public void addListener(IConsumerListener listener);
+
 	
 }

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.agentecon.ISimulation;
+import com.agentecon.agent.IAgent;
 import com.agentecon.consumer.IConsumer;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.Portfolio;
@@ -48,9 +49,11 @@ public class OwnershipStats extends SimStats {
 				}
 			};
 			for (IShareholder pc : getAgents().getShareholders()) {
-				String ownerType = pc.getType();
-				if (pc instanceof IConsumer && ((IConsumer) pc).isRetired()) {
+				String ownerType = "Unclaimed Inheritance";
+				if (pc instanceof IConsumer && ((IConsumer) pc).isRetired()){
 					ownerType = "Retiree";
+				} else if (pc instanceof IAgent) {
+					ownerType = ((IAgent)pc).getType();
 				}
 				Portfolio pf = pc.getPortfolio();
 				for (Position pos : pf.getPositions()) {

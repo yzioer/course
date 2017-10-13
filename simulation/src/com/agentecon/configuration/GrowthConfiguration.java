@@ -17,7 +17,10 @@ import com.agentecon.IAgentFactory;
 import com.agentecon.ISimulation;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgent;
+import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.consumer.Consumer;
+import com.agentecon.consumer.IConsumer;
+import com.agentecon.consumer.IUtility;
 import com.agentecon.events.GrowthEvent;
 import com.agentecon.events.IUtilityFactory;
 import com.agentecon.exercises.ExerciseAgentLoader;
@@ -40,6 +43,9 @@ public class GrowthConfiguration extends FarmingConfiguration implements IUtilit
 	
 	private static final int BASIC_AGENTS = 30;
 	public static final String BASIC_AGENT = "com.agentecon.exercise4.Farmer";
+	
+	public static final double GROWTH_RATE = 0.002;
+	public static final int MAX_AGE = 500;
 
 	public static final Good LAND = HermitConfiguration.LAND;
 	public static final Good POTATOE = HermitConfiguration.POTATOE;
@@ -47,7 +53,7 @@ public class GrowthConfiguration extends FarmingConfiguration implements IUtilit
 
 	@SafeVarargs
 	public GrowthConfiguration(Class<? extends Consumer>... agents) {
-		this(new AgentFactoryMultiplex(agents, BASIC_AGENTS), BASIC_AGENTS);
+		this(new AgentFactoryMultiplex(agents), BASIC_AGENTS);
 	}
 	
 	public GrowthConfiguration() throws SocketTimeoutException, IOException {
@@ -55,18 +61,28 @@ public class GrowthConfiguration extends FarmingConfiguration implements IUtilit
 	}
 	
 	public GrowthConfiguration(IAgentFactory loader, int agents) {
-		super(loader, agents);
+		super(new IAgentFactory() {
+			
+			private int number = 1;
+			
+			@Override
+			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+				int maxAge = number++ * MAX_AGE / agents;
+				return loader.createConsumer(id, maxAge, endowment, utilityFunction);
+			}
+		}, agents);
 		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, HermitConfiguration.DAILY_ENDOWMENT) };
 		Endowment workerEndowment = new Endowment(getMoney(), new IStock[0], dailyEndowment);
-		addEvent(new GrowthEvent(300, 0.001){
+		addEvent(new GrowthEvent(0, GROWTH_RATE){
 
 			@Override
 			protected void execute(ICountry sim) {
-				sim.add(new Consumer(sim.getAgents(), workerEndowment, create(0)));
+				IConsumer cons = loader.createConsumer(sim, MAX_AGE, workerEndowment, create(0));
+				sim.add(cons);
 			}
 			
 		});
-		addEvent(new InterestEvent(0.001, 1));
+//		addEvent(new InterestEvent(0.001, 1));
 	}
 
 	public void diagnoseResult(PrintStream out, ISimulation sim) {

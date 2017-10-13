@@ -9,6 +9,7 @@
 package com.agentecon.configuration;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import com.agentecon.IAgentFactory;
@@ -38,11 +39,22 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 		this.current = 0;
 	}
 
-	public AgentFactoryMultiplex(Class<? extends Consumer>[] agents, int maxPerType) {
+	public AgentFactoryMultiplex(Class<? extends IConsumer>[] agents) {
 		this.factories = new IAgentFactory[agents.length];
 		for (int i = 0; i < agents.length; i++) {
-			final Class<? extends Consumer> current = agents[i];
-			this.factories[i] = new LimitingAgentFactory(maxPerType, new IAgentFactory() {
+			final Class<? extends IConsumer> current = agents[i];
+			this.factories[i] = new IAgentFactory() {
+				
+				@Override
+				public IConsumer createConsumer(IAgentIdGenerator id, int maxAge, Endowment endowment, IUtility utilityFunction) {
+					try {
+						Constructor<? extends IConsumer> constructor = current.getConstructor(IAgentIdGenerator.class, int.class, Endowment.class, IUtility.class);
+						return constructor.newInstance(id, maxAge, endowment, utilityFunction);
+					} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException | SecurityException e) {
+						System.err.println("Could not instantiate agent " + current + " due to " + e);
+						return null;
+					}
+				}
 
 				@Override
 				public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
@@ -53,23 +65,36 @@ public class AgentFactoryMultiplex implements IAgentFactory {
 						return null;
 					}
 				}
-			});
+			};
 		}
 	}
 
 	private IAgentFactory getCurrent() {
 		return factories[current++ % factories.length];
 	}
+	
+	protected IAgentFactory getDefaultFactory() {
+		return new IAgentFactory() {
+			
+			@Override
+			public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
+				return new Consumer(id, endowment, utilityFunction);
+			}
+		};
+	}
+
+	@Override
+	public IConsumer createConsumer(IAgentIdGenerator id, int maxAge, Endowment endowment, IUtility utilityFunction) {
+		IAgentFactory current = getCurrent();
+		IConsumer consumer = current.createConsumer(id, maxAge, endowment, utilityFunction);
+		return consumer == null ? getDefaultFactory().createConsumer(id, maxAge, endowment, utilityFunction) : consumer;
+	}
 
 	@Override
 	public IConsumer createConsumer(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
 		IAgentFactory current = getCurrent();
 		IConsumer consumer = current.createConsumer(id, endowment, utilityFunction);
-		return consumer == null ? createDefault(id, endowment, utilityFunction) : consumer;
+		return consumer == null ? getDefaultFactory().createConsumer(id, endowment, utilityFunction) : consumer;
 	}
-
-	protected IConsumer createDefault(IAgentIdGenerator id, Endowment endowment, IUtility utilityFunction) {
-		return new Consumer(id, endowment, utilityFunction);
-	}
-
+	
 }

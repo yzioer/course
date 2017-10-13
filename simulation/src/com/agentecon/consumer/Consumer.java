@@ -10,7 +10,6 @@ import com.agentecon.agent.IAgentIdGenerator;
 import com.agentecon.finance.TradingPortfolio;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.IStockMarket;
-import com.agentecon.firm.Portfolio;
 import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
 import com.agentecon.goods.Inventory;
@@ -140,9 +139,15 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 		return false;
 	}
 
-	public Inventory considerDeath(Portfolio inheritance) {
+	public Inheritance considerDeath() {
 		super.age();
 		return null;
+	}
+	
+	@Override
+	public void inherit(Inheritance inheritance) {
+		getInventory().absorb(inheritance.getInventory());
+		getPortfolio().absorb(inheritance.getPortfolio());
 	}
 
 	public boolean isRetired() {

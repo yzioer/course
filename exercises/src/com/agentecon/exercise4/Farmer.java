@@ -9,12 +9,13 @@
 package com.agentecon.exercise4;
 
 import com.agentecon.Simulation;
+import com.agentecon.agent.Agent;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
+import com.agentecon.classloader.RemoteLoader;
 import com.agentecon.configuration.GrowthConfiguration;
-import com.agentecon.consumer.Consumer;
 import com.agentecon.consumer.IUtility;
-import com.agentecon.exercise3.InterestEvent;
+import com.agentecon.consumer.MortalConsumer;
 import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.finance.Firm;
@@ -36,20 +37,19 @@ import com.agentecon.research.IInnovation;
  * Unlike the Hermit, the farmer can decide to work at other farms and to buy from others. To formalize these relationships, the farmer does not produce himself anymore, but instead uses his land to
  * found a profit-maximizing firm.
  */
-public class Farmer extends Consumer implements IFounder {
+public class Farmer extends MortalConsumer implements IFounder {
 	
 	private static final double CAPITAL_BUFFER = 0.80;
-
 	public static final double MINIMUM_WORKING_HOURS = 5;
 
 	private Good manhours;
 
-	public Farmer(IAgentIdGenerator id, Endowment end, IUtility utility) {
-		super(id, end, utility);
+	public Farmer(IAgentIdGenerator id, int maxAge, Endowment end, IUtility utility) {
+		super(id, maxAge, end, utility);
 		this.manhours = end.getDaily()[0].getGood();
-		assert this.manhours.equals(HermitConfiguration.MAN_HOUR);
+		assert this.manhours.equals(FarmingConfiguration.MAN_HOUR);
 	}
-
+	
 	@Override
 	public IFirm considerCreatingFirm(IStatistics statistics, IInnovation research, IAgentIdGenerator id) {
 		IStock myLand = getStock(FarmingConfiguration.LAND);
@@ -105,7 +105,6 @@ public class Farmer extends Consumer implements IFounder {
 
 	public static void main(String[] args) {
 		GrowthConfiguration configuration = new GrowthConfiguration(Farmer.class);
-		configuration.addEvent(new InterestEvent(0.001, 10));
 		
 		// In case you want to test a setting with two different types of farmers, you configure the simulation like this:
 //		FarmingConfiguration configuration = new FarmingConfiguration(Farmer.class, AlternateFarmer.class);

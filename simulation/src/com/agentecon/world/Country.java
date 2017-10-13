@@ -7,6 +7,7 @@ import java.util.Random;
 import com.agentecon.agent.Agent;
 import com.agentecon.agent.IAgent;
 import com.agentecon.consumer.IConsumer;
+import com.agentecon.consumer.Inheritance;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.Portfolio;
@@ -115,29 +116,54 @@ public class Country implements ICountry {
 	}
 
 	public void finishDay(IStatistics stats) {
-		IStock inheritedMoney = new Stock(money);
-		Portfolio inheritance = new Portfolio(inheritedMoney);
-		Collection<IConsumer> consumers = agents.getConsumers();
-		Iterator<IConsumer> iter = consumers.iterator();
-		utility = new Average();
-		while (iter.hasNext()) {
-			IConsumer c = iter.next();
-			assert c.isAlive();
-			double util = c.consume();
-			utility.add(util);
-			c.considerDeath(inheritance);
-		}
-		for (Position pos : inheritance.getPositions()) {
-			agents.getCompany(pos.getTicker()).inherit(pos);
-		}
-		if (inheritedMoney.getAmount() > 0) {
-			agents.getRandomConsumer().getMoney().absorb(inheritedMoney);
-		}
+		consume();
+		
+		handleDeath();
 		
 		dismantleFirms(stats);
 
 		listeners.notifyDayEnded(stats);
 	}
+	
+	protected void consume() {
+		utility = new Average();
+		for (IConsumer c: agents.getConsumers()) {
+			assert c.isAlive();
+			double util = c.consume();
+			utility.add(util);
+		}
+	}
+	
+	protected void handleDeath() {
+		for (IConsumer c: agents.getConsumers()) {
+			assert c.isAlive();
+			Inheritance left = c.considerDeath();
+			if (left != null) {
+				agents.addInheritance(left);
+			}
+		}
+	}
+
+//	protected void handleDeath() {
+//		IStock inheritedMoney = new Stock(money);
+//		Portfolio inheritance = new Portfolio(inheritedMoney);
+//		Collection<IConsumer> consumers = agents.getConsumers();
+//		Iterator<IConsumer> iter = consumers.iterator();
+//		utility = new Average();
+//		while (iter.hasNext()) {
+//			IConsumer c = iter.next();
+//			assert c.isAlive();
+//			double util = c.consume();
+//			utility.add(util);
+//			c.considerDeath(inheritance);
+//		}
+//		for (Position pos : inheritance.getPositions()) {
+//			agents.getCompany(pos.getTicker()).inherit(pos);
+//		}
+//		if (inheritedMoney.getAmount() > 0) {
+//			agents.getRandomConsumer().getMoney().absorb(inheritedMoney);
+//		}
+//	}
 
 	public void startTransaction() {
 		this.backup = agents.duplicate();

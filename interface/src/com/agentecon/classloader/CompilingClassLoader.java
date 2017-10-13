@@ -12,12 +12,15 @@ public class CompilingClassLoader extends RemoteLoader {
 	private AgentCompiler compiler;
 	
 	public CompilingClassLoader(SimulationHandle source) throws SocketTimeoutException, IOException {
-		this(null, source);
+		super(CompilingClassLoader.class.getClassLoader(), source);
+		assert !(getParent() instanceof RemoteLoader) : "If parent is a remote loader, you should call the other constructor";
+		this.compiler = new AgentCompiler(null, source);
 	}
 
 	public CompilingClassLoader(RemoteLoader parent, SimulationHandle source) throws SocketTimeoutException, IOException {
-		super(parent == null ? CompilingClassLoader.class.getClassLoader() : parent, source);
+		super(parent, source);
 		this.compiler = new AgentCompiler(parent, source);
+		parent.registerSubloader(this);
 	}
 
 	@Override

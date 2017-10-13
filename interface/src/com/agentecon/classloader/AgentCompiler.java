@@ -24,6 +24,10 @@ public class AgentCompiler implements DiagnosticListener<JavaFileObject> {
 
 	private JavaCompiler compiler;
 	private SourceFileManager manager;
+	
+	public AgentCompiler(SimulationHandle source) {
+		this(null, source);
+	}
 
 	public AgentCompiler(RemoteLoader simulationJar, SimulationHandle source) {
 		this.compiler = ToolProvider.getSystemJavaCompiler();

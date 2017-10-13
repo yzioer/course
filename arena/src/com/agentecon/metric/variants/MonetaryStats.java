@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
+import com.agentecon.consumer.Inheritance;
 import com.agentecon.goods.Good;
 import com.agentecon.market.IMarketStatistics;
 import com.agentecon.market.IStatistics;
@@ -50,6 +51,9 @@ public class MonetaryStats extends SimStats {
 		double moneySupply = 0.0;
 		for (IAgent a : getAgents().getAgents()) {
 			moneySupply += a.getMoney().getAmount();
+		}
+		for (Inheritance pending: getAgents().getPendingInheritances()) {
+			moneySupply += pending.getMoney().getAmount();
 		}
 		this.moneySupply.set(day, moneySupply);
 

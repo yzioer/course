@@ -8,7 +8,9 @@
  */
 package com.agentecon.exercise4;
 
+import com.agentecon.agent.Agent;
 import com.agentecon.agent.IAgentIdGenerator;
+import com.agentecon.classloader.RemoteLoader;
 import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.finance.Producer;
 import com.agentecon.firm.IShareholder;
@@ -37,7 +39,7 @@ public class Farm extends Producer {
 		getMoney().absorb(money);
 		assert getMoney().getAmount() > 0;
 	}
-
+	
 	protected double getInitialBudget(IStatistics stats) {
 		try {
 			return stats.getGoodsMarketStats().getPriceBelief(FarmingConfiguration.MAN_HOUR) * 10;

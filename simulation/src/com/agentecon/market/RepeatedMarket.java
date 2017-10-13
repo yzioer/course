@@ -5,11 +5,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import com.agentecon.agent.IAgent;
-import com.agentecon.consumer.IConsumer;
 import com.agentecon.consumer.IMarketParticipant;
 import com.agentecon.goods.Good;
 import com.agentecon.production.IGoodsTrader;
-import com.agentecon.production.IProducer;
 import com.agentecon.sim.SimulationListeners;
 import com.agentecon.util.Average;
 import com.agentecon.util.InstantiatingHashMap;
@@ -23,30 +21,28 @@ public class RepeatedMarket {
 
 	public RepeatedMarket(Country world, SimulationListeners listeners, MarketStatistics stats) {
 		this.world = world;
-		this.listeners = listeners; 
+		this.listeners = listeners;
 		this.stats = stats;
 	}
 
 	public void iterate(int day, int iterations) {
+		if (iterations == 0) {
+			Market market = new Market(world.getRand());
+			trade(market);
+			market.close(day);
+		} else {
+			doIterate(day, iterations);
+		}
+	}
+
+	public void doIterate(int day, int iterations) {
 		MarketObserver observer = new MarketObserver(iterations);
 		while (true) {
 			world.startTransaction();
-			Collection<IGoodsTrader> firms = world.getAgents().getRandomGoodsMarketMakers();
-			Collection<IMarketParticipant> cons = world.getAgents().getRandomMarketParticipants();
 			Market market = new Market(world.getRand());
 			market.addMarketListener(observer);
-			market.addMarketListener(stats);
-			listeners.notifyGoodsMarketOpened(market);
-			for (IGoodsTrader firm : firms) {
-				firm.offer(market);
-			}
-			for (IMarketParticipant c : cons) {
-				c.tradeGoods(market);
-			}
-			for (IGoodsTrader firm: firms) {
-				firm.adaptPrices();
-			}
-			if (observer.shouldTryAgain()){
+			trade(market);
+			if (observer.shouldTryAgain()) {
 				market.cancel();
 				world.abortTransaction();
 			} else {
@@ -57,10 +53,26 @@ public class RepeatedMarket {
 		}
 	}
 
+	protected void trade(Market market) {
+		Collection<IGoodsTrader> firms = world.getAgents().getRandomGoodsMarketMakers();
+		Collection<IMarketParticipant> cons = world.getAgents().getRandomMarketParticipants();
+		market.addMarketListener(stats);
+		listeners.notifyGoodsMarketOpened(market);
+		for (IGoodsTrader firm : firms) {
+			firm.offer(market);
+		}
+		for (IMarketParticipant c : cons) {
+			c.tradeGoods(market);
+		}
+		for (IGoodsTrader firm : firms) {
+			firm.adaptPrices();
+		}
+	}
+
 	static class MarketObserver implements IMarketListener {
-		
+
 		static int count = 0;
-		
+
 		private int iters;
 		private double sensitivity;
 		private HashMap<Good, Average> current;
@@ -82,7 +94,7 @@ public class RepeatedMarket {
 				}
 			};
 		}
-		
+
 		@Override
 		public void notifyTraded(IAgent seller, IAgent buyer, Good good, double quantity, double payment) {
 			current.get(good).add(quantity, payment / quantity);
@@ -92,24 +104,24 @@ public class RepeatedMarket {
 		public void notifyTradesCancelled() {
 			current.clear();
 		}
-		
+
 		public boolean shouldTryAgain() {
-			if (iters-- <= 0){
+			if (iters-- <= 0) {
 				return false;
-			} else if (prev == null){
+			} else if (prev == null) {
 				next();
 				return true;
 			} else {
 				Average change = new Average();
-				for (Map.Entry<Good, Average> e: current.entrySet()){
+				for (Map.Entry<Good, Average> e : current.entrySet()) {
 					double p1 = e.getValue().getAverage();
 					double p2 = prev.get(e.getKey()).getAverage();
 					double diff = Math.abs(p1 - p2) / p1;
 					change.add(diff);
 				}
 				next();
-//				sensitivity *= 1.3;
-//				System.out.println(count++);
+				// sensitivity *= 1.3;
+				// System.out.println(count++);
 				return change.getAverage() > sensitivity;
 			}
 		}
@@ -119,5 +131,5 @@ public class RepeatedMarket {
 		}
 
 	}
-	
+
 }

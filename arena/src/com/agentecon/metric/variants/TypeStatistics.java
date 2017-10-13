@@ -53,7 +53,7 @@ public class TypeStatistics extends SimStats {
 
 				@Override
 				public String getIndividualKey() {
-					return agent.getName();
+					return null;
 				}
 
 				@Override
