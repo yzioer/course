@@ -38,7 +38,9 @@ public interface IConsumer extends IAgent, IMarketParticipant {
 	/**
 	 * Receive an inheritance.
 	 */
-	public void inherit(Inheritance removeFirst);
+	public default void inherit(Inheritance removeFirst) {
+		throw new RuntimeException("not implemented");
+	}
 	
 	public boolean isRetired();
 	

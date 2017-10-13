@@ -1,6 +1,7 @@
 package com.agentecon.agent;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Set;
 
 import com.agentecon.consumer.IConsumer;
@@ -32,6 +33,8 @@ public Collection<? extends IAgent> getAgents();
 
 	public Collection<IAgent> getAgents(String type);
 
-	public Collection<Inheritance> getPendingInheritances();
+	public default Collection<Inheritance> getPendingInheritances(){
+		return Collections.emptyList();
+	}
 
 }

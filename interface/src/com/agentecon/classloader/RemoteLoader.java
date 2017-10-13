@@ -77,7 +77,7 @@ public abstract class RemoteLoader extends ClassLoader {
 
 	public void registerSubloader(SimulationHandle source, RemoteLoader loader) {
 		RemoteLoader prev = this.subLoaderCache.put(source, loader);
-		assert prev == null;
+		assert prev == null || loader == prev;
 	}
 
 	public RemoteLoader getSubloader(SimulationHandle handle) {
