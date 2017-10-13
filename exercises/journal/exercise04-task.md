@@ -22,7 +22,7 @@ From there, think what influence dividends have and design a simple daily decisi
 
 ## Task 2: Simulation
 
-To test your savings heuristic, you should implement the two methods managePortfolio of your [farmer](../src/com/agentecon/exercise4/Farmer.java).
+To test your savings heuristic, you should implement the method managePortfolio of your [farmer](../src/com/agentecon/exercise4/Farmer.java).
 
 Note that when the agents save too much money, there might not be enough money left to keep the economy going. To prevent this, the [GrowthConfiguration](../../simulation/src/com/agentecon/configuration/GrowthConfiguration.java) includes a CentralBankEvent which prints a little money whenever the price of a potatoe falls below 5.
 
