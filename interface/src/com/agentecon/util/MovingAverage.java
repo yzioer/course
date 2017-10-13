@@ -6,19 +6,17 @@ public class MovingAverage implements Cloneable, IAverage {
 
 	private double memory;
 	private double mean, var;
+	private int samples;
 
 	public MovingAverage() {
 		this(0.95);
 	}
 
 	public MovingAverage(double memory) {
-		this(memory, 0.0);
-	}
-	
-	public MovingAverage(double memory, double start) {
 		this.memory = memory;
-		this.mean = start;
+		this.mean = 0.0;
 		this.var = 1.0;
+		this.samples = 0;
 	}
 
 	public double getAverage() {
@@ -32,11 +30,13 @@ public class MovingAverage implements Cloneable, IAverage {
 
 	public void add(double point) {
 		assert !Double.isNaN(point);
+		this.samples++;
+		double maxMemory = Math.min(memory, 1.0 - 1.0d / samples);
 		double oldMean = this.mean;
-		this.mean = memory * oldMean + (1 - memory) * point;
+		this.mean = maxMemory * oldMean + (1 - maxMemory) * point;
 		double adjustment = this.mean - oldMean;
 		double delta = point - this.mean;
-		this.var = memory * (this.var + adjustment * adjustment) + (1 - memory) * delta * delta;
+		this.var = maxMemory * (this.var + adjustment * adjustment) + (1 - maxMemory) * delta * delta;
 		assert !Double.isNaN(mean);
 		assert !Double.isNaN(var);
 	}

@@ -8,8 +8,10 @@ import java.util.HashMap;
 
 import com.agentecon.ISimulation;
 import com.agentecon.consumer.IConsumer;
+import com.agentecon.firm.IShareholder;
 import com.agentecon.market.IStatistics;
 import com.agentecon.metric.SimStats;
+import com.agentecon.metric.series.AveragingTimeSeries;
 import com.agentecon.metric.series.Chart;
 import com.agentecon.metric.series.TimeSeries;
 import com.agentecon.util.InstantiatingHashMap;
@@ -17,6 +19,7 @@ import com.agentecon.util.InstantiatingHashMap;
 public class UtilityStats extends SimStats {
 
 	private TimeSeries tot, min, max;
+	private AveragingTimeSeries retirees, shareHolders;
 	private HashMap<String, TimeSeries> utilities;
 
 	public UtilityStats(ISimulation sim) {
@@ -24,6 +27,8 @@ public class UtilityStats extends SimStats {
 		this.tot = new TimeSeries("Average");
 		this.min = new TimeSeries("Min");
 		this.max = new TimeSeries("Max");
+		this.retirees = new AveragingTimeSeries("Retirees");
+		this.shareHolders = new AveragingTimeSeries("Shareholders");
 		this.utilities = new InstantiatingHashMap<String, TimeSeries>() {
 
 			@Override
@@ -39,8 +44,17 @@ public class UtilityStats extends SimStats {
 		this.min.set(stats.getDay(), stats.getAverageUtility().getMin());
 		this.max.set(stats.getDay(), stats.getAverageUtility().getMax());
 		for (IConsumer consumer: getAgents().getConsumers()) {
-			utilities.get(consumer.getName()).set(stats.getDay(), consumer.getUtilityFunction().getLatestExperiencedUtility());
+			double util = consumer.getUtilityFunction().getLatestExperiencedUtility();
+			if (consumer instanceof IShareholder && ((IShareholder)consumer).getPortfolio().hasPositions()) {
+				this.shareHolders.add(util);
+			}
+			if (consumer.isRetired()) {
+				this.retirees.add(util);
+			}
+			utilities.get(consumer.getName()).set(stats.getDay(), util);
 		}
+		this.shareHolders.push(stats.getDay());
+		this.retirees.push(stats.getDay());
 	}
 
 	@Override
@@ -56,7 +70,7 @@ public class UtilityStats extends SimStats {
 
 	@Override
 	public Collection<TimeSeries> getTimeSeries() {
-		Collection<TimeSeries> list = new ArrayList<>(Arrays.asList(tot, min, max));
+		Collection<TimeSeries> list = new ArrayList<>(Arrays.asList(tot, min, max, retirees.getTimeSeries(), shareHolders.getTimeSeries()));
 		ArrayList<TimeSeries> individuals = new ArrayList<>(utilities.values());
 		Collections.sort(individuals);
 		list.addAll(individuals);

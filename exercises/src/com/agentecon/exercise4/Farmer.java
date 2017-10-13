@@ -9,10 +9,8 @@
 package com.agentecon.exercise4;
 
 import com.agentecon.Simulation;
-import com.agentecon.agent.Agent;
 import com.agentecon.agent.Endowment;
 import com.agentecon.agent.IAgentIdGenerator;
-import com.agentecon.classloader.RemoteLoader;
 import com.agentecon.configuration.GrowthConfiguration;
 import com.agentecon.consumer.IUtility;
 import com.agentecon.consumer.MortalConsumer;
@@ -21,6 +19,7 @@ import com.agentecon.exercises.HermitConfiguration;
 import com.agentecon.finance.Firm;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IShareholder;
+import com.agentecon.firm.IStockMarket;
 import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
 import com.agentecon.goods.Inventory;
@@ -43,17 +42,42 @@ public class Farmer extends MortalConsumer implements IFounder {
 	public static final double MINIMUM_WORKING_HOURS = 5;
 
 	private Good manhours;
+	private double savings;
 
 	public Farmer(IAgentIdGenerator id, int maxAge, Endowment end, IUtility utility) {
 		super(id, maxAge, end, utility);
+		this.savings = 0.0;
 		this.manhours = end.getDaily()[0].getGood();
 		assert this.manhours.equals(FarmingConfiguration.MAN_HOUR);
 	}
 	
 	@Override
+	public void managePortfolio(IStockMarket stocks) {
+		// instead of investing in stocks, the farmer simply decides how much money to keep under the pillow
+		// note that if this agent is a firm owner, she will still receive dividends even when retired
+		
+		double yesterdaysSavingsTarget = this.savings; // how much we decided to keep aside yesterday
+		double spendings = getDailySpendings(); // how much we are spending on consumption goods at average
+		double dividends = getPortfolio().getLatestDividendIncome(); // how much dividends did we get today?
+		double money = getMoney().getAmount(); // that's how much money we currently have
+		boolean retired = isRetired(); // are we retired yet
+		int age = getAge(); // the current age
+		int retirementAge = getRetirementAge(); // the age at which retirement starts
+		int lifeEnd = getMaxAge(); // the age at which the agent dies
+		
+		if (retired) {
+			// Stupid example heuristic: when in retirement, spend 10% of the savings
+			this.savings = yesterdaysSavingsTarget * 0.9;
+		} else {
+			// Stupid example heuristic: try to increase the savings by 5
+			this.savings = yesterdaysSavingsTarget + 1;
+		}
+	}
+	
+	@Override
 	public IFirm considerCreatingFirm(IStatistics statistics, IInnovation research, IAgentIdGenerator id) {
 		IStock myLand = getStock(FarmingConfiguration.LAND);
-		if (myLand.hasSome() && statistics.getRandomNumberGenerator().nextDouble() < 0.05 && getAge() < 2000) {
+		if (myLand.hasSome() && statistics.getRandomNumberGenerator().nextDouble() < 0.02) {
 			// I have plenty of land and feel lucky, let's see if we want to found a farm
 			IProductionFunction prod = research.createProductionFunction(FarmingConfiguration.POTATOE);
 			if (checkProfitability(statistics.getGoodsMarketStats(), myLand, prod)) {
@@ -83,18 +107,13 @@ public class Farmer extends MortalConsumer implements IFounder {
 
 	@Override
 	protected void trade(Inventory inv, IPriceTakerMarket market) {
-		// In the beginning, shelves can be empty and thus there is no incentive
-		// to work (sell man-hours) either.
-		// To kick-start the economy, we require the farmer to sell some of his
-		// man-hours anyway, even if he cannot
-		// buy anything with the earned money.
+		// The trading inventory is created in two stages:
+		// - First we hide the savings, which we want to keep for the future
+		// - Second we hide a relative amount of what is left as a buffer as usual
+		Inventory inventoryWithoutSavings = inv.hide(getMoney().getGood(), savings);
+		Inventory reducedInv = inventoryWithoutSavings.hideRelative(getMoney().getGood(), CAPITAL_BUFFER);
+		
 		super.workAtLeast(market, MINIMUM_WORKING_HOURS);
-
-		// After having worked the minimum amount, work some more and buy goods for consumption in an optimal balance.
-		// Before calling the optimal trade function, we create a facade inventory that hides 80% of the money.
-		// That way, we can build up some savings to smoothen fluctuations and to create new firms. In equilibrium,
-		// the daily amount spent is the same, but more smooth over time.
-		Inventory reducedInv = inv.hideRelative(getMoney().getGood(), CAPITAL_BUFFER);
 		super.trade(reducedInv, market);
 	}
 
@@ -104,11 +123,9 @@ public class Farmer extends MortalConsumer implements IFounder {
 	}
 
 	public static void main(String[] args) {
+		// You can run this to test whether the simulation actually completes
+		// To analyze the results, you should use the SimulationServer
 		GrowthConfiguration configuration = new GrowthConfiguration(Farmer.class);
-		
-		// In case you want to test a setting with two different types of farmers, you configure the simulation like this:
-//		FarmingConfiguration configuration = new FarmingConfiguration(Farmer.class, AlternateFarmer.class);
-
 		System.out.print("Creating and running the simulation...");
 		// Create the simulation based on that configuration
 		Simulation sim = new Simulation(configuration);
@@ -116,8 +133,6 @@ public class Farmer extends MortalConsumer implements IFounder {
 		sim.run(); // run the simulation
 		long t1 = System.nanoTime();
 		System.out.println(" done after " + (t1 - t0) / 1000000 + "ms");
-
-//		configuration.diagnoseResult(System.out, sim);
 	}
 
 }

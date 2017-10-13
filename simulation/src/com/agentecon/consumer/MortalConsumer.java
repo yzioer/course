@@ -80,9 +80,13 @@ public class MortalConsumer extends Consumer {
 	public boolean isRetired() {
 		return getAge() > getRetirementAge();
 	}
+	
+	public int getMaxAge() {
+		return maxAge;
+	}
 
 	public int getRetirementAge() {
-		return maxAge; // no retirement / 5 * 4;
+		return maxAge / 5 * 4;
 	}
 
 	@Override

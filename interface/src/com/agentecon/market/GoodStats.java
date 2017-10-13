@@ -31,7 +31,7 @@ public class GoodStats {
 	void commitCurrent() {
 		if (current.hasValue()) {
 			if (moving == null){
-				this.moving = new MovingAverage(0.95, current.getAverage());
+				this.moving = new MovingAverage(0.95);
 			} else {
 				this.moving.add(current.getAverage());
 			}
