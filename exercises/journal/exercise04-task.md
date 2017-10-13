@@ -12,11 +12,11 @@ This task can be solved entirely with pen and paper and good reasoning. Assuming
 
 You should maximize total life-time utility, i.e.:
 
-$max \sum_{i=1}^{500} u(h_{l,i}) + u(p_i)$
+$max \sum_{i=1}^{500} u(h_{l,i}) + u(x_{p,i})$
 
-You can assume constant prices and a constant income stream during $w_i$ for as long as the agent works (i.e. for the first 400 days). This reduces the problem to maximizing potatoe consumption:
+You can assume constant prices and a constant income stream during $w_i$ for as long as the agent works (i.e. for the first 400 days). This reduces the problem to maximizing utility from potatoe consumption $x_{p,i}$:
 
-$max \sum_{i=1}^{500} u(p_i)$
+$max \sum_{i=1}^{500} u(x_{p,i})$
 
 From there, think what influence dividends have and design a simple daily decision heuristic for the agent. Ideally, this decision rule is robust against fluctuations in income, so you cannot simply assume that total life-time income is 400 times the latest income.
 
