@@ -72,7 +72,7 @@ public class ChartMethod extends SimSpecificMethod {
 
 	class ChartData extends JsonData {
 
-		private static final int MAX_OPTIONS = 15;
+		private static final int MAX_OPTIONS = 16;
 
 		private String description;
 		private TimeSeriesData[] data;
