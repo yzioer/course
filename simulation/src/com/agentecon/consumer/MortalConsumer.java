@@ -11,12 +11,30 @@ import com.agentecon.util.MovingAverage;
 public class MortalConsumer extends Consumer {
 
 	private int maxAge;
+	private boolean receivedInheritance;
 	private MovingAverage dailySpendings;
 
 	public MortalConsumer(IAgentIdGenerator id, int maxAge, Endowment end, IUtility utility) {
 		super(id, end, utility);
 		this.maxAge = maxAge;
 		this.dailySpendings = new MovingAverage(0.9);
+	}
+	
+	@Override
+	public void inherit(Inheritance inheritance) {
+		this.receivedInheritance = true;
+		super.inherit(inheritance);
+	}
+	
+	// special getType for the growth configuration
+	@Override
+	public String getType() {
+		String basic = super.getType();
+		if (receivedInheritance) {
+			return basic + " (capitalist)";
+		} else {
+			return basic + " (worker)";
+		}
 	}
 
 //	@Override

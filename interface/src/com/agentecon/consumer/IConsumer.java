@@ -18,6 +18,8 @@ public interface IConsumer extends IAgent, IMarketParticipant {
 	 * @return the utility gained from consumption.
 	 */
 	public double consume();
+	
+	public boolean isMortal();
 
 	/**
 	 * Get one day older and die if the maximum age is reached.

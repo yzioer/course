@@ -112,7 +112,7 @@ public abstract class Agent implements IAgent, Cloneable {
 		return getType() + " " + number;
 	}
 
-	public final String getType() {
+	public String getType() {
 		return type;
 	}
 

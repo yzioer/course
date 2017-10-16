@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import com.agentecon.ISimulation;
 import com.agentecon.agent.Agent;
@@ -25,6 +26,7 @@ import com.agentecon.metric.SimStats;
 import com.agentecon.metric.series.AveragingTimeSeries;
 import com.agentecon.metric.series.Chart;
 import com.agentecon.metric.series.TimeSeries;
+import com.agentecon.util.Average;
 import com.agentecon.util.IAverage;
 import com.agentecon.util.InstantiatingHashMap;
 import com.agentecon.util.MovingAverage;
@@ -52,7 +54,7 @@ public class UtilityRanking extends SimStats {
 
 	@Override
 	public void notifyConsumerCreated(IConsumer consumer) {
-		ConsumerListener listener = new ConsumerListener((Agent) consumer);
+		ConsumerListener listener = new ConsumerListener(getDay(), consumer);
 		list.add(listener);
 		consumer.addListener(listener);
 	}
@@ -60,15 +62,22 @@ public class UtilityRanking extends SimStats {
 	@Override
 	public void notifyDayEnded(int day) {
 		if (enableTimeSeries) {
-			for (ConsumerListener cons: list) {
-				timeSeries.get(cons.getType()).add(cons.getAverage());
+			Iterator<ConsumerListener> iter = list.iterator();
+			while (iter.hasNext()) {
+				ConsumerListener cons = iter.next();
+				if (cons.shouldRemove(day)) {
+					iter.remove();
+				} else if (cons.shouldInclude()) {
+					timeSeries.get(cons.getType()).add(cons.getAverage());
+				}
 			}
-			for (AveragingTimeSeries ts: timeSeries.values()) {
+			for (AveragingTimeSeries ts : timeSeries.values()) {
 				ts.push(day);
 			}
 		}
 	}
 
+	@Override
 	public void print(PrintStream out) {
 		Collections.sort(list);
 		int rank = 1;
@@ -81,12 +90,14 @@ public class UtilityRanking extends SimStats {
 	public Collection<Rank> getRanking() {
 		HashMap<String, Rank> ranking = new HashMap<String, Rank>();
 		for (ConsumerListener listener : list) {
-			Rank rank = ranking.get(listener.getType());
-			if (rank == null) {
-				rank = new Rank(listener.getType(), listener.getAgent());
-				ranking.put(listener.getType(), rank);
+			if (listener.shouldInclude()) {
+				Rank rank = ranking.get(listener.getType());
+				if (rank == null) {
+					rank = new Rank(listener.getType(), listener.getAgent());
+					ranking.put(listener.getType(), rank);
+				}
+				rank.add(listener.getAverage());
 			}
-			rank.add(listener.getAverage());
 		}
 		ArrayList<Rank> list = new ArrayList<>(ranking.values());
 		Collections.sort(list);
@@ -95,12 +106,30 @@ public class UtilityRanking extends SimStats {
 
 	class ConsumerListener implements IConsumerListener, Comparable<ConsumerListener> {
 
+		private int birthday;
 		private AgentRef agent;
 		private IAverage averageUtility;
 
-		public ConsumerListener(IAgent agent) {
+		public ConsumerListener(int birthday, IConsumer agent) {
+			this.birthday = birthday;
 			this.agent = agent.getReference();
-			this.averageUtility = new MovingAverage(0.98);
+			this.averageUtility = agent.isMortal() ? new Average() : new MovingAverage(0.98);
+		}
+
+		public boolean shouldRemove(int day) {
+			IConsumer cons = (IConsumer) getAgent();
+			if (cons.isAlive()) {
+				return false;
+			} else {
+				int deathDay = birthday + cons.getAge();
+				return deathDay < day / 2;
+			}
+		}
+
+		public boolean shouldInclude() {
+			// include mortal consumers only after their death
+			IConsumer cons = (IConsumer) getAgent();
+			return !(cons.isAlive() && cons.isMortal());
 		}
 
 		public Agent getAgent() {

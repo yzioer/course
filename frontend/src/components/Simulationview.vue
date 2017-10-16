@@ -5,8 +5,8 @@
     <div v-if="!loading">This simulation is based on the
       <a :href="simInfo.configurationSourceURL">{{simInfo.configurationName}} configuration</a> and runs for {{simInfo.days}} days.</div>
     <h2>Ranking</h2>
-    <p>The ranking is based on an exponentially moving average, measured at the last day of the simulation. If there are multiple instances of an agent type, the type score is the average score of its instances. The number of simulation days may change before the final ranking, so do not bet on it.</p>
-    <p>If your team does not appear in the ranking despite having pushed the agent class for the relevant exercise to github, please drop me an e-mail. There might be a bug.</p>
+    <p>For configurations with immortal consumers, the ranking is based on an exponentially moving average, measured at the last day of the simulation. If there are multiple instances of an agent type, the type score is the average score of its instances. For simulations with mortal consumers, the type score is based on the average life-time utility of all instances that died in the second half of the simulation.</p>
+    <p>The number of simulation days may change before the final ranking, so do not bet on it.</p>
     <table class="agentlist" v-if="!loadingRanking">
       <tr>
         <td>Rank</td>
