@@ -23,7 +23,7 @@ public class MortalConsumer extends Consumer {
 	
 	@Override
 	public void inherit(Inheritance inheritance) {
-		this.receivedInheritance = true;
+		this.receivedInheritance = inheritance.getPortfolio().hasPositions();
 		super.inherit(inheritance);
 	}
 	

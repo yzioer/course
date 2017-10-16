@@ -56,7 +56,6 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 
 	public static final Quantity FIXED_COSTS = HermitConfiguration.FIXED_COSTS;
 
-	
 	private int agentsWithLand;
 
 	@SafeVarargs
