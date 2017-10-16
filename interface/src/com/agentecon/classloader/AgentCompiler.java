@@ -50,6 +50,8 @@ public class AgentCompiler implements DiagnosticListener<JavaFileObject> {
 			}
 			assert byteCode != null;
 			return byteCode;
+		} catch (CompilerRuntimeException e) {
+			throw new ClassNotFoundException("Could not load " + name, e);
 		} catch (IOException e) {
 			throw new ClassNotFoundException("Could not load " + name, e);
 		}
@@ -58,7 +60,7 @@ public class AgentCompiler implements DiagnosticListener<JavaFileObject> {
 	@Override
 	public void report(Diagnostic<? extends JavaFileObject> diagnostic) {
 		if (diagnostic.getKind() == javax.tools.Diagnostic.Kind.ERROR) { 
-			throw new RuntimeException(diagnostic.toString());
+			throw new CompilerRuntimeException(diagnostic.toString());
 		} else {
 			System.out.println("Compiler warns: " + diagnostic);
 		}
