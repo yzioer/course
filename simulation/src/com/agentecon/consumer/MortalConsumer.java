@@ -18,6 +18,7 @@ public class MortalConsumer extends Consumer {
 		super(id, end, utility);
 		this.maxAge = maxAge;
 		this.dailySpendings = new MovingAverage(0.9);
+		this.receivedInheritance = end.getInitialInventory().getQuantities().size() > 1;
 	}
 	
 	@Override

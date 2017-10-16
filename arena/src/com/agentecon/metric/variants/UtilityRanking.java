@@ -181,7 +181,7 @@ public class UtilityRanking extends SimStats {
 
 	@Override
 	public Collection<TimeSeries> getTimeSeries() {
-		return AveragingTimeSeries.unwrap(timeSeries.values());
+		return TimeSeries.sort(AveragingTimeSeries.unwrap(timeSeries.values()));
 	}
 
 }

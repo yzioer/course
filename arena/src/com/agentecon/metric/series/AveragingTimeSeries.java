@@ -2,6 +2,7 @@ package com.agentecon.metric.series;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 public class AveragingTimeSeries {
 

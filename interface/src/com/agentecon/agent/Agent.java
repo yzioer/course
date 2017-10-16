@@ -105,7 +105,11 @@ public abstract class Agent implements IAgent, Cloneable {
 	}
 
 	public int getAge() {
-		return age;
+		if (age < 0) {
+			return -age;
+		} else {
+			return age;
+		}
 	}
 
 	public String getName() {
@@ -127,7 +131,8 @@ public abstract class Agent implements IAgent, Cloneable {
 
 	public Inventory dispose() {
 		assert isAlive();
-		age = -1;
+		assert age > 0;
+		age = -age;
 		Inventory old = this.inv;
 		Inventory newInventory = new Inventory(old.getMoney().getGood());
 		newInventory.absorb(old);
