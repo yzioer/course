@@ -103,7 +103,7 @@ public class FarmingConfiguration extends SimulationConfig implements IInnovatio
 	@Override
 	public CobbDouglasProductionWithFixedCost createProductionFunction(Good desiredOutput) {
 		assert desiredOutput.equals(POTATOE);
-		return new CobbDouglasProductionWithFixedCost(POTATOE, 1.0, FIXED_COSTS, new Weight(LAND, 0.2, true), new Weight(MAN_HOUR, 0.6));
+		return new CobbDouglasProductionWithFixedCost(POTATOE, 10.0, FIXED_COSTS, new Weight(LAND, 0.2, true), new Weight(MAN_HOUR, 0.6));
 	}
 
 	@Override
