@@ -88,9 +88,10 @@ public class UtilityRanking extends SimStats {
 	}
 
 	public Collection<Rank> getRanking() {
+		int day = getDay();
 		HashMap<String, Rank> ranking = new HashMap<String, Rank>();
 		for (ConsumerListener listener : list) {
-			if (listener.shouldInclude()) {
+			if (listener.shouldInclude() && !listener.shouldRemove(day)) {
 				Rank rank = ranking.get(listener.getType());
 				if (rank == null) {
 					rank = new Rank(listener.getType(), listener.getAgent());
