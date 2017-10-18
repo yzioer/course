@@ -18,7 +18,7 @@ You can assume constant prices and a constant income stream  $w_i = w$ during fo
 
 $max \sum_{i=1}^{500} u(x_{p,i})$ subject to the budget constraint $\sum_{i=1}^{500} p x_{p,i} = \sum_{i=1}^{400} w_i = 400 w$
 
-From there, think what influence dividends have and design a simple daily decision heuristic for the agent. Ideally, this decision rule is robust against fluctuations in income, so you cannot simply assume that total life-time income is 400 times the latest income.
+Once you have solved this simple form of the problem, you derive a simple yet optimal savings heuristic for workers that do not receive a dividend. In a second step, try to adjust the heuristic to incorporate dividends, i.e. adding an income stream that continues in retirement. Ideally, this decision rule is robust against fluctuations in income, so you cannot simply assume that total life-time income is 400 times the latest income.
 
 ## Task 2: Simulation
 
