@@ -1,13 +1,14 @@
 package com.agentecon.finance;
 
 import com.agentecon.agent.IAgent;
+import com.agentecon.firm.IRegister;
 import com.agentecon.goods.IStock;
 import com.agentecon.learning.ExpSearchBelief;
 import com.agentecon.market.IPriceMakerMarket;
 import com.agentecon.util.Numbers;
 
 public class MarketMakerPrice {
-	
+
 	private static final double INITIAL_PRICE_BELIEF = 10;
 
 	public static final double MIN_SPREAD = 0.01;
@@ -17,15 +18,16 @@ public class MarketMakerPrice {
 	private CeilingFactor ceiling;
 
 	public MarketMakerPrice(IStock pos) {
-		this.floor = new FloorFactor(pos, new ExpSearchBelief(0.1, INITIAL_PRICE_BELIEF / SPREAD_MULTIPLIER){
+		this.floor = new FloorFactor(pos, new ExpSearchBelief(0.1, INITIAL_PRICE_BELIEF / SPREAD_MULTIPLIER) {
 			@Override
-			protected double getMax(){
+			protected double getMax() {
 				return 0.1;
 			}
+
 		});
-		this.ceiling = new CeilingFactor(pos, new ExpSearchBelief(0.1, INITIAL_PRICE_BELIEF * SPREAD_MULTIPLIER){
+		this.ceiling = new CeilingFactor(pos, new ExpSearchBelief(0.1, INITIAL_PRICE_BELIEF * SPREAD_MULTIPLIER) {
 			@Override
-			protected double getMax(){
+			protected double getMax() {
 				return 0.1;
 			}
 		});
@@ -35,13 +37,19 @@ public class MarketMakerPrice {
 		double low = floor.getPrice();
 		double high = ceiling.getPrice();
 		double middle = (low + high) / 2;
-//		System.out.println("Price offers\t" + low + "\t" + high);
+		// System.out.println("Price offers\t" + low + "\t" + high);
 		if (Numbers.isBigger(budget, 0.0)) {
 			floor.adapt(middle / SPREAD_MULTIPLIER);
 			floor.createOffers(dsm, owner, wallet, budget / floor.getPrice());
 		}
-		ceiling.adapt(middle * SPREAD_MULTIPLIER);
-		ceiling.createOffers(dsm, owner, wallet, ceiling.getStock().getAmount() * 0.05); // offer a fraction of the present shares
+		if (ceiling.getStock().getAmount() > 0.0) {
+			ceiling.adapt(middle * SPREAD_MULTIPLIER);
+			double sharesOwned = ceiling.getStock().getAmount();
+			double percentageOwned = sharesOwned / IRegister.SHARES_PER_COMPANY;
+			
+			 // offer a fraction of the present shares, but offer more if we have more
+			ceiling.createOffers(dsm, owner, wallet, sharesOwned * 0.05);
+		}
 	}
 
 	public double getPrice() {
@@ -58,7 +66,7 @@ public class MarketMakerPrice {
 	public String getSpread() {
 		double p1 = floor.getPrice();
 		double p2 = ceiling.getPrice();
-		return Double.toString((p2 - p1)/p2);
+		return Double.toString((p2 - p1) / p2);
 	}
 
 }

@@ -1,7 +1,6 @@
 package com.agentecon.finance;
 
 import java.util.ArrayList;
-import java.util.Collections;
 
 import com.agentecon.agent.IAgent;
 import com.agentecon.firm.IStockMarket;
@@ -46,26 +45,36 @@ public class TradingPortfolio extends Portfolio {
 		}
 		return wallet.getAmount() - moneyBefore;
 	}
-
+	
+	/**
+	 * Invest according to the default strategy, weighting the chances of 
+	 * choosing a stock by its market capitalization.
+	 * This is similar to what an Index-ETF does.
+	 */
 	public double invest(IStockMarket stocks, IAgent owner, double budget) {
+		return invest(new IStockPickingStrategy() {
+			
+			@Override
+			public Ticker findStockToBuy(IStockMarket stocks) {
+				return stocks.getRandomStock(false);
+			}
+		}, stocks, owner, budget);
+	}
+	
+	public double invest(IStockPickingStrategy strategy, IStockMarket stocks, IAgent owner, double budget) {
 		double moneyBefore = wallet.getAmount();
+		budget = Math.min(moneyBefore, budget);
 		if (Numbers.isBigger(budget, 0.0)) {
-			assert wallet.getAmount() >= budget;
-			Ticker any = findStockToBuy(stocks);
+			Ticker any = strategy.findStockToBuy(stocks);
 			if (any != null) {
 				double before = wallet.getAmount();
 				Position pos = getPosition(any);
 				addPosition(stocks.buy(owner, any, pos, wallet, budget));
 				double spent = before - wallet.getAmount();
-				invest(stocks, owner, budget - spent);
+				invest(strategy, stocks, owner, budget - spent);
 			}
 		}
 		return moneyBefore - wallet.getAmount();
-	}
-
-	@SuppressWarnings("unchecked")
-	private Ticker findStockToBuy(IStockMarket stocks) {
-		return stocks.findAnyAsk(Collections.EMPTY_LIST, false);
 	}
 
 	@Override

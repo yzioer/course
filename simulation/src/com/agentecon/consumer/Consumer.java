@@ -30,8 +30,8 @@ public class Consumer extends Agent implements IConsumer, IShareholder {
 		super(id, end);
 		this.soldGood = end.getDaily()[0].getGood();
 		this.utility = utility;
-		this.portfolio = new TradingPortfolio(getMoney());
 		this.listeners = new ConsumerListeners();
+		this.portfolio = new TradingPortfolio(getMoney());
 	}
 
 	public void addListener(IConsumerListener listener) {

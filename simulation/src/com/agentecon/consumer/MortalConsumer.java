@@ -11,58 +11,14 @@ import com.agentecon.util.MovingAverage;
 public class MortalConsumer extends Consumer {
 
 	private int maxAge;
-	private boolean receivedInheritance;
 	private MovingAverage dailySpendings;
 
 	public MortalConsumer(IAgentIdGenerator id, int maxAge, Endowment end, IUtility utility) {
 		super(id, end, utility);
 		this.maxAge = maxAge;
 		this.dailySpendings = new MovingAverage(0.9);
-		this.receivedInheritance = end.getInitialInventory().getQuantities().size() > 1;
 	}
 	
-	@Override
-	public void inherit(Inheritance inheritance) {
-		this.receivedInheritance = inheritance.getPortfolio().hasPositions();
-		super.inherit(inheritance);
-	}
-	
-	// special getType for the growth configuration
-	@Override
-	public String getType() {
-		String basic = super.getType();
-		if (receivedInheritance) {
-			return basic + " (capitalist)";
-		} else {
-			return basic + " (worker)";
-		}
-	}
-
-//	@Override
-//	public void managePortfolio(IStockMarket stocks) {
-//		if (isRetired()) {
-//			int daysLeft = maxAge - getAge() + 1;
-//			double amount = portfolio.sell(stocks, this, 1.0 / daysLeft);
-//			listeners.notifyDivested(this, amount);
-//		} else {
-//			double shareOfLiveSpentInRetirement = (maxAge - getRetirementAge()) / maxAge;
-//			double invest = dailySpendings.getAverage() * shareOfLiveSpentInRetirement;
-//			invest(stocks, invest);
-//		}
-//	}
-
-//	private void invest(IStockMarket stocks, double invest) {
-//		double dividendIncome = portfolio.getLatestDividendIncome();
-//		if (dividendIncome < invest) {
-//			savingsTarget = invest - dividendIncome;
-//			invest = Math.min(getMoney().getAmount(), invest);
-//		} else {
-//			savingsTarget = 0.0;
-//		}
-//		double amount = portfolio.invest(stocks, this, invest);
-//		listeners.notifyInvested(this, amount);
-//	}
-//
 	public double getDailySpendings() {
 		return dailySpendings.getAverage();
 	}

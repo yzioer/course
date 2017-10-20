@@ -9,6 +9,7 @@ import com.agentecon.firm.IStockMarket;
 import com.agentecon.firm.Position;
 import com.agentecon.firm.Ticker;
 import com.agentecon.goods.IStock;
+import com.agentecon.goods.Quantity;
 import com.agentecon.market.Bid;
 import com.agentecon.util.MovingAverage;
 import com.agentecon.util.Numbers;
@@ -37,7 +38,8 @@ public class ShareRegister implements IRegister {
 			collectRootDividend(wallet);
 			Bid bid = dsm.getBid(getTicker());
 			if (bid != null) {
-				bid.accept(owner, wallet, rootPosition, rootPosition.getQuantity());
+				double volume = Math.min(rootPosition.getAmount(), bid.getAmount() / 2);
+				bid.accept(owner, wallet, rootPosition, new Quantity(rootPosition.getGood(), volume));
 			}
 		}
 	}
@@ -49,8 +51,8 @@ public class ShareRegister implements IRegister {
 	public void payDividend(IStock sourceWallet, double totalDividends) {
 		dividend.add(totalDividends);
 
-		if (!Numbers.equals(getTotalShares(), SHARES_PER_COMPANY)) {
-			double diff = getTotalShares() - SHARES_PER_COMPANY;
+		if (!Numbers.equals(calculateTotalShares(), SHARES_PER_COMPANY)) {
+			double diff = calculateTotalShares() - SHARES_PER_COMPANY;
 			if (diff > 0) {
 				rootPosition.add(diff);
 			}
@@ -86,7 +88,7 @@ public class ShareRegister implements IRegister {
 		return ticker;
 	}
 
-	private double getTotalShares() {
+	private double calculateTotalShares() {
 		double tot = 0.0;
 		for (Position p : all) {
 			tot += p.getAmount();
@@ -98,6 +100,7 @@ public class ShareRegister implements IRegister {
 		return all.size();
 	}
 
+	@Override
 	public double getFreeFloatShares() {
 		return SHARES_PER_COMPANY - rootPosition.getAmount();
 	}

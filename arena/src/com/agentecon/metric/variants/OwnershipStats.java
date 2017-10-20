@@ -4,13 +4,16 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 import com.agentecon.ISimulation;
 import com.agentecon.agent.IAgent;
 import com.agentecon.consumer.IConsumer;
+import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IShareholder;
 import com.agentecon.firm.Portfolio;
 import com.agentecon.firm.Position;
+import com.agentecon.firm.Ticker;
 import com.agentecon.metric.SimStats;
 import com.agentecon.metric.series.Chart;
 import com.agentecon.metric.series.Line;
@@ -48,19 +51,37 @@ public class OwnershipStats extends SimStats {
 					return new OwnershipStructure(key);
 				}
 			};
+			HashMap<Ticker, Double> total = new HashMap<>();
 			for (IShareholder pc : getAgents().getShareholders()) {
 				String ownerType = "Unclaimed Inheritance";
-				if (pc instanceof IConsumer && ((IConsumer) pc).isRetired()){
-					ownerType = "Retiree";
-				} else if (pc instanceof IAgent) {
+				if (pc instanceof IAgent) {
 					ownerType = ((IAgent)pc).getType();
 				}
+				boolean isRetiree = pc instanceof IConsumer && ((IConsumer) pc).isRetired();
 				Portfolio pf = pc.getPortfolio();
 				for (Position pos : pf.getPositions()) {
+					Double before = total.get(pos.getTicker());
+					double beforeValue = before == null ? 0.0 : before.doubleValue();
+					total.put(pos.getTicker(), beforeValue + pos.getAmount());
 					String ownedType = pos.getTicker().getType();
 					owners.get(ownedType).include(ownerType, pos.getAmount());
+					if (isRetiree) {
+						owners.get(ownedType).include("Retiree", pos.getAmount());
+					}
 				}
 			}
+			for (IFirm firm: getAgents().getFirms()) {
+				double selfOwned = firm.getShareRegister().getTotalShares() - firm.getShareRegister().getFreeFloatShares();
+				owners.get(firm.getType()).include("self", selfOwned);
+			}
+			total.forEach(new BiConsumer<Ticker, Double>() {
+
+				@Override
+				public void accept(Ticker t, Double u) {
+					IFirm firm = (IFirm) getAgents().getAgent(t.getNumer());
+					assert Math.abs(u.doubleValue() - firm.getShareRegister().getFreeFloatShares()) < 0.0001;
+				}
+			});
 			for (OwnershipStructure os : owners.values()) {
 				os.push(day, structure.get(os.type));
 			}

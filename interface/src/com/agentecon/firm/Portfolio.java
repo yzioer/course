@@ -59,6 +59,17 @@ public class Portfolio implements Cloneable {
 	public Position getPosition(Ticker ticker) {
 		return inv.get(ticker);
 	}
+	
+	public double notifyFirmClosed(Ticker t) {
+		Position p = inv.remove(t);
+		if (p == null) {
+			return 0.0;
+		} else {
+			double amount = p.consume();
+			p.dispose();
+			return amount;
+		}
+	}
 
 	public void disposePosition(Ticker t) {
 		Position p = inv.remove(t);
@@ -68,6 +79,9 @@ public class Portfolio implements Cloneable {
 	}
 
 	public void dispose() {
+		for (Position p: inv.values()) {
+			p.dispose();
+		}
 		this.inv.clear();
 	}
 

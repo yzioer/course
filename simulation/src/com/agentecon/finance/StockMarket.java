@@ -2,6 +2,7 @@ package com.agentecon.finance;
 
 import java.util.Collection;
 
+import com.agentecon.firm.FirmFinancials;
 import com.agentecon.firm.IFirm;
 import com.agentecon.firm.IMarketMaker;
 import com.agentecon.firm.IShareholder;
@@ -36,7 +37,8 @@ public class StockMarket {
 		for (IShareholder shareholder : ags.getShareholders()) {
 			shareholder.getPortfolio().collectDividends();
 		}
-		DailyStockMarket dsm = new DailyStockMarket(country.getRand());
+		FinancialMarketData financials = new FinancialMarketData(ags, stockStats);
+		DailyStockMarket dsm = new DailyStockMarket(financials, country.getRand());
 		dsm.addMarketListener(stockStats);
 		listeners.notifyStockMarketOpened(dsm);
 

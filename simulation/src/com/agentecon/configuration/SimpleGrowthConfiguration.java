@@ -19,7 +19,6 @@ import com.agentecon.events.IUtilityFactory;
 import com.agentecon.exercises.ExerciseAgentLoader;
 import com.agentecon.exercises.FarmingConfiguration;
 import com.agentecon.exercises.HermitConfiguration;
-import com.agentecon.goods.Good;
 import com.agentecon.goods.IStock;
 import com.agentecon.goods.Stock;
 import com.agentecon.research.IInnovation;
@@ -31,10 +30,6 @@ public class SimpleGrowthConfiguration extends FarmingConfiguration implements I
 	public static final String BASIC_AGENT = "com.agentecon.exercise3.Farmer";
 	
 	public static final double GROWTH_RATE = 0.001;
-
-	public static final Good LAND = HermitConfiguration.LAND;
-	public static final Good POTATOE = HermitConfiguration.POTATOE;
-	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
 
 	@SafeVarargs
 	public SimpleGrowthConfiguration(Class<? extends Consumer>... agents) {

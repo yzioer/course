@@ -2,6 +2,8 @@ package com.agentecon.finance;
 
 import com.agentecon.agent.IAgent;
 import com.agentecon.firm.Factor;
+import com.agentecon.firm.Portfolio;
+import com.agentecon.firm.Position;
 import com.agentecon.goods.IStock;
 import com.agentecon.learning.IBelief;
 import com.agentecon.market.AbstractOffer;
@@ -22,7 +24,12 @@ public class FloorFactor extends Factor {
 
 	@Override
 	protected AbstractOffer newOffer(IAgent owner, IStock money, double p, double planned) {
-		return new Bid(owner, money, stock, new Price(getGood(), p), planned);
+		Price price = new Price(getGood(), p);
+		if (stock instanceof Position) {
+			return new BidFin(owner, money, (Position) stock, price, planned);
+		} else {
+			return new Bid(owner, money, stock, price, planned);
+		}
 	}
 
 }

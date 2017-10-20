@@ -37,8 +37,11 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 	private HashMap<Good, TimeSeries> peratio;
 	private AveragingTimeSeries investments, divestments, difference;
 
-	public StockMarketStats(ISimulation agents) {
+	private boolean includeIndex;
+
+	public StockMarketStats(ISimulation agents, boolean includeIndex) {
 		super(agents);
+		this.includeIndex = includeIndex;
 		this.investments = new AveragingTimeSeries("Inflows");
 		this.divestments = new AveragingTimeSeries("Outflows");
 		this.difference = new AveragingTimeSeries("Inflows - Outflows");
@@ -103,7 +106,7 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 	public void notifyTradesCancelled() {
 		averages.clear();
 	}
-	
+
 	@Override
 	public void notifyMarketClosed(int day) {
 		investments.pushSum(day);
@@ -117,7 +120,7 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 				return new Average();
 			}
 		};
-		Average indexRatio = new Average();
+		// Average indexRatio = new Average();
 		HashMap<Good, Average> sectorRatios = new InstantiatingHashMap<Good, Average>() {
 
 			@Override
@@ -134,13 +137,15 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 
 			double dividends = getAgents().getFirm(firm).getShareRegister().getAverageDividend();
 			if (dividends > 1) {
-				double peratio = avgPrice.getAverage() / dividends;
-				indexRatio.add(peratio);
-				sectorRatios.get(sector).add(peratio);
+				double yield = dividends / avgPrice.getAverage();
+				// indexRatio.add(yield);
+				sectorRatios.get(sector).add(yield);
 			}
 		}
 		printTicker(day);
-		sectorIndices.put(index, indexPoints);
+		if (includeIndex) {
+			sectorIndices.put(index, indexPoints);
+		}
 		for (Map.Entry<Good, Average> e : sectorIndices.entrySet()) {
 			Average ind = e.getValue();
 			if (ind.hasValue()) {
@@ -152,9 +157,9 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 		for (Map.Entry<Good, Average> e : sectorRatios.entrySet()) {
 			peratio.get(e.getKey()).set(day, e.getValue().getAverage());
 		}
-		if (indexRatio.hasValue()) {
-			peratio.get(index).set(day, indexRatio.getAverage());
-		}
+		// if (indexRatio.hasValue()) {
+		// peratio.get(index).set(day, indexRatio.getAverage());
+		// }
 	}
 
 	private ArrayList<Ticker> toPrint = new ArrayList<>();
@@ -216,13 +221,12 @@ public class StockMarketStats extends SimStats implements IMarketListener, ICons
 		list.addAll(TimeSeries.prefix("Price", prices.values()));
 		ArrayList<TimeSeries> logReturns = TimeSeries.logReturns(list);
 		list.addAll(logReturns);
-		list.addAll(TimeSeries.absolute(logReturns));
 		list.addAll(TimeSeries.prefix("Volume", volumes.values()));
-		list.addAll(TimeSeries.prefix("P/E Ratio", peratio.values()));
+		list.addAll(TimeSeries.prefix("Dividend yield", peratio.values()));
 		if (investments.getTimeSeries().compact().isInteresting()) {
 			list.add(investments.getTimeSeries());
 			list.add(divestments.getTimeSeries());
-			list.add(difference.getTimeSeries());
+//			list.add(difference.getTimeSeries());
 		}
 		return list;
 	}

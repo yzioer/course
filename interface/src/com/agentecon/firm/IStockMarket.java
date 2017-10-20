@@ -1,6 +1,6 @@
 package com.agentecon.firm;
 
-import java.util.List;
+import java.util.Collection;
 
 import com.agentecon.agent.IAgent;
 import com.agentecon.goods.IStock;
@@ -8,9 +8,21 @@ import com.agentecon.market.Ask;
 import com.agentecon.market.Bid;
 import com.agentecon.market.IPriceMakerMarket;
 
-public interface IStockMarket extends IPriceMakerMarket {
-
-	public Ticker findAnyAsk(List<Ticker> preferred, boolean marketCapWeight);
+public interface IStockMarket extends IPriceMakerMarket, IFinancialMarketData {
+	
+	/**
+	 * A list of stocks for which there are offers in the market.
+	 * Note that for some of them their might be no open bid or no open ask.
+	 */
+	public Collection<Ticker> getTradedStocks();
+	
+	/**
+	 * Get the ticker of a random stock, with picking probabilities either proportionally
+	 * to the market capitalization or equally weighted.
+	 * 
+	 * Stocks for which their is no offer available are ignored! So this is a little biased.
+	 */
+	public Ticker getRandomStock(boolean marketCapWeight);
 	
 	public Position buy(IAgent buyer, Ticker ticker, Position existing, IStock wallet, double budget);
 

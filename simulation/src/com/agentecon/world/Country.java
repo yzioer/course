@@ -69,17 +69,13 @@ public class Country implements ICountry {
 				double totalshares = firm.dispose(inv, port);
 				IShareholder last = null;
 				for (IShareholder shareholder : agents.getShareholders()) {
-					Position pos = shareholder.getPortfolio().getPosition(firm.getTicker());
-					if (pos != null) {
+					double shares = shareholder.getPortfolio().notifyFirmClosed(firm.getTicker());
+					if (shares > 0.0) {
 						last = shareholder;
-						double shares = pos.getAmount();
 						double ratio = Math.min(shares / totalshares, 1.0);
 						shareholder.getInventory().absorb(ratio, inv);
 						shareholder.getPortfolio().absorbPositions(ratio, port);
 						totalshares -= shares;
-						if (totalshares <= 0.0) {
-							break;
-						}
 					}
 				}
 				last.getInventory().absorb(inv);

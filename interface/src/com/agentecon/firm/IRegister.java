@@ -9,6 +9,13 @@ public interface IRegister {
 	public double getAverageDividend();
 	
 	public int getShareholderCount();
-
 	
+	public default double getTotalShares() {
+		return SHARES_PER_COMPANY;
+	}
+	
+	public default double getFreeFloatShares() {
+		return getTotalShares();
+	}
+
 }

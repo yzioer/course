@@ -5,11 +5,17 @@ import com.agentecon.goods.Good;
 // Immutable
 public class Ticker extends Good {
 	
-	private String type;
+	private final int number;
+	private final String type;
 	
 	public Ticker(String type, int number) {
 		super(generateSymbol(type) + number);
 		this.type = type;
+		this.number = number;
+	}
+	
+	public int getNumer() {
+		return number;
 	}
 
 	protected static String generateSymbol(String type) {

@@ -94,7 +94,7 @@ public enum EMetrics {
 		case PRODUCTION:
 			return new ProductionStats(sim);
 		case STOCKMARKET:
-			return new StockMarketStats(sim);
+			return new StockMarketStats(sim, false);
 		case RANKING:
 			return new UtilityRanking(sim, true);
 		case UTILITY:

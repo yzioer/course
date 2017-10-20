@@ -22,7 +22,7 @@ import com.agentecon.sim.SimulationConfig;
 
 public class ExerciseAgentLoader extends AgentFactoryMultiplex {
 
-	private static final Collection<String> TEAMS = createRepos(1, 2, 3, 4, 5, 7, 10);
+	private static final Collection<String> TEAMS = createRepos(1, 2, 3, 5, 7, 10);
 
 	private IAgentFactory defaultFactory;
 

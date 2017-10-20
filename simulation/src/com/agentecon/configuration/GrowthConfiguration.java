@@ -37,10 +37,6 @@ public class GrowthConfiguration extends FarmingConfiguration implements IUtilit
 	public static final double GROWTH_RATE = 0.0025;
 	public static final int MAX_AGE = 500;
 
-	public static final Good LAND = HermitConfiguration.LAND;
-	public static final Good POTATOE = HermitConfiguration.POTATOE;
-	public static final Good MAN_HOUR = HermitConfiguration.MAN_HOUR;
-
 	@SafeVarargs
 	public GrowthConfiguration(Class<? extends Consumer>... agents) {
 		this(new AgentFactoryMultiplex(agents), BASIC_AGENTS);
@@ -63,25 +59,34 @@ public class GrowthConfiguration extends FarmingConfiguration implements IUtilit
 		}, agents);
 		IStock[] dailyEndowment = new IStock[] { new Stock(MAN_HOUR, HermitConfiguration.DAILY_ENDOWMENT) };
 		Endowment workerEndowment = new Endowment(getMoney(), new IStock[0], dailyEndowment);
-		addEvent(new MinPopulationGrowthEvent(0, BASIC_AGENTS){
+		try {
+			IAgentFactory growthLoader = new AgentFactoryMultiplex(new ExerciseAgentLoader("com.agentecon.exercise5.Saver"));
+			addEvent(new MinPopulationGrowthEvent(0, BASIC_AGENTS){
 
-			@Override
-			protected void execute(ICountry sim) {
-				IConsumer cons = loader.createConsumer(sim, MAX_AGE, workerEndowment, create(0));
-				sim.add(cons);
-			}
-			
-		});
-		addEvent(new GrowthEvent(0, GROWTH_RATE){
+				@Override
+				protected void execute(ICountry sim) {
+					IConsumer cons = growthLoader.createConsumer(sim, MAX_AGE, workerEndowment, create(0));
+					sim.add(cons);
+				}
+				
+			});
+			addEvent(new GrowthEvent(0, GROWTH_RATE){
 
-			@Override
-			protected void execute(ICountry sim) {
-				IConsumer cons = loader.createConsumer(sim, MAX_AGE, workerEndowment, create(0));
-				sim.add(cons);
-			}
-			
-		});
-		addEvent(new CentralBankEvent(POTATOE));
+				@Override
+				protected void execute(ICountry sim) {
+					IConsumer cons = growthLoader.createConsumer(sim, MAX_AGE, workerEndowment, create(0));
+					sim.add(cons);
+				}
+				
+			});
+			addEvent(new CentralBankEvent(POTATOE));
+		} catch (SocketTimeoutException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 	public static void main(String[] args) {

@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Random;
 
 import com.agentecon.agent.IAgent;
+import com.agentecon.firm.FirmFinancials;
+import com.agentecon.firm.IFinancialMarketData;
 import com.agentecon.firm.IStockMarket;
 import com.agentecon.firm.Position;
 import com.agentecon.firm.Ticker;
@@ -23,9 +25,11 @@ public class DailyStockMarket implements IStockMarket {
 	private Random rand;
 	private MarketListeners listeners;
 	private HashMap<Ticker, BestPriceMarket> market;
+	private IFinancialMarketData bloomberg;
 
-	public DailyStockMarket(Random rand) {
+	public DailyStockMarket(IFinancialMarketData bloomberg, Random rand) {
 		this.rand = rand;
+		this.bloomberg = bloomberg;
 		this.listeners = new MarketListeners();
 		this.market = new InstantiatingHashMap<Ticker, BestPriceMarket>() {
 
@@ -37,33 +41,36 @@ public class DailyStockMarket implements IStockMarket {
 	}
 	
 	@Override
+	public Collection<Ticker> getTradedStocks() {
+		return market.keySet();
+	}
+	
+	@Override
+	public FirmFinancials getFirmData(Ticker ticker) {
+		return bloomberg.getFirmData(ticker);
+	}
+	
+	@Override
 	public void addMarketListener(IMarketListener listener) {
 		this.listeners.add(listener);
 	}
 
 	@Override
 	public void offer(Bid bid) {
+		assert bid instanceof BidFin;
 		bid.setListener(listeners);
 		this.market.get(bid.getGood()).offer(bid);
 	}
 
 	@Override
 	public void offer(Ask ask) {
+		assert ask instanceof AskFin;
 		ask.setListener(listeners);
 		this.market.get(ask.getGood()).offer(ask);
 	}
-
+	
 	@Override
-	public Ticker findAnyAsk(List<Ticker> preferred, boolean marketCapWeight) {
-		while (preferred.size() > 0){
-			int choice = rand.nextInt(preferred.size());
-			Ticker t = preferred.get(choice);
-			if (hasAsk(t)){
-				return t;
-			} else {
-				preferred.remove(choice);
-			}
-		}
+	public Ticker getRandomStock(boolean marketCapWeight) {
 		if (marketCapWeight){
 			return findMarketCapWeightedRandomAsk();
 		} else {
