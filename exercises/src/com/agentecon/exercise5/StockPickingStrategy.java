@@ -8,6 +8,7 @@ import com.agentecon.finance.IStockPickingStrategy;
 import com.agentecon.firm.FirmFinancials;
 import com.agentecon.firm.IStockMarket;
 import com.agentecon.firm.Portfolio;
+import com.agentecon.firm.Position;
 import com.agentecon.firm.Ticker;
 import com.agentecon.market.Ask;
 
@@ -32,6 +33,11 @@ public class StockPickingStrategy implements IStockPickingStrategy {
 			FirmFinancials financialData = stocks.getFirmData(aFarm);
 			double dividendYield = financialData.getDailyDividendPerShare() / financialData.getSharePrice();
 			Ask ask = stocks.getAsk(aFarm); // the lowest ask for that particular firm in the orderbook
+			Position existingPosition = portfolio.getPosition(aFarm);
+			boolean weAlreadyOwnSomeOfThatStock = existingPosition != null;
+			if (weAlreadyOwnSomeOfThatStock) {
+				double numberOfSharesWeOwn = existingPosition.getAmount();
+			}
 		}
 		return stocks.getRandomStock(false); // the strategy everyone else is following
 	}

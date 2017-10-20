@@ -23,6 +23,8 @@ Just make a good qualitative argument, no maths needed. The following considerat
 * Working agents should buy more shares when they offer high returns, and less when they offer lower returns.
 * Working agents cannot invest more than what they earn.
 
+Also, keep it short. Do not spend more than half an hour on this.
+
 ## Task 2: Better investing
 
 The provided implementation of the Investor class does the same as everyone else, namely saving as usual and invest the savings using an equal weight strategy.
