@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.Random;
 
 import com.agentecon.finance.IStockPickingStrategy;
+import com.agentecon.firm.FirmFinancials;
 import com.agentecon.firm.IStockMarket;
 import com.agentecon.firm.Portfolio;
 import com.agentecon.firm.Ticker;
+import com.agentecon.market.Ask;
 
 public class StockPickingStrategy implements IStockPickingStrategy {
 
@@ -19,16 +21,26 @@ public class StockPickingStrategy implements IStockPickingStrategy {
 		this.random = random;
 	}
 
+	/**
+	 * Select a stock to buy.
+	 */
 	@Override
 	public Ticker findStockToBuy(IStockMarket stocks) {
-		return selectRandomFarm(stocks);
+		Collection<Ticker> listedStocks = stocks.getTradedStocks(); // a list of traded stocks
+		Ticker aFarm = selectRandomFarm(stocks); // a random farm
+		if (aFarm != null) {
+			FirmFinancials financialData = stocks.getFirmData(aFarm);
+			double dividendYield = financialData.getDailyDividendPerShare() / financialData.getSharePrice();
+			Ask ask = stocks.getAsk(aFarm); // the lowest ask for that particular firm in the orderbook
+		}
+		return stocks.getRandomStock(false); // the strategy everyone else is following
 	}
 
 	protected Ticker selectRandomFarm(IStockMarket stocks) {
-		Collection<Ticker> listedStocks = stocks.getTradedStocks(); // a list of traded stocks
+		Collection<Ticker> listedStocks = stocks.getTradedStocks(); 
 		ArrayList<Ticker> farms = new ArrayList<>();
 		for (Ticker t: listedStocks) {
-			if (t.getType().endsWith("Maker") && stocks.hasAsk(t)){
+			if (t.getType().endsWith("Farm") && stocks.hasAsk(t)){
 				farms.add(t);
 			}
 		}
