@@ -10,12 +10,12 @@ public interface IRegister {
 	
 	public int getShareholderCount();
 	
-	public default double getTotalShares() {
+	public default double getTotalShareCount() {
 		return SHARES_PER_COMPANY;
 	}
 	
 	public default double getFreeFloatShares() {
-		return getTotalShares();
+		return getTotalShareCount();
 	}
 
 }

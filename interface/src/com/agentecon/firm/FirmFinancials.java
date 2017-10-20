@@ -40,7 +40,7 @@ public class FirmFinancials {
 	 */
 	public double getDailyDividendPerShare() {
 		IRegister register = firm.getShareRegister();
-		return register.getAverageDividend() / register.getTotalShares();
+		return register.getAverageDividend() / register.getTotalShareCount();
 	}
 
 	/**

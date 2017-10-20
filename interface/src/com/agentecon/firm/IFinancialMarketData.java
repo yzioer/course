@@ -1,9 +1,9 @@
 package com.agentecon.firm;
 
-import java.util.Collection;
-
 public interface IFinancialMarketData {
 	
-	public FirmFinancials getFirmData(Ticker ticker);
+	public default FirmFinancials getFirmData(Ticker ticker){
+		throw new RuntimeException("Not implemented");
+	}
 
 }

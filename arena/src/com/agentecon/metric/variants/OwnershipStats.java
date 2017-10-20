@@ -71,7 +71,7 @@ public class OwnershipStats extends SimStats {
 				}
 			}
 			for (IFirm firm: getAgents().getFirms()) {
-				double selfOwned = firm.getShareRegister().getTotalShares() - firm.getShareRegister().getFreeFloatShares();
+				double selfOwned = firm.getShareRegister().getTotalShareCount() - firm.getShareRegister().getFreeFloatShares();
 				owners.get(firm.getType()).include("self", selfOwned);
 			}
 			total.forEach(new BiConsumer<Ticker, Double>() {
