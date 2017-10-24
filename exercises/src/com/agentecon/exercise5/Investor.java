@@ -39,7 +39,7 @@ public class Investor extends InvestingConsumer {
 			double dividends = getPortfolio().getLatestDividendIncome();
 			double workFraction = 1.0d / getMaxAge() * getRetirementAge(); // 80%
 			double retirementFraction = 1 - workFraction; // 20%
-			double toInvest = (getDailySpendings() - dividends) / workFraction * retirementFraction;
+			double toInvest = (getDailySpendings() - dividends);
 			double actualInvestment = getPortfolio().invest(strategy, stocks, this, toInvest);
 			listeners.notifyInvested(this, actualInvestment); // notify listeners for inflow / outflow statistics
 		}
